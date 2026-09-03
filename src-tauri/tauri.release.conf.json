@@ -1,0 +1,14 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "bundle": {
+    "createUpdaterArtifacts": true
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "REPLACE_WITH_THE_MINISIGN_PUBLIC_KEY",
+      "endpoints": [
+        "https://github.com/priyanshujain/margin-mail/releases/latest/download/latest.json"
+      ]
+    }
+  }
+}

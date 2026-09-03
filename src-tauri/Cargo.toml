@@ -1,0 +1,97 @@
+[package]
+name = "margin-mail"
+version = "0.0.1"
+description = "A calm, keyboard-first mail client for Gmail"
+authors = ["Margin"]
+edition = "2021"
+license = "LicenseRef-FSL-1.1-MIT"
+
+[lib]
+name = "margin_mail_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-opener = "2"
+tauri-plugin-notification = "2"
+tauri-plugin-os = "2"
+# Mobile has no loopback listener to catch Google's redirect, so the OAuth answer comes back as a
+# custom URI scheme the OS routes to this app. Registered on desktop too, so both flows are one
+# code path with one difference in it rather than two.
+tauri-plugin-deep-link = "2"
+
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+base64 = "0.22"
+sha2 = "0.10"
+rand = "0.8"
+url = "2"
+chrono = { version = "0.4", features = ["serde"] }
+tokio = { version = "1", features = ["sync", "time"] }
+
+# gzip because Gmail's JSON compresses by an order of magnitude and hydration is thousands of
+# responses; http2 because a batch of 50 and the poll loop share one connection.
+reqwest = { version = "0.13", default-features = false, features = [
+  "rustls",
+  "webpki-roots",
+  "json",
+  "gzip",
+  "http2",
+] }
+
+# `bundled` so FTS5 is compiled in unconditionally rather than depending on what the platform's
+# libsqlite3 was built with. Several accounts share one process and one connection, so the busy
+# timeout in `mirror::open` is not optional.
+rusqlite = { version = "0.40", features = ["bundled"] }
+
+# Bodies are parsed from the raw RFC 2822 bytes, never from Gmail's pre-parsed payload:
+# `full_encoding` is what reads the legacy charsets that still arrive daily.
+mail-parser = { version = "0.11", features = ["full_encoding"] }
+mail-builder = "0.5"
+
+# The sanitiser. `ammonia` is a whitelist, which is the only shape of HTML filter worth trusting,
+# and `css-inline` folds the editor's stylesheet into the markup before a message is built so mail
+# clients that drop <style> still render it.
+ammonia = "4.1"
+css-inline = "0.21"
+
+# Refresh tokens, the backup key and every uploaded journal segment are sealed with
+# XChaCha20-Poly1305. There is no `keyring` here on purpose: it has no Android backend at all, and
+# on macOS it ties the item to the code signature, so every rebuild re-prompts.
+chacha20poly1305 = "0.11"
+# The backup key is derived from the recovery phrase, so the derivation has to be slow.
+argon2 = "0.6"
+bip39 = { version = "2.2", features = ["rand"] }
+
+# The system families the Appearance section offers alongside the six bundled ones.
+fontdb = "0.24"
+
+# There is no auto-updater and no process to restart on a phone: the store is the update channel.
+[target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
+tauri-plugin-process = "2"
+tauri-plugin-updater = "2"
+
+# Two things wry leaves to us: one UIKit property (stop_uikit_shrinking_the_viewport in lib.rs) and
+# the SFSafariViewController that shows the consent page (google/browser.rs). These versions are the
+# ones wry already resolves for its own iOS backend, so matching them keeps a single copy of objc2
+# in the build rather than a second incompatible one.
+[target.'cfg(target_os = "ios")'.dependencies]
+objc2 = "0.6"
+objc2-ui-kit = { version = "0.3", default-features = false, features = [
+  "std",
+  "UIResponder",
+  "UIView",
+  "UIScrollView",
+] }
+objc2-foundation = { version = "0.3", default-features = false, features = [
+  "std",
+  "NSString",
+  "NSURL",
+] }
+block2 = "0.6"
+
+[dev-dependencies]
+tempfile = "3"

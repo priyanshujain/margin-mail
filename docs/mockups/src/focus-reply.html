@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<title>Margin Mail: Focus &amp; Reply</title>
+<link rel="stylesheet" href="mail.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+    <symbol id="i-places" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></symbol>
+    <symbol id="i-pen" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></symbol>
+    <symbol id="i-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="i-reply" viewBox="0 0 24 24"><path d="M9 17 4 12l5-5"/><path d="M20 18v-2a4 4 0 0 0-4-4H4"/></symbol>
+    <symbol id="i-later" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-aside" viewBox="0 0 24 24"><path d="M12 17v4"/><path d="M8 3h8l-1 7 3 3H6l3-3z"/></symbol>
+    <symbol id="i-snooze" viewBox="0 0 24 24"><path d="M5 3 2 6"/><path d="m22 6-3-3"/><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/></symbol>
+    <symbol id="i-archive" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8"/><path d="M10 12h4"/></symbol>
+    <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="19" cy="12" r="1.2"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-clip" viewBox="0 0 24 24"><path d="m21 11-8.5 8.5a5 5 0 0 1-7-7L14 4a3.3 3.3 0 0 1 4.7 4.7L10.5 17a1.7 1.7 0 0 1-2.4-2.4L16 6.7"/></symbol>
+    <symbol id="i-note" viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/></symbol>
+    <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></symbol>
+  </defs>
+</svg>
+
+<div class="app">
+  <header class="titlebar">
+    <div class="traffic"><i></i><i></i><i></i></div>
+    <div class="lead">
+      <button class="account-chip">
+        <span class="avatar" data-hue="4">PJ</span>
+        pj@73ai.org
+        <svg class="chev" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-chev"/></svg>
+      </button>
+    </div>
+    <div class="view-switch">
+      <button class="view-option"><span class="key">1</span>Inbox</button>
+      <button class="view-option"><span class="key">2</span>Feed</button>
+      <button class="view-option"><span class="key">3</span>Paper Trail</button>
+    </div>
+    <div class="trail">
+      <button class="icon-button" title="Search /"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-search"/></svg></button>
+      <button class="icon-button" title="Places ⌘K"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-places"/></svg></button>
+      <button class="write-button"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-pen"/></svg>Write<span class="key">c</span></button>
+    </div>
+  </header>
+
+  <div class="stage">
+    <section class="focus">
+      <div class="focus-inner">
+        <div class="screen-intro">
+          <h1>Focus &amp; Reply</h1>
+          <p>Every thread in Reply later, each with its own reply box. Send, or move on to the next.</p>
+        </div>
+        <div class="focus-hint">
+          <span>2 left</span>
+          <span>·</span>
+          <span class="key">Tab</span><span>next</span>
+          <span>·</span>
+          <span class="key">⌘↩</span><span>send</span>
+          <span>·</span>
+          <span class="key">Esc</span><span>back</span>
+        </div>
+
+        <div class="focus-item" data-sent>
+          <div class="focus-sent">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+            <span>Sent to <b>Robyn Madison</b> · You have an invitation from Robyn Madison</span>
+          </div>
+        </div>
+
+        <div class="focus-item" data-active>
+          <div class="focus-read">
+            <h2 class="thread-subject">Re: Cooper's parent-teacher conference</h2>
+            <div class="msg">
+              <div class="msg-head">
+                <span class="avatar" data-hue="7">JW</span>
+                <div class="msg-who"><div class="msg-name">Jeff Wolfe<span class="addr">jeff.wolfe@oakridge-school.example</span></div><div class="msg-to">to you</div></div>
+                <div class="msg-time">Yesterday 16:02</div>
+              </div>
+              <div class="msg-body">
+                <p>Mr. and Mrs. Young, this is just a reminder to schedule your parent-teacher conference with me. You can feel free to do that here.</p>
+                <p>If you would prefer a video call instead of meeting at school, I am happy to do that as well. Please let me know what date and time works best for you.</p>
+              </div>
+            </div>
+          </div>
+          <div class="focus-write">
+            <div class="reply">
+              <div class="reply-head">Reply to <b>Jeff Wolfe</b></div>
+              <div class="reply-body">Thanks Jeff. Wednesday at 4pm in person would suit us, if that is still open.<span class="caret"></span></div>
+              <div class="reply-foot">
+                <button class="button" data-variant="primary">Send<span class="key">⌘↩</span></button>
+                <button class="button" data-variant="ghost">Skip<span class="key">Tab</span></button>
+                <span class="spacer"></span>
+                <button class="icon-button" title="Attach"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-clip"/></svg></button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="focus-item">
+          <div class="focus-read">
+            <h2 class="thread-subject">Re: Life insurance quote</h2>
+            <div class="msg">
+              <div class="msg-head">
+                <span class="avatar" data-hue="5">TM</span>
+                <div class="msg-who"><div class="msg-name">Todd Markham<span class="addr">todd@harborlife.example</span></div><div class="msg-to">to you</div></div>
+                <div class="msg-time">Mon 09:48</div>
+              </div>
+              <div class="msg-body">
+                <p>Following up on the quote I sent through last week for the twenty year term policy. If the premium looks right, I can start the paperwork whenever you are ready.</p>
+              </div>
+            </div>
+          </div>
+          <div class="focus-write">
+            <div class="reply">
+              <div class="reply-head">Reply to <b>Todd Markham</b></div>
+              <div class="reply-body"><span class="placeholder">Write a reply</span></div>
+              <div class="reply-foot">
+                <button class="button" data-variant="primary">Send<span class="key">⌘↩</span></button>
+                <button class="button" data-variant="ghost">Skip<span class="key">Tab</span></button>
+                <span class="spacer"></span>
+                <button class="icon-button" title="Attach"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-clip"/></svg></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+</body>
+</html>

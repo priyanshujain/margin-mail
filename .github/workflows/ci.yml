@@ -1,0 +1,92 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+# The two checkouts reproduce the layout on a working machine: this repository sits at
+# rust/margin-mail and the public margin repository beside it at python/margin, because
+# package.json depends on margin-shared through a relative path. A token edit there is meant to
+# show up in every Margin app at once, and a copy vendored here would defeat that.
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: rust/margin-mail
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          path: rust/margin-mail
+
+      - uses: actions/checkout@v7
+        with:
+          repository: priyanshujain/margin
+          path: python/margin
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 26
+
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 10
+
+      - run: pnpm install --frozen-lockfile
+
+      # The vendored copy under public/fonts is what the bundle serves, and it drifting from the
+      # package is a face that falls back to Georgia in one app and not the other.
+      - run: pnpm fonts:check
+
+      # `pnpm build` is tsc then vite, so this is the typecheck and the bundle in one step.
+      - run: pnpm build
+
+      - run: pnpm test
+
+      - run: node scripts/docs-check.mjs
+
+  rust:
+    runs-on: ubuntu-22.04
+    defaults:
+      run:
+        working-directory: rust/margin-mail
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          path: rust/margin-mail
+
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libgtk-3-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            patchelf \
+            libxdo-dev \
+            libssl-dev \
+            build-essential
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: rust/margin-mail/src-tauri -> target
+
+      # tauri_build::build() wants a frontendDist that exists, and build.rs wants credentials to
+      # embed. The example file is what a fresh clone compiles against, so that is what CI uses.
+      - name: Stub the build inputs
+        run: |
+          mkdir -p dist && touch dist/index.html
+          cp google-credentials.example.json google-credentials.json
+
+      - name: Test
+        working-directory: rust/margin-mail/src-tauri
+        run: cargo test

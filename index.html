@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/marginmail-mark.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <script>
+      (function () {
+        try {
+          var root = document.documentElement;
+
+          var t = localStorage.getItem("marginmail-theme");
+          if (t !== "light" && t !== "dark")
+            t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+          root.setAttribute("data-theme", t);
+
+          // Both attributes are set again by usePhone/useTouch once React is up. They are set here
+          // as well so the first paint is already the right shape: without it a phone renders the
+          // desktop header and a 420px list column for a frame and then jumps.
+          var phone = matchMedia("(max-width: 640px)").matches;
+          if (phone) root.setAttribute("data-phone", "");
+          if (matchMedia("(pointer: coarse)").matches) root.setAttribute("data-touch", "");
+
+          // The reading pane is a layout decision, so it has to be right on the first paint or the
+          // list column is 420px wide for a frame and then takes the window.
+          if (localStorage.getItem("marginmail-pane") === "0") root.setAttribute("data-no-pane", "");
+
+          // The two font slots, which are a setting rather than a constant. Written here so a page
+          // set in EB Garamond does not paint in Literata first and reflow.
+          var f = JSON.parse(localStorage.getItem("marginmail-fonts") || "null");
+          if (f && typeof f.ui === "string") root.style.setProperty("--font-ui", f.ui);
+          if (f && typeof f.text === "string") root.style.setProperty("--font-heading", f.text);
+          var s = localStorage.getItem("marginmail-text-size");
+          if (s) root.style.setProperty("--body-size", s + "px");
+        } catch (e) {}
+      })();
+    </script>
+    <title>Margin Mail</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<title>Margin Mail: Thread</title>
+<link rel="stylesheet" href="mail.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+    <symbol id="i-places" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></symbol>
+    <symbol id="i-pen" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></symbol>
+    <symbol id="i-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="i-reply" viewBox="0 0 24 24"><path d="M9 17 4 12l5-5"/><path d="M20 18v-2a4 4 0 0 0-4-4H4"/></symbol>
+    <symbol id="i-later" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-aside" viewBox="0 0 24 24"><path d="M12 17v4"/><path d="M8 3h8l-1 7 3 3H6l3-3z"/></symbol>
+    <symbol id="i-snooze" viewBox="0 0 24 24"><path d="M5 3 2 6"/><path d="m22 6-3-3"/><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/></symbol>
+    <symbol id="i-archive" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8"/><path d="M10 12h4"/></symbol>
+    <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="19" cy="12" r="1.2"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-clip" viewBox="0 0 24 24"><path d="m21 11-8.5 8.5a5 5 0 0 1-7-7L14 4a3.3 3.3 0 0 1 4.7 4.7L10.5 17a1.7 1.7 0 0 1-2.4-2.4L16 6.7"/></symbol>
+    <symbol id="i-note" viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/></symbol>
+    <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></symbol>
+    <symbol id="i-merge" viewBox="0 0 24 24"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 0 0 9 9"/></symbol>
+  </defs>
+</svg>
+
+<div class="app">
+  <header class="titlebar">
+    <div class="traffic"><i></i><i></i><i></i></div>
+    <div class="lead">
+      <button class="account-chip">
+        <span class="avatar" data-hue="4">PJ</span>
+        pj@73ai.org
+        <svg class="chev" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-chev"/></svg>
+      </button>
+    </div>
+    <div class="view-switch">
+      <button class="view-option" data-active="true"><span class="key">1</span>Inbox</button>
+      <button class="view-option"><span class="key">2</span>Feed</button>
+      <button class="view-option"><span class="key">3</span>Paper Trail</button>
+    </div>
+    <div class="trail">
+      <button class="icon-button" title="Search /"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-search"/></svg></button>
+      <button class="icon-button" title="Places ⌘K"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-places"/></svg></button>
+      <button class="write-button"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-pen"/></svg>Write<span class="key">c</span></button>
+    </div>
+  </header>
+
+  <div class="stage">
+    <section class="list-col">
+      <div class="list-head">
+        <h1 class="list-title">Inbox</h1>
+        <button class="pill"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-shield"/></svg>Screen 3 new senders<span class="key">6</span></button>
+      </div>
+      <div class="list">
+        <div class="section">New for you</div>
+
+        <div class="row" data-new>
+          <div class="row-gutter"><span class="row-dot"></span></div>
+          <span class="avatar" data-hue="2">MR</span>
+          <div class="row-main">
+            <div class="row-top"><span class="row-sender">Maya Raghunathan</span><span class="row-count">3</span><span class="row-time">11:42</span></div>
+            <div class="row-bottom"><span class="row-subject">Dinner on Thursday?</span><span class="row-snippet">Priya said the place on Church Street takes bookings now, want me to</span></div>
+          </div>
+        </div>
+
+        <div class="row" data-new>
+          <div class="row-gutter"><span class="row-dot"></span></div>
+          <span class="avatar" data-hue="6">AK</span>
+          <div class="row-main">
+            <div class="row-top"><span class="row-sender">Arun Kulkarni</span><span class="row-time">10:15</span></div>
+            <div class="row-bottom"><span class="row-subject">Re: Lease renewal for the studio</span><span class="row-snippet">Attached the revised draft. The only change is clause 7, which now</span></div>
+          </div>
+        </div>
+
+        <div class="row" data-new>
+          <div class="row-gutter"><span class="row-dot"></span></div>
+          <span class="avatar" data-brand>Ai</span>
+          <div class="row-main">
+            <div class="row-top"><span class="row-sender">Airbnb</span><span class="row-time">09:03</span></div>
+            <div class="row-bottom"><span class="row-subject">Your reservation in Lisbon is confirmed</span><span class="row-snippet">Check-in Friday 12 September after 15:00. Your host Inês will send</span></div>
+          </div>
+        </div>
+
+        <div class="row" data-new data-selected>
+          <div class="row-gutter"><span class="row-dot"></span></div>
+          <span class="avatar" data-hue="7">SO</span>
+          <div class="row-main">
+            <div class="row-top"><span class="row-sender">Sam Okafor</span><span class="row-count">4</span><span class="row-time">Yesterday</span></div>
+            <div class="row-bottom"><span class="row-subject">Piano on Wednesdays</span><span class="row-snippet">Got it, thank you. Wednesdays at five work for us. Is there a</span></div>
+          </div>
+        </div>
+
+        <div class="seen">
+          <div class="section">Previously seen</div>
+
+          <div class="row" data-noted>
+            <div class="row-gutter"></div>
+            <span class="avatar" data-hue="5">LB</span>
+            <div class="row-main">
+              <div class="row-top"><span class="row-sender">Lena Brandt</span><span class="row-count">7</span><span class="row-time">Yesterday</span></div>
+              <div class="row-bottom"><span class="row-subject">Kitchen bench quote</span><span class="row-snippet">Sounds good, Julie. Any afternoon next week works for me.</span></div>
+            </div>
+            <div class="row-note">Ask about the oak finish before confirming</div>
+          </div>
+
+          <div class="row">
+            <div class="row-gutter"></div>
+            <span class="avatar" data-hue="3">DP</span>
+            <div class="row-main">
+              <div class="row-top"><span class="row-sender">Dev Patel</span><span class="row-time">Mon</span></div>
+              <div class="row-bottom"><span class="row-subject">Slides from the talk</span><span class="row-snippet">Here they are, plus the reading list I mentioned. The paper on</span></div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="row-gutter"></div>
+            <span class="avatar" data-brand>Ds</span>
+            <div class="row-main">
+              <div class="row-top"><span class="row-sender">DocuSign</span><span class="row-time">Mon</span></div>
+              <div class="row-bottom"><span class="row-subject">Completed: Studio lease 2026</span><span class="row-snippet">All parties have completed the envelope. You can access the</span></div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="row-gutter"></div>
+            <span class="avatar" data-hue="8">HW</span>
+            <div class="row-main">
+              <div class="row-top"><span class="row-sender">Hannah Weiss</span><span class="row-count">2</span><span class="row-time">Sun</span></div>
+              <div class="row-bottom"><span class="row-subject">Photos from the Hawaii trip</span><span class="row-snippet">Finally went through them all. The ones from the ridge walk are</span></div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="row-gutter"></div>
+            <span class="avatar" data-hue="1">RY</span>
+            <div class="row-main">
+              <div class="row-top"><span class="row-sender">Russell Young</span><span class="row-time">30 Aug</span></div>
+              <div class="row-bottom"><span class="row-subject">Pumpkin bread recipe</span><span class="row-snippet">From my mother's card, transcribed as best I could. Bake at 175</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="piles">
+        <button class="pile">
+          <div class="pile-card" data-depth="2"></div>
+          <div class="pile-card" data-depth="1"></div>
+          <div class="pile-card" data-depth="0">
+            <div class="pile-top"><svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-later"/></svg>Reply later<span class="key">4</span></div>
+            <div class="pile-subject">Re: Cooper's parent-teacher conference</div>
+            <div class="pile-from">Jeff Wolfe, and 2 more</div>
+          </div>
+        </button>
+        <button class="pile">
+          <div class="pile-card" data-depth="1"></div>
+          <div class="pile-card" data-depth="0">
+            <div class="pile-top"><svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-aside"/></svg>Set aside<span class="key">5</span></div>
+            <div class="pile-subject">Les Misérables tickets</div>
+            <div class="pile-from">Caroline Bauhaus, and 1 more</div>
+          </div>
+        </button>
+      </div>
+    </section>
+
+    <section class="pane" style="position: relative">
+      <div class="pane-bar">
+        <button class="verb"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-reply"/></svg>Reply<span class="key">r</span></button>
+        <button class="verb"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-later"/></svg>Reply later<span class="key">l</span></button>
+        <button class="verb"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-aside"/></svg>Set aside<span class="key">s</span></button>
+        <button class="verb"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-snooze"/></svg>Snooze<span class="key">b</span></button>
+        <span class="spacer"></span>
+        <button class="verb"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-bell"/></svg>Notify<span class="key">⇧N</span></button>
+        <button class="verb"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-archive"/></svg>Archive<span class="key">e</span></button>
+        <button class="icon-button" title="More ."><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-more"/></svg></button>
+      </div>
+
+      <div class="thread">
+        <div class="thread-inner">
+          <div class="thread-head">
+            <h1 class="thread-subject">Piano on Wednesdays<span class="renamed">renamed · was "Re: Fw: (no subject)"</span></h1>
+            <div class="thread-meta">
+              <span class="avatars"><span class="avatar" data-hue="7">SO</span><span class="avatar" data-brand>Sd</span><span class="avatar" data-hue="4">PJ</span></span>
+              <span>Sam Okafor, Sunny Day Music and you</span>
+              <span>·</span>
+              <span>3 messages</span>
+            </div>
+          </div>
+
+          <div class="banner" data-tone="muted">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-merge"/></svg>
+            <span>Merged from <b>2 threads</b> · Sam Okafor, Sunny Day Music</span>
+            <button class="banner-action">Unmerge</button>
+          </div>
+
+          <div class="msg" data-collapsed>
+            <div class="msg-head">
+              <span class="avatar" data-brand>Sd</span>
+              <div class="msg-who"><div class="msg-name">Sunny Day Music</div><div class="msg-preview">Enrolment received for Cooper. Term starts the week of 8 September and your teacher will be in touch to fix a</div></div>
+              <div class="msg-time">12 Aug</div>
+            </div>
+          </div>
+
+          <div class="msg" data-collapsed>
+            <div class="msg-head">
+              <span class="avatar" data-hue="4">PJ</span>
+              <div class="msg-who"><div class="msg-name">You</div><div class="msg-preview">Hi Sam, form signed and attached. Would a weekday after school suit Cooper? He finishes at four and</div></div>
+              <div class="msg-time">Mon 09:12</div>
+            </div>
+          </div>
+
+          <div class="msg">
+            <div class="msg-head">
+              <span class="avatar" data-hue="7">SO</span>
+              <div class="msg-who"><div class="msg-name">Sam Okafor<span class="addr">sam@sunnydaymusic.example</span></div><div class="msg-to">to you</div></div>
+              <div class="msg-time">Yesterday 15:40</div>
+            </div>
+            <div class="msg-body">
+              <p>Got it, thank you. Wednesdays at five work for us.</p>
+              <p>The first lesson is on the 10th, nothing to prepare.</p>
+              <p>The invitation is attached, it should land in your calendar.<br>Sam</p>
+            </div>
+
+            <div class="invite">
+              <div class="invite-date"><span class="mon">Sep</span><span class="day">10</span></div>
+              <div>
+                <div class="invite-title">Piano lesson · Cooper</div>
+                <div class="invite-when">Wednesday 10 September · 17:00 to 17:45 · Sunny Day Music, Bandra</div>
+                <div class="invite-actions">
+                  <button class="button" data-variant="primary">Accept<span class="key">y</span></button>
+                  <button class="button">Maybe<span class="key">m</span></button>
+                  <button class="button">Decline<span class="key">n</span></button>
+                  <span class="open">Open in Margin Calendar</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="reply">
+            <div class="reply-head">Reply to <b>Sam Okafor</b><span style="margin-left:auto" class="key">a</span><span style="color:var(--ink-faint)">reply all</span></div>
+            <div class="reply-body"><span class="placeholder">Write a reply</span></div>
+            <div class="reply-foot">
+              <button class="button" data-variant="primary">Send<span class="key">⌘↩</span></button>
+              <button class="button" data-variant="ghost">Remind me if no reply</button>
+              <span class="spacer"></span>
+              <button class="icon-button" title="Attach"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-clip"/></svg></button>
+              <button class="icon-button" title="Note"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-note"/></svg></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="popover" style="left: 680px; top: 352px">
+        <div class="contact-head">
+          <span class="avatar" data-hue="7">SO</span>
+          <div>
+            <div class="contact-name">Sam Okafor</div>
+            <div class="contact-addr">sam@sunnydaymusic.example</div>
+          </div>
+        </div>
+        <div class="contact-rows">
+          <div class="contact-row"><span class="lab">Delivers to</span><span class="val"><span class="pill">Inbox<svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-chev"/></svg></span></span></div>
+          <div class="contact-row"><span class="lab">Notify</span><span class="val">Off · this thread only</span></div>
+          <div class="contact-row"><span class="lab">Screened</span><span class="val">In, on 12 Aug</span></div>
+          <div class="contact-row" data-wrap><span class="lab">Note</span><span class="val">Cooper's teacher. Prefers email over calls.</span></div>
+        </div>
+        <div class="contact-section">Recent threads</div>
+        <div class="contact-thread"><span>Piano on Wednesdays</span><span>Today</span></div>
+        <div class="contact-thread"><span>Recital in November</span><span>20 Aug</span></div>
+        <div class="contact-thread"><span>Enrolment form</span><span>12 Aug</span></div>
+        <div class="contact-section">Files</div>
+        <div class="contact-thread"><span>Enrolment-form.pdf</span><span>12 Aug</span></div>
+        <div class="contact-thread"><span>Term-dates.pdf</span><span>12 Aug</span></div>
+      </div>
+    </section>
+  </div>
+</div>
+</body>
+</html>

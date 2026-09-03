@@ -1,0 +1,41 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.sw?
+
+# Tauri build output
+src-tauri/target/
+src-tauri/gen/schemas/
+
+# Xcode build output. The project under src-tauri/gen/apple is generated but committed, the
+# products of building it are not.
+src-tauri/gen/apple/build/
+src-tauri/gen/apple/Externals/
+src-tauri/gen/apple/Pods/
+src-tauri/gen/apple/Podfile.lock
+xcuserdata/
+
+# Google OAuth desktop client (real values, never commit). Shared with the other Margin apps: the
+# suite has one Cloud project and one installed client, so this file is a copy of margin's.
+/google-credentials.json
+/client_secret_*.json
+
+# Screenshots & Playwright MCP artifacts
+.playwright-mcp/
+/*.png
+
+# The Kit page and screen screenshots the UI suite writes for review by eye
+/screenshots/
