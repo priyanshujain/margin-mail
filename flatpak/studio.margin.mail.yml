@@ -39,9 +39,13 @@ modules:
       # after the product and the binary, so both are renamed on the way in.
       - install -Dm644 "deb/usr/share/applications/Margin Mail.desktop" /app/share/applications/studio.margin.mail.desktop
       - desktop-file-edit --set-icon=studio.margin.mail /app/share/applications/studio.margin.mail.desktop
+      # Only the plainly named sizes. Tauri also writes a `256x256@2` directory, and hicolor spells
+      # a scaled one `256x256@2x`, so flatpak would be exporting an icon at a size that is not a
+      # size.
       - |
-        for src in deb/usr/share/icons/hicolor/*/apps/margin-mail.png; do
-          size=$(basename "$(dirname "$(dirname "$src")")")
+        for size in 32x32 128x128; do
+          src="deb/usr/share/icons/hicolor/$size/apps/margin-mail.png"
+          [ -f "$src" ] || continue
           install -Dm644 "$src" "/app/share/icons/hicolor/$size/apps/studio.margin.mail.png"
         done
 

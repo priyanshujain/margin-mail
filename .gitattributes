@@ -1,0 +1,3 @@
+# MIME fixtures and golden renders contain intentional CRLF and mixed line endings.
+# Preserve their bytes on Windows too; checkout conversion breaks exact comparisons.
+src-tauri/fixtures/** -text

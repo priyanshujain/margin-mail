@@ -5,7 +5,7 @@
   <summary>A calm, keyboard-first mail client for Gmail</summary>
 
   <metadata_license>CC0-1.0</metadata_license>
-  <project_license>LicenseRef-proprietary=https://github.com/priyanshujain/margin-mail/blob/main/LICENSE</project_license>
+  <project_license>LicenseRef-FSL-1.1-MIT=https://github.com/priyanshujain/margin-mail/blob/main/LICENSE</project_license>
 
   <developer id="studio.margin">
     <name>Margin</name>

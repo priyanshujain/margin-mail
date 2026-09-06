@@ -58,6 +58,18 @@ build:
       *)      echo "just: no local build for $(uname -s); macOS and Linux are the desktop targets." >&2; exit 1 ;;
     esac
 
+# Wants flatpak, and pulls the Flathub builder and GNOME runtime if they are not installed.
+# The release workflow runs the same script over the deb it published.
+# Build the flatpak, which is the deb repackaged. Linux only.
+flatpak:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    [ "$(uname -s)" = Linux ] || { echo "just: the flatpak builds on Linux only." >&2; exit 1; }
+    pnpm install
+    pnpm tauri build --bundles deb
+    cp {{bundle}}/deb/*.deb flatpak/margin-mail.deb
+    flatpak/build.sh
+
 # Build, install over whatever version is already installed, and start the new one.
 install: build
     #!/usr/bin/env bash

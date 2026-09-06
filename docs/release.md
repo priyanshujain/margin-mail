@@ -105,6 +105,11 @@ against. The sandbox gets the network, the notification service and the download
 nothing else. CI builds the same manifest on every push to main, against a deb built there, which
 is the only way a break in it gets found before a release.
 
+On Linux, `just flatpak` builds the deb and repackages it locally. Install `flatpak` first; the
+build script installs the GNOME runtime and `org.flatpak.Builder` from Flathub for your user.
+Both CI and local builds use that builder because Ubuntu 22.04's `flatpak-builder` calls the old
+`appstream-compose` tool, which the GNOME 48 SDK no longer includes.
+
 The **nix** job runs after the publish, so the flake can only ever point at a release that survived
 the manifest check. It hashes the published deb into `nix/release.json`, builds the package to
 prove the pin works, and commits the pin to main. `NIXPKGS_ALLOW_UNFREE` and `--impure` are in that

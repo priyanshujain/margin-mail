@@ -167,8 +167,7 @@ jobs:
             libxdo-dev \
             libssl-dev \
             build-essential \
-            flatpak \
-            flatpak-builder
+            flatpak
 
       - uses: actions/setup-node@v6
         with:
