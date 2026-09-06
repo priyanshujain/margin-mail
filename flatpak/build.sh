@@ -13,19 +13,22 @@ bundle=${1:-$here/margin-mail.flatpak}
 
 [ -f "$deb" ] || { echo "flatpak/build.sh: no $deb beside this script." >&2; exit 1; }
 
+builder_version=$(flatpak-builder --version | sed -E 's/^flatpak-builder[- ]//')
+if [ "$(printf '1.4.4\n%s\n' "$builder_version" | sort -V | head -1)" != 1.4.4 ]; then
+  echo "flatpak/build.sh: flatpak-builder >= 1.4.4 is required for GNOME 48's AppStream tools." >&2
+  exit 1
+fi
+
 runtime_version=$(sed -n "s/^runtime-version: *'\(.*\)'/\1/p" "$id.yml")
 
 # --user so nothing here needs root, and --if-not-exists so a second run is free.
 flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 flatpak install --user --noninteractive flathub \
-  org.flatpak.Builder \
   "org.gnome.Platform//$runtime_version" \
   "org.gnome.Sdk//$runtime_version"
 
 rm -rf build repo
-# Ubuntu 22.04's builder calls appstream-compose, which GNOME 48 no longer ships.
-# Use the Flathub builder for its current AppStream support on CI and local builds alike.
-flatpak run org.flatpak.Builder --user --disable-rofiles-fuse --force-clean --repo=repo build "$id.yml"
+flatpak-builder --user --disable-rofiles-fuse --force-clean --repo=repo build "$id.yml"
 flatpak build-bundle repo "$bundle" "$id"
 
 echo "Wrote $bundle"

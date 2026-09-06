@@ -84,6 +84,11 @@ the ones that did not.
 Linux builds on Ubuntu 22.04 on purpose. The bundle will not run on anything older than the glibc it
 was linked against, so it is built on the oldest release that is supported.
 
+Before bundling on Linux, `scripts/prepare-bundle.mjs` prepares a pinned GTK packaging plugin in
+the project's tools cache. It leaves Wayland libraries to the host, alongside the host's graphics
+driver: bundling Ubuntu's older Wayland makes recent Mesa fail to load and leaves the AppImage
+window blank. This happens before Tauri generates updater signatures.
+
 The Windows installers are not code-signed, so SmartScreen warns on the first download until the
 app has built up reputation. A certificate would go in as `WINDOWS_CERTIFICATE` and
 `WINDOWS_CERTIFICATE_PASSWORD` and needs nothing else changed.
@@ -105,10 +110,10 @@ against. The sandbox gets the network, the notification service and the download
 nothing else. CI builds the same manifest on every push to main, against a deb built there, which
 is the only way a break in it gets found before a release.
 
-On Linux, `just flatpak` builds the deb and repackages it locally. Install `flatpak` first; the
-build script installs the GNOME runtime and `org.flatpak.Builder` from Flathub for your user.
-Both CI and local builds use that builder because Ubuntu 22.04's `flatpak-builder` calls the old
-`appstream-compose` tool, which the GNOME 48 SDK no longer includes.
+On Linux, `just flatpak` builds the deb and repackages it locally. Install `flatpak` and
+`flatpak-builder` 1.4.4 or newer first; the script installs the GNOME runtime for your user.
+CI gets these tools from the Flatpak team's stable PPA because Ubuntu 22.04's original builder
+calls `appstream-compose`, which the GNOME 48 SDK no longer includes.
 
 The **nix** job runs after the publish, so the flake can only ever point at a release that survived
 the manifest check. It hashes the published deb into `nix/release.json`, builds the package to

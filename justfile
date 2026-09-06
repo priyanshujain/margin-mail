@@ -58,7 +58,7 @@ build:
       *)      echo "just: no local build for $(uname -s); macOS and Linux are the desktop targets." >&2; exit 1 ;;
     esac
 
-# Wants flatpak, and pulls the Flathub builder and GNOME runtime if they are not installed.
+# Wants flatpak and flatpak-builder >= 1.4.4, and pulls the GNOME runtime if needed.
 # The release workflow runs the same script over the deb it published.
 # Build the flatpak, which is the deb repackaged. Linux only.
 flatpak:

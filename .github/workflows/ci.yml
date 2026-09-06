@@ -157,6 +157,7 @@ jobs:
 
       - name: Install Linux dependencies
         run: |
+          sudo add-apt-repository -y ppa:flatpak/stable
           sudo apt-get update
           sudo apt-get install -y \
             libwebkit2gtk-4.1-dev \
@@ -167,7 +168,8 @@ jobs:
             libxdo-dev \
             libssl-dev \
             build-essential \
-            flatpak
+            flatpak \
+            flatpak-builder
 
       - uses: actions/setup-node@v6
         with:
