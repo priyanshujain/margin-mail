@@ -1,6 +1,6 @@
 [package]
 name = "margin-mail"
-version = "0.0.3"
+version = "0.0.4"
 description = "A calm, keyboard-first mail client for Gmail"
 authors = ["Margin"]
 edition = "2021"
