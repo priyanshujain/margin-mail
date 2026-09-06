@@ -5,7 +5,7 @@
   "identifier": "studio.margin.mail",
   "build": {
     "beforeDevCommand": "pnpm dev",
-    "devUrl": "http://localhost:1440",
+    "devUrl": "http://localhost:1450",
     "beforeBuildCommand": "pnpm build",
     "frontendDist": "../dist"
   },
@@ -31,18 +31,29 @@
   "plugins": {
     "deep-link": {
       "desktop": {
-        "schemes": ["studio.margin.mail"]
+        "schemes": [
+          "studio.margin.mail"
+        ]
       },
       "mobile": [
         {
-          "scheme": ["studio.margin.mail"]
+          "scheme": [
+            "studio.margin.mail"
+          ]
         }
       ]
     }
   },
   "bundle": {
     "active": true,
-    "targets": ["app", "dmg", "appimage", "deb"],
+    "targets": [
+      "app",
+      "dmg",
+      "appimage",
+      "deb",
+      "nsis",
+      "msi"
+    ],
     "category": "Productivity",
     "shortDescription": "A calm, keyboard-first mail client for Gmail",
     "longDescription": "New senders wait at the door until you let them in, people and newsletters and receipts live in three separate boxes, and every decision you make is kept beside the mail rather than inside it.",
@@ -53,13 +64,9 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "linux": {
-      "deb": {
-        "depends": ["libwebkit2gtk-4.1-0", "libgtk-3-0"]
-      }
-    },
     "macOS": {
-      "minimumSystemVersion": "10.15"
+      "minimumSystemVersion": "10.15",
+      "signingIdentity": "-"
     }
   }
 }

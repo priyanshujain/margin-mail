@@ -8,7 +8,7 @@
 
 import { defineConfig } from "@playwright/test";
 
-const PORT = 1440;
+const PORT = 1450;
 const BASE_URL = `http://localhost:${PORT}`;
 
 export default defineConfig({

@@ -1,1 +1,213 @@
-/* Placeholder. The design system replaces this in F2. */
+/* The base layer: the reset, the window, and the overlay shell every panel in the app is built
+   from. Everything with a shape of its own is a primitive in src/ui and brings its own stylesheet.
+ *
+ * .overlay and .panel live here rather than with the Sheet, because the Palette, the Sheet and
+ * anything else that takes the window over are all the same box and margin settled its shape
+ * first. What each of them adds on top of it is in its own file. */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  /* A webview reads every tap as the start of a text selection: a grey flash over the button, a
+     callout on a long press, and a caret in whatever it decided you meant. */
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  margin: 0;
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
+  background: var(--shell);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: var(--t-3);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--selection);
+}
+
+:root[data-touch] body {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+:root[data-touch] input,
+:root[data-touch] textarea,
+:root[data-touch] [contenteditable] {
+  -webkit-user-select: text;
+  user-select: text;
+  -webkit-touch-callout: default;
+}
+
+/* iOS Safari zooms in on a focused field under 16px and the locked viewport leaves no way back. */
+:root[data-phone] input,
+:root[data-phone] textarea,
+:root[data-phone] select {
+  font-size: var(--t-5);
+}
+
+/* A phone reads mail at arm's length rather than at a desk. */
+:root[data-phone] body {
+  font-size: var(--t-4);
+}
+
+button {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+input,
+textarea,
+select {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+svg {
+  display: block;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* The window: one bar of chrome and then the stage, nothing else resident. Height rather than a
+   viewport unit, because html, body and #root are already exactly the layout viewport and a unit
+   naming the screen drifts from it under UIKit. */
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Overlays
+   --------------------------------------------------------------------------------------------- */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  /* Over the title bar, which carries a stacking order of its own so that a popover hanging off
+     the account chip clears the list underneath it. A panel with a scrim is the front of the app:
+     under the toasts, over everything a person could otherwise have reached past it. The phone
+     rule below found this first, for the tab bar, and it is the same answer for both. */
+  z-index: 50;
+  background: var(--scrim);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+  display: grid;
+  place-items: center;
+  padding: 40px;
+}
+
+/* The palette does not sit in the middle of the window: it is a thing you type into, and the list
+   under it wants the room below rather than an equal margin above and below. */
+.overlay[data-align="top"] {
+  align-items: start;
+  padding-top: 12vh;
+}
+
+.panel {
+  width: min(480px, calc(100vw - 32px));
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-pop);
+  overflow: hidden;
+}
+
+.panel-head {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 16px 14px 16px 22px;
+  border-bottom: 1px solid var(--line);
+}
+
+.panel-head h2 {
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 18px;
+}
+
+.panel-body {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 20px 22px 24px;
+  overflow-y: auto;
+}
+
+.panel-foot {
+  flex: none;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 22px;
+  border-top: 1px solid var(--line);
+}
+
+/* On a phone the same panel docks to the bottom edge. A centred box with a 40px moat around it
+   spends the only screen there is on scrim and puts its buttons at the far end of the reach. */
+:root[data-phone] .overlay {
+  padding: 0;
+  place-items: end center;
+}
+
+:root[data-phone] .panel {
+  width: 100%;
+  max-height: var(--sheet-max-h);
+  border-width: 1px 0 0;
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  /* The home indicator sits over the foot of the sheet, so the last row stops above it. */
+  padding-bottom: var(--safe-bottom);
+  animation: sheet-up 180ms var(--ease);
+}
+
+/* A list that has run out of rows must not start scrolling the page underneath it. */
+:root[data-phone] .panel-body {
+  overscroll-behavior: contain;
+}
+
+@keyframes sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root[data-phone] .panel {
+    animation: none;
+  }
+}

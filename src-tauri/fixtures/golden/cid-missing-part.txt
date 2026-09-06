@@ -1,0 +1,30 @@
+render-version: 2
+message-id: fwd-4471@harbourline.example
+in-reply-to: -
+references-first: -
+from: Harbour Line Ops <ops@harbourline.example>
+to: Priyanshu Jain <pj@73ai.org>
+cc: -
+bcc: -
+reply-to: -
+date-ms: 1788250533000
+subject: Fwd: Dock schedule for the week
+is-html: true
+surface: theme
+snippet: Forwarding the schedule. The chart was in the original. Nothing else changed this week.
+list-id: -
+auto-submitted: -
+precedence: -
+unsubscribe: -
+blocked-images: 0
+
+--- html ---
+
+<p>Forwarding the schedule. The chart was in the original.</p>
+<p><img alt="Dock schedule chart" width="480" height="320"></p>
+<p>Nothing else changed this week.</p>
+
+--- quoted: none ---
+
+--- text ---
+Forwarding the schedule. The chart was in the original. Nothing else changed this week.

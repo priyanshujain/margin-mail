@@ -1,0 +1,63 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+/* The same small uppercase label as a group heading, because they are the same thing: a name for
+   what is under it, said once and quietly. */
+.field-label {
+  color: var(--ink-faint);
+  font-size: var(--t-1);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.field-input,
+.field-textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 7px 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm);
+  background: var(--raised);
+  transition: border-color 120ms var(--ease);
+}
+
+.field-input:hover,
+.field-textarea:hover {
+  border-color: var(--ink-faint);
+}
+
+.field-input:disabled,
+.field-textarea:disabled {
+  color: var(--ink-faint);
+  cursor: default;
+  border-color: var(--line);
+}
+
+.field-input::placeholder,
+.field-textarea::placeholder {
+  color: var(--ink-faint);
+}
+
+.field-textarea {
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.field-hint {
+  color: var(--ink-faint);
+  font-size: var(--t-2);
+  line-height: 1.45;
+}
+
+.field-hint[data-tone="error"] {
+  color: var(--danger-ink);
+}
+
+:root[data-touch] .field-input {
+  min-height: var(--touch-h);
+}

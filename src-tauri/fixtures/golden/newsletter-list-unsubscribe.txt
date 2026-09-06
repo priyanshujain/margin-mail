@@ -1,0 +1,42 @@
+render-version: 2
+message-id: 01000198a2f4c1b2-9b0c1d2e-3f4a-5b6c-7d8e-9f0a1b2c3d4e@thebrowser.example
+in-reply-to: -
+references-first: -
+from: The Browser <hello@thebrowser.example>
+to: <pj@73ai.org>
+cc: -
+bcc: -
+reply-to: -
+date-ms: 1788411603000
+subject: Five things worth reading this weekend
+is-html: true
+surface: theme
+snippet: Good morning. It is a long weekend in some places and a wet one in most, so this edition leans toward pieces you can settle into. The pencil, at length. Henry Petroski wrote a whole book about the…
+list-id: the-browser.list.thebrowser.example
+auto-submitted: -
+precedence: bulk
+unsubscribe: one-click=true mailto=mailto:unsubscribe+91827@mail.thebrowser.example?subject=unsub url=https://thebrowser.example/unsubscribe?u=91827&id=8f3a1c
+blocked-images: 0
+
+--- html ---
+
+<p>Good morning. It is a long weekend in some places and a wet one in most, so this edition leans toward pieces you can settle into.</p>
+<p><b>The pencil, at length.</b> Henry Petroski wrote a whole book about the pencil and this essay is the argument for why that was a reasonable thing to do. Graphite, cedar, the Napoleonic wars and a factory in Nuremberg that still runs.</p>
+<p><b>Why bridges hum.</b> A short explanation of vortex shedding from an engineer who spent a career listening to cables.</p>
+<p><b>The last typewriter repairman in Mumbai.</b> A profile that is really about what it means to keep a trade going after the trade has gone.</p>
+<p><a href="https://thebrowser.example/unsubscribe?u=91827&amp;id=8f3a1c" target="_blank" rel="noopener noreferrer">Unsubscribe</a></p>
+
+--- quoted: none ---
+
+--- text ---
+Good morning. It is a long weekend in some places and a wet one in most,
+so this edition leans toward pieces you can settle into. A long piece on
+the history of the pencil, a short one on why bridges hum, and three more.
+
+THE PENCIL, AT LENGTH. Henry Petroski wrote a whole book about the pencil
+and this essay is the argument for why that was a reasonable thing to do.
+
+WHY BRIDGES HUM. A short explanation of vortex shedding from an engineer
+who spent a career listening to cables.
+
+Unsubscribe: https://thebrowser.example/unsubscribe?u=91827&id=8f3a1c

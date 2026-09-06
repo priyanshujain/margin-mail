@@ -1,0 +1,36 @@
+render-version: 2
+message-id: hs-2026-08-31-8812@meridianproperties.in
+in-reply-to: -
+references-first: -
+from: Arun Kulkarni <arun@meridianproperties.in>
+to: Priyanshu Jain <pj@73ai.org>
+cc: -
+bcc: -
+reply-to: -
+date-ms: 1788157964000
+subject: The studio, one more thing
+is-html: true
+surface: theme
+snippet: Priyanshu, the floor plan you asked for is below. The measurements are from the survey in June, not the original drawing. Arun
+list-id: -
+auto-submitted: -
+precedence: -
+unsubscribe: -
+blocked-images: 1
+blocked-url: https://meridianproperties.in/img/studio-floorplan.jpg
+tracker: HubSpot https://track.hubspot.com/__ptq.gif?k=8812&r=pj%4073ai.org
+tracker: meridianproperties.in https://meridianproperties.in/o/open.png?id=8812
+
+--- html ---
+
+<p>Priyanshu, the floor plan you asked for is below. The measurements are
+from the survey in June, not the original drawing.</p>
+<p><img alt="Studio floor plan" width="640" height="420"></p>
+<p>Arun</p>
+<img style="border:0" width="1" height="1" alt="">
+<img alt="" width="1" height="1">
+
+--- quoted: none ---
+
+--- text ---
+Priyanshu, the floor plan you asked for is below. The measurements are from the survey in June, not the original drawing. Arun

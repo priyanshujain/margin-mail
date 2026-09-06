@@ -1,0 +1,45 @@
+Return-Path: <dev.patel@example.org>
+MIME-Version: 1.0
+Date: Mon, 31 Aug 2026 21:14:55 +0530
+Message-ID: <CAG5dev-slides-03@mail.example.org>
+In-Reply-To: <CAG5pj-slides-02@mail.73ai.org>
+References: <CAG5dev-slides-01@mail.example.org>
+ <CAG5pj-slides-02@mail.73ai.org>
+Subject: Re: Slides from the talk
+From: Dev Patel <dev.patel@example.org>
+To: Priyanshu Jain <pj@73ai.org>
+Content-Type: multipart/alternative; boundary="alt-slides-03"
+
+--alt-slides-03
+Content-Type: text/plain; charset=UTF-8
+
+Here they are, plus the reading list I mentioned. The paper on cache
+oblivious layouts is the one to start with.
+
+--alt-slides-03
+Content-Type: text/html; charset=UTF-8
+
+<div dir="ltr">Here they are, plus the reading list I mentioned. The paper
+on cache oblivious layouts is the one to start with.</div>
+<br>
+<div class="gmail_quote">
+<div dir="ltr" class="gmail_attr">On Mon, 31 Aug 2026 at 18:40, Priyanshu
+Jain &lt;<a href="mailto:pj@73ai.org">pj@73ai.org</a>&gt; wrote:</div>
+<blockquote class="gmail_quote" style="margin:0 0 0 .8ex;border-left:1px
+ solid #ccc;padding-left:1ex">
+<div dir="ltr">Good talk. Could you send the slides, and the reading list
+you put up at the end?</div>
+<br>
+<div class="gmail_quote">
+<div dir="ltr" class="gmail_attr">On Fri, 28 Aug 2026 at 12:02, Dev Patel
+&lt;<a href="mailto:dev.patel@example.org">dev.patel@example.org</a>&gt;
+wrote:</div>
+<blockquote class="gmail_quote" style="margin:0 0 0 .8ex;border-left:1px
+ solid #ccc;padding-left:1ex">
+<div dir="ltr">Talk is on Monday at six, room 4.02. Come if you are free.</div>
+</blockquote>
+</div>
+</blockquote>
+</div>
+
+--alt-slides-03--

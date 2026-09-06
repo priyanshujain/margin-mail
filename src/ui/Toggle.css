@@ -1,0 +1,81 @@
+.toggle {
+  flex: none;
+  position: relative;
+  width: 34px;
+  height: 20px;
+  padding: 2px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-pill);
+  background: var(--raised);
+  transition: background 120ms var(--ease), border-color 120ms var(--ease);
+}
+
+.toggle-knob {
+  display: block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--ink-faint);
+  transition: transform 120ms var(--ease), background 120ms var(--ease);
+}
+
+.toggle[data-on] {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.toggle[data-on] .toggle-knob {
+  background: var(--accent-contrast);
+  transform: translateX(14px);
+}
+
+.toggle:disabled {
+  cursor: default;
+  border-color: var(--line);
+  background: var(--raised);
+}
+
+.toggle:disabled .toggle-knob {
+  background: var(--line-strong);
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 32px;
+}
+
+.toggle-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.toggle-label {
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.toggle-note {
+  color: var(--ink-faint);
+  font-size: var(--t-2);
+  line-height: 1.45;
+}
+
+/* A 20px switch is a mis-tap. The track grows and the knob and its travel grow with it. */
+:root[data-touch] .toggle {
+  width: 46px;
+  height: 28px;
+}
+
+:root[data-touch] .toggle-knob {
+  width: 22px;
+  height: 22px;
+}
+
+:root[data-touch] .toggle[data-on] .toggle-knob {
+  transform: translateX(18px);
+}

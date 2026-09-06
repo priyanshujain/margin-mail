@@ -1,0 +1,46 @@
+render-version: 2
+message-id: 2026090211140-arun@meridianproperties.example
+in-reply-to: -
+references-first: -
+from: Arun Mehta <arun.mehta@meridianproperties.example>
+to: Priyanshu Jain <pj@73ai.org>
+cc: -
+bcc: -
+reply-to: -
+date-ms: 1788327842000
+subject: Three things before Thursday
+is-html: true
+surface: theme
+snippet: Morning Priyanshu, Three things before Thursday, none of them urgent : The revised lease is with the landlord's solicitor. The service charge reconciliation went out on Monday. Parking bay 12 is…
+list-id: -
+auto-submitted: -
+precedence: -
+unsubscribe: -
+blocked-images: 0
+
+--- html ---
+<div>
+<p>Morning Priyanshu,</p>
+<p>Three things before Thursday, none of them <b>urgent</b>:</p>
+<ul>
+<li>The <b>revised lease</b> is with the landlord's solicitor.</li>
+<li>The service charge reconciliation went out on Monday.</li>
+<li>Parking bay 12 is yours from the first.</li>
+</ul>
+<p>Links, in case you want them now rather than Thursday:
+<a href="https://meridianproperties.example/lease/8812" target="_blank" rel="noopener noreferrer">the draft</a>,
+<a href="https://meridianproperties.example/charges/2026" target="_blank" rel="noopener noreferrer">the reconciliation</a>,
+<a href="https://meridianproperties.example/parking" target="_blank" rel="noopener noreferrer">the bay plan</a> and the
+<a href="https://meridianproperties.example/contact" target="_blank" rel="noopener noreferrer">office number</a>.</p>
+<p>Best,<br>Arun</p>
+<div>
+<p>Arun Mehta<br>
+Meridian Properties<br>
++91 22 6100 4400</p>
+</div>
+</div>
+
+--- quoted: none ---
+
+--- text ---
+Morning Priyanshu, Three things before Thursday, none of them urgent : The revised lease is with the landlord's solicitor. The service charge reconciliation went out on Monday. Parking bay 12 is yours from the first. Links, in case you want them now rather than Thursday: the draft , the reconciliation , the bay plan and the office number . Best, Arun Arun Mehta Meridian Properties +91 22 6100 4400

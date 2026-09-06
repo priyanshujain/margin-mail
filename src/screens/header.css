@@ -1,0 +1,162 @@
+/* One row of chrome and nothing else: the account on the left, the three boxes in the centre, and
+   search, places and Write on the right. No sidebar, no folder tree, no toolbar.
+ *
+ * Three columns rather than a flex row with a spacer, so the boxes are centred in the window and
+ * not in whatever is left of it after the account's name. */
+
+.titlebar {
+  flex: none;
+  position: relative;
+  z-index: 45;
+  height: var(--titlebar-h);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 0 14px;
+  border-bottom: 1px solid var(--line);
+  background: var(--shell);
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* The lane the macOS traffic lights are drawn in. Only one platform has them inside the page, and
+   main.tsx says so on the root before the first paint. */
+:root[data-traffic] .titlebar {
+  padding-left: var(--traffic-pad);
+}
+
+.titlebar-lead,
+.titlebar-trail {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.titlebar-trail {
+  justify-content: flex-end;
+}
+
+.account-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 28px;
+  padding: 0 10px 0 6px;
+  border-radius: var(--r-sm);
+  color: var(--ink);
+  font-size: var(--t-3);
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background 120ms var(--ease);
+}
+
+.account-chip:hover {
+  background: var(--accent-wash);
+}
+
+.account-chip .icon {
+  color: var(--ink-faint);
+}
+
+.sync-note {
+  color: var(--ink-faint);
+  font-size: var(--t-1);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* What is happening, in the quietest voice the header has. Sentence case rather than the note's
+   small caps, because this is a sentence and not a label, and it is a line to notice out of the
+   corner of an eye rather than one to read. It ellipsises rather than wrapping: the header is one
+   row tall and a mailbox that is busy must never be a mailbox that has moved. */
+.sync-busy {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--ink-faint);
+  font-size: var(--t-2);
+  font-variant-numeric: tabular-nums;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The switcher behind the chip. */
+
+.account-list {
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+}
+
+.account-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 7px 8px;
+  border-radius: var(--r-sm);
+  text-align: left;
+  transition: background 120ms var(--ease);
+}
+
+.account-option:hover,
+.account-option[data-active] {
+  background: var(--accent-wash);
+}
+
+.account-option .icon {
+  flex: none;
+  color: var(--ink-faint);
+}
+
+.account-who {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.account-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--t-3);
+}
+
+.account-address {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink-faint);
+  font-size: var(--t-2);
+}
+
+/* Under the rule, because it is somewhere to go rather than one more account to be. */
+.account-settings {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: calc(100% - 12px);
+  margin: 4px 6px 6px;
+  padding: 7px 8px;
+  border-top: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  color: var(--ink-soft);
+  font-size: var(--t-3);
+  text-align: left;
+  transition: background 120ms var(--ease), color 120ms var(--ease);
+}
+
+.account-settings:hover {
+  background: var(--accent-wash);
+  color: var(--ink);
+}
+
+:root[data-touch] .account-chip,
+:root[data-touch] .account-option,
+:root[data-touch] .account-settings {
+  min-height: var(--touch-h);
+}

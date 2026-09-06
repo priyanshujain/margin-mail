@@ -1,0 +1,29 @@
+render-version: 2
+message-id: b0d1c4f2e3a54c8f9b7a1d2e3f405162@docusign.example
+in-reply-to: -
+references-first: -
+from: DocuSign NA3 System <dse@docusign.example>
+to: Priyanshu Jain <pj@73ai.org>
+cc: -
+bcc: -
+reply-to: -
+date-ms: 1788201667000
+subject: Completed: Studio lease 2026
+is-html: false
+surface: theme
+snippet: All parties have completed the envelope. You can access the signed copy from the link below or from the attached PDF.
+list-id: -
+auto-submitted: -
+precedence: -
+unsubscribe: -
+blocked-images: 0
+attachment: part=2 name="Studio lease 2026 (signé).pdf" type=application/pdf size=193 inline=false cid=- sha256=e5a636ac00ea3c17
+
+--- html ---
+<p>All parties have completed the envelope. You can access the signed copy from the link below or from the attached PDF.</p>
+
+--- quoted: none ---
+
+--- text ---
+All parties have completed the envelope. You can access the signed copy
+from the link below or from the attached PDF.

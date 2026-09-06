@@ -1,0 +1,74 @@
+/* The row of spans and the button under it, on the welcome stage and in the arriving panel. The
+   options are the first-run panel's choices, at the same size, because they are the same kind
+   of question. */
+
+.window-choice {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.window-choice-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.window-choice-option {
+  padding: 5px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-pill);
+  background: var(--raised);
+  color: var(--ink-soft);
+  font-size: var(--t-2);
+  transition: background 120ms var(--ease), border-color 120ms var(--ease), color 120ms var(--ease);
+}
+
+.window-choice-option:hover {
+  color: var(--ink);
+}
+
+.window-choice-option[data-on] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+.window-choice-option:disabled {
+  opacity: 0.6;
+}
+
+:root[data-touch] .window-choice-option {
+  min-height: var(--touch-h);
+}
+
+.window-choice-note {
+  margin: 0;
+  color: var(--ink-faint);
+  font-size: var(--t-2);
+  line-height: 1.5;
+}
+
+.window-choice-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 2px;
+}
+
+/* On the welcome stage everything is centred, and the row and the button follow. */
+.welcome .window-choice {
+  align-items: center;
+  width: min(420px, 100%);
+}
+
+.welcome .window-choice-options {
+  justify-content: center;
+}
+
+.welcome .window-choice-note {
+  text-align: center;
+}
+
+.welcome .window-choice-actions {
+  justify-content: center;
+}

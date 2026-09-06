@@ -1,0 +1,295 @@
+/* The guide: search across the top, then a rail of articles on the left and one article on the
+   right at a measure prose is read at, inside the panel that takes the window. The shape below the
+   search is Settings', and the two files agree on purpose: a person who has been in one of them
+   should not have to work out the other. Layout only, every value through a token.
+
+   The panel's own head carries the title and the close control, so the guide starts at the search
+   field, which runs the width of the panel above both columns rather than sitting in the corner of
+   one of them. */
+
+.guide {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* The two columns, under the search that narrows one of them. */
+.guide-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+
+.guide-rail {
+  flex: none;
+  width: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 12px 10px;
+  border-right: 1px solid var(--line);
+  background: var(--sidebar);
+  overflow-y: auto;
+}
+
+/* The search bar. A band across the panel with a rule under it rather than a box inside a column:
+   it is the head of the whole guide and not a control belonging to the rail, and a boxed field
+   floating in a band that wide would read as one. It is the size of the thing it is: the type is
+   the phone field size, which is the largest the app sets, so the bar is the first thing the eye
+   lands on under the title. */
+.guide-search {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 22px;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink-faint);
+  cursor: text;
+}
+
+.guide-search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: var(--t-5);
+}
+
+.guide-search input::placeholder {
+  color: var(--ink-faint);
+}
+
+.guide-search input:focus {
+  outline: none;
+}
+
+/* The engine's own clear control for a search field, which is drawn in nobody's palette and sits
+   where the rest of the app puts nothing. The field clears by deleting what is in it. */
+.guide-search input::-webkit-search-cancel-button {
+  appearance: none;
+}
+
+/* A search with no answer: under the field that asked, across the panel, because it is the answer
+   to the search rather than a state of the rail. The rail below it is empty and the article that
+   was open is still open, which is the point: nothing was taken away, there is just nothing more. */
+.guide-nothing {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 26px 22px 28px;
+  border-bottom: 1px solid var(--line);
+  text-align: center;
+}
+
+/* The family's empty line without the room a list gives it: here it is the head of a short block
+   rather than the whole of what a column has to say. */
+.guide-nothing .empty-state {
+  padding: 0;
+}
+
+.guide-ask {
+  max-width: var(--measure);
+  margin: 0;
+  color: var(--ink-soft);
+  font-family: var(--font-ui);
+  font-size: var(--t-3);
+  line-height: 1.5;
+}
+
+/* The section labels in the rail are the family's group head, so a group of articles is read the
+   same way a group of threads is. What they lose is a list's horizontal padding, which is drawn for
+   a 420px column and not for this one. */
+.guide-rail .group-head {
+  padding: 12px 8px 4px;
+}
+
+.guide-tab {
+  padding: 6px 10px;
+  border-radius: var(--r-sm);
+  color: var(--ink-soft);
+  font-size: var(--t-3);
+  line-height: 1.35;
+  text-align: left;
+  transition: background 120ms var(--ease), color 120ms var(--ease);
+}
+
+.guide-tab:hover {
+  background: var(--accent-wash);
+}
+
+.guide-tab[data-active] {
+  background: var(--accent-wash);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.guide-panel {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+  padding: 24px 32px 48px;
+}
+
+/* The text face at the reading size. The measure is on the prose rather than on the article,
+   because a picture is not prose: the sentences hold to the same 46em the reading pane holds to,
+   and a picture of the app is allowed the whole column, which is the only way it is drawn at the
+   size it was taken at. */
+.guide-article {
+  font-family: var(--font-book);
+  font-size: var(--t-4);
+}
+
+.guide-eyebrow {
+  margin: 0 0 6px;
+  color: var(--ink-faint);
+  font-family: var(--font-ui);
+  font-size: var(--t-1);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.guide-title {
+  margin: 0 0 16px;
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 22px;
+  letter-spacing: -0.01em;
+}
+
+.guide-p {
+  max-width: var(--measure);
+  margin: 0 0 14px;
+  color: var(--ink);
+  line-height: 1.65;
+}
+
+.guide-steps {
+  max-width: var(--measure);
+  margin: 0 0 14px;
+  padding-left: 22px;
+  color: var(--ink);
+  line-height: 1.65;
+}
+
+.guide-steps li {
+  margin-bottom: 8px;
+}
+
+/* There are no keys on a phone, and the space in front of one goes with it. The cap itself is
+   hidden by the primitive; what this rule takes away is the gap it would leave in a sentence. */
+:root[data-phone] .guide-cap {
+  display: none;
+}
+
+/* One line set apart from the prose: the thing people get wrong, or the promise worth saying
+   twice. A rule down the left rather than a box, because a box in the middle of a page reads as a
+   warning and almost none of these are one. */
+.guide-note {
+  max-width: var(--measure);
+  margin: 0 0 14px;
+  padding: 2px 0 2px 14px;
+  border-left: 2px solid var(--line-strong);
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+
+/* The verbs of a thing as a table. A paragraph that lists six keys is a paragraph nobody reads. */
+.guide-keys {
+  max-width: var(--measure);
+  margin: 0 0 16px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 7px 14px;
+  align-items: baseline;
+}
+
+.guide-key {
+  display: contents;
+}
+
+.guide-key dt {
+  margin: 0;
+  justify-self: end;
+}
+
+.guide-key dd {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: var(--t-3);
+  color: var(--ink-soft);
+}
+
+/* A drawn figure is not a photograph and does not want a photograph's frame: it is made of the
+   app's own parts, so it sits on the paper the way the app does. */
+.guide-figure[data-drawn] {
+  margin: 18px 0 20px;
+}
+
+.guide-link {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--line-strong);
+  transition: text-decoration-color 120ms var(--ease);
+}
+
+.guide-link:hover {
+  text-decoration-color: var(--ink);
+}
+
+/* A picture is drawn at the size it was, which the `img` carries, and the only thing left here is
+   what to do when the column is narrower than that: shrink it and keep its shape. A window shot is
+   1440 wide and the column is not, so that case is every window in the guide. */
+.guide-figure {
+  margin: 20px 0 22px;
+}
+
+.guide-figure img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+}
+
+.guide-figure figcaption {
+  max-width: var(--measure);
+  margin-top: 8px;
+  color: var(--ink-faint);
+  font-family: var(--font-ui);
+  font-size: var(--t-2);
+}
+
+/* On a phone the rail sits above the article rather than beside it, and keeps its shape: 260px of
+   names next to a column of prose is the whole screen twice over, and a strip of fifty names with
+   the section labels dropped out of it is a map with the countries rubbed off. */
+:root[data-phone] .guide-body {
+  flex-direction: column;
+}
+
+:root[data-phone] .guide-rail {
+  flex: none;
+  width: auto;
+  max-height: 40dvh;
+  border-right: 0;
+  border-bottom: 1px solid var(--line);
+}
+
+:root[data-phone] .guide-search {
+  padding: 9px 16px;
+}
+
+:root[data-phone] .guide-nothing {
+  padding: 20px 16px 22px;
+}
+
+:root[data-phone] .guide-panel {
+  padding: 18px 16px 40px;
+}

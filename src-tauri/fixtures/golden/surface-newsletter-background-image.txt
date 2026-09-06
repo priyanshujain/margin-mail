@@ -1,0 +1,37 @@
+render-version: 2
+message-id: hm-2026-09-02-9912@harbourmarket.example
+in-reply-to: -
+references-first: -
+from: Harbour Market <hello@harbourmarket.example>
+to: <pj@73ai.org>
+cc: -
+bcc: -
+reply-to: -
+date-ms: 1788326100000
+subject: The autumn box is back
+is-html: true
+surface: paper
+snippet: The autumn box is back, and it is heavier than last year. See what is in it
+list-id: news.harbourmarket.example
+auto-submitted: -
+precedence: bulk
+unsubscribe: -
+blocked-images: 0
+
+--- html ---
+
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
+<tbody><tr><td align="center" style="padding:20px 0">
+<table width="600" cellpadding="0" cellspacing="0" border="0">
+<tbody><tr><td style="padding:28px;color:#2b2b2b;font-family:Georgia , serif">
+<p style="margin:0 0 12px">The autumn box is back, and it is heavier than last year.</p>
+<p style="margin:0"><a href="https://harbourmarket.example/boxes" target="_blank" rel="noopener noreferrer">See what is in it</a></p>
+</td></tr>
+</tbody></table>
+</td></tr>
+</tbody></table>
+
+--- quoted: none ---
+
+--- text ---
+The autumn box is back, and it is heavier than last year. See what is in it

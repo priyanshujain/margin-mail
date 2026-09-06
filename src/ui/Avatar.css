@@ -1,0 +1,76 @@
+/* The size is set as --avatar rather than as a width, so the type inside follows the box and a
+   phone row, which widens --avatar to 36px, gets bigger initials without being told twice. */
+.avatar {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: var(--avatar);
+  height: var(--avatar);
+  border-radius: 50%;
+  background: var(--hue-1);
+  color: var(--accent-contrast);
+  font-size: calc(var(--avatar) * 0.37);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  user-select: none;
+}
+
+/* md is deliberately absent: it takes --avatar as the layout around it has set it. */
+.avatar[data-size="xs"] {
+  --avatar: 16px;
+}
+
+.avatar[data-size="sm"] {
+  --avatar: 20px;
+}
+
+.avatar[data-size="lg"] {
+  --avatar: 40px;
+}
+
+.avatar[data-hue="2"] { background: var(--hue-2); }
+.avatar[data-hue="3"] { background: var(--hue-3); }
+.avatar[data-hue="4"] { background: var(--hue-4); }
+.avatar[data-hue="5"] { background: var(--hue-5); }
+.avatar[data-hue="6"] { background: var(--hue-6); }
+.avatar[data-hue="7"] { background: var(--hue-7); }
+.avatar[data-hue="8"] { background: var(--hue-8); }
+
+/* A company gets a bordered mark in the text face instead of a hue. Colouring DocuSign the same
+   green as a friend claims a relationship that is not there. */
+.avatar[data-brand] {
+  background: var(--raised);
+  border: 1px solid var(--line);
+  color: var(--ink-soft);
+  font-family: var(--font-heading);
+  font-size: calc(var(--avatar) * 0.4);
+  font-weight: 600;
+}
+
+/* Stacked participants overlap, and each one cuts the one behind it with a ring of the surface
+   it is standing on. */
+.avatar-stack {
+  display: flex;
+  flex: none;
+}
+
+.avatar-stack .avatar {
+  margin-left: -6px;
+  border: 2px solid var(--paper);
+}
+
+.avatar-stack .avatar:first-child {
+  margin-left: 0;
+}
+
+/* The people the stack ran out of room for, as a count rather than a face. It is the wash an
+   attachment's kind mark takes, because it is the same kind of thing: a circle that is not
+   somebody, so it cannot wear one of the eight hues. Three glyphs in a 20px circle need the
+   tighter size. */
+.avatar-stack .avatar[data-more] {
+  background: var(--accent-wash);
+  color: var(--ink-soft);
+  font-size: calc(var(--avatar) * 0.32);
+  letter-spacing: -0.02em;
+}

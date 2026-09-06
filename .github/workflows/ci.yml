@@ -50,8 +50,20 @@ jobs:
 
       - run: node scripts/docs-check.mjs
 
+  # Every desktop the release ships to, because the parts of this crate that differ by platform are
+  # the parts nobody runs by hand: the UserNotifications bridge on macOS, the D-Bus one everywhere
+  # else, the machine id the refresh tokens are sealed against. A break in one of those used to
+  # surface at release time on a runner nobody was watching.
   rust:
-    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Ubuntu 22.04 is the glibc baseline the release builds on, so it is what CI tests on.
+          - os: ubuntu-22.04
+          - os: macos-26
+          - os: windows-latest
+    runs-on: ${{ matrix.os }}
     defaults:
       run:
         working-directory: rust/margin-mail
@@ -61,6 +73,7 @@ jobs:
           path: rust/margin-mail
 
       - name: Install Linux dependencies
+        if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y \
@@ -79,14 +92,107 @@ jobs:
       - uses: swatinem/rust-cache@v2
         with:
           workspaces: rust/margin-mail/src-tauri -> target
+          key: ${{ matrix.os }}
 
       # tauri_build::build() wants a frontendDist that exists, and build.rs wants credentials to
       # embed. The example file is what a fresh clone compiles against, so that is what CI uses.
       - name: Stub the build inputs
+        shell: bash
         run: |
           mkdir -p dist && touch dist/index.html
           cp google-credentials.example.json google-credentials.json
 
+      # The gate docs/release.md names is the test suites, and that is all this enforces. `cargo fmt
+      # --check` and `cargo clippy -D warnings` both fail on the tree as it stands; adopting either
+      # is a cleanup pass to decide on separately, not something to bolt onto CI first.
       - name: Test
         working-directory: rust/margin-mail/src-tauri
         run: cargo test
+
+  # The flake at whatever release nix/release.json pins. A broken flake, or a deb that no longer
+  # patches against current nixpkgs, shows up here rather than at the next release. Before the
+  # first release there is nothing pinned and nothing to build.
+  nix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - id: pin
+        run: echo "version=$(jq -r '.version // ""' nix/release.json)" >> "$GITHUB_OUTPUT"
+
+      - uses: cachix/install-nix-action@v31
+        if: steps.pin.outputs.version != ''
+
+      # --impure with the environment variable because the licence is FSL rather than MIT, so
+      # nixpkgs treats the package as unfree and refuses to build it otherwise.
+      - if: steps.pin.outputs.version != ''
+        run: NIXPKGS_ALLOW_UNFREE=1 nix build --impure .#margin-mail --print-build-logs
+
+      - if: steps.pin.outputs.version == ''
+        run: echo "nix/release.json pins no release yet, so there is nothing to build."
+
+  # The flatpak manifest is hand-written rather than produced by Tauri, so nothing else would catch
+  # a runtime that stopped carrying webkit2gtk-4.1 or a permission the app needs and does not ask
+  # for. The release job repackages the published deb; this one builds the same manifest against a
+  # deb built here, which is the only difference between them.
+  #
+  # On main rather than on every pull request: it is a full release-mode build plus a runtime
+  # download, the manifest changes about once a year, and a break in it is worth finding within the
+  # day rather than within the minute.
+  flatpak:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-22.04
+    defaults:
+      run:
+        working-directory: rust/margin-mail
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          path: rust/margin-mail
+
+      - uses: actions/checkout@v7
+        with:
+          repository: priyanshujain/margin
+          path: python/margin
+
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libgtk-3-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            patchelf \
+            libxdo-dev \
+            libssl-dev \
+            build-essential \
+            flatpak \
+            flatpak-builder
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 26
+
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 10
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: rust/margin-mail/src-tauri -> target
+          key: flatpak
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: cp google-credentials.example.json google-credentials.json
+
+      - run: pnpm tauri build --bundles deb
+
+      - name: Build the flatpak
+        run: |
+          mv src-tauri/target/release/bundle/deb/*.deb flatpak/margin-mail.deb
+          flatpak/build.sh

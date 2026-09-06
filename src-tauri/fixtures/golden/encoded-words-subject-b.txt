@@ -1,0 +1,35 @@
+render-version: 2
+message-id: 9c11e0a4-tickets@bauhaus-tickets.example
+in-reply-to: -
+references-first: -
+from: Caroline Bauhaus <caroline@bauhaus-tickets.example>
+to: Priyanshu Jain <pj@73ai.org>, Maya Raghunathan <maya.raghunathan@example.com>
+cc: -
+bcc: -
+reply-to: -
+date-ms: 1788120295000
+subject: Les Misérables tickets, second night
+is-html: false
+surface: theme
+snippet: I got four for the second night rather than the first, the seats are better and it is ten pounds less each. Row H, slightly left of centre. Nobody has to pay me back until after, and if Karthik drops…
+list-id: -
+auto-submitted: -
+precedence: -
+unsubscribe: -
+blocked-images: 0
+
+--- html ---
+<p>I got four for the second night rather than the first, the seats are better and it is ten pounds less each. Row H, slightly left of centre.</p>
+<p>Nobody has to pay me back until after, and if Karthik drops out I know two people who would take his.</p>
+<p>Caroline</p>
+
+--- quoted: none ---
+
+--- text ---
+I got four for the second night rather than the first, the seats are
+better and it is ten pounds less each. Row H, slightly left of centre.
+
+Nobody has to pay me back until after, and if Karthik drops out I know
+two people who would take his.
+
+Caroline

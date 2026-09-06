@@ -1,0 +1,242 @@
+/* Focus & Reply: the whole stage, a column of items on a measure of its own.
+ *
+ * Wider than the reading pane's, because an item is two columns rather than one: what was written
+ * to you on the left and what you are writing back on the right, so both of them get a measure a
+ * paragraph can live on. */
+
+.focus {
+  flex: 1;
+  min-height: 0;
+  /* This element is the stage as well as the page, and the stage is a flex row. Declaring the
+     column here is what keeps the items stacked and, more to the point, keeps them from being
+     shrunk to the height of the window instead of scrolling past it. */
+  flex-direction: column;
+  align-items: center;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 40px 40px 60px;
+}
+
+.focus-inner {
+  flex: none;
+  width: 100%;
+  max-width: var(--focus-w);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.focus-head {
+  text-align: center;
+}
+
+.focus-title {
+  margin: 0 0 8px;
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 32px;
+  letter-spacing: -0.015em;
+}
+
+.focus-lede {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: var(--t-4);
+}
+
+/* The keys, right aligned under the sentence rather than centred with it: it is a legend for the
+   page below rather than part of the title. */
+.focus-hint {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  margin: 22px 0 0;
+  color: var(--ink-faint);
+  font-size: var(--t-2);
+}
+
+/* One card, two columns, a hairline down the middle. */
+.focus-item {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  /* Paper rather than the raised surface, because a message body is rendered in its own document
+     on the paper colour and a card a shade off it would draw a rectangle round every message. */
+  background: var(--paper);
+  overflow: hidden;
+  transition: border-color 120ms var(--ease), box-shadow 120ms var(--ease);
+}
+
+.focus-item[data-active] {
+  border-color: var(--line-strong);
+  box-shadow: var(--card-ring);
+}
+
+.focus-message {
+  min-width: 0;
+  padding: 22px 24px 24px;
+}
+
+.focus-subject {
+  margin: 0 0 14px;
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.focus-from {
+  display: grid;
+  grid-template-columns: var(--avatar) 1fr auto;
+  gap: 0 12px;
+  align-items: center;
+}
+
+.focus-who {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.focus-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--t-3);
+  font-weight: 600;
+}
+
+.focus-name .addr {
+  margin-left: 6px;
+  color: var(--ink-faint);
+  font-weight: 400;
+}
+
+.focus-to,
+.focus-time {
+  color: var(--ink-faint);
+  font-size: var(--t-2);
+}
+
+.focus-time {
+  white-space: nowrap;
+}
+
+.focus-body {
+  margin-top: 14px;
+}
+
+/* Before the body has arrived, and where it never will: the snippet is what the list already knew
+   about this thread, and it is enough to recognise it by. */
+.focus-snippet {
+  margin: 0;
+  color: var(--ink-soft);
+  font-family: var(--font-book);
+  font-size: var(--body-size);
+  line-height: 1.55;
+}
+
+.focus-reply {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid var(--line);
+}
+
+.focus-reply-head {
+  flex: none;
+  padding: 13px 18px;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink-faint);
+  font-size: var(--t-3);
+}
+
+.focus-reply-head b {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+/* The box is the reply, so it takes the height the message beside it needs and grows no scrollbar
+   of its own until it has to. */
+.focus-box {
+  flex: 1;
+  min-height: 180px;
+  padding: 16px 18px;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font-family: var(--font-book);
+  font-size: var(--body-size);
+  line-height: 1.55;
+  resize: none;
+}
+
+.focus-box:focus {
+  outline: none;
+}
+
+.focus-box::placeholder {
+  color: var(--ink-faint);
+}
+
+.focus-reply-foot {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--line);
+}
+
+/* An item that has been answered is one line: the page shortens as it is worked through, which is
+   the only progress this screen reports. */
+.focus-sent {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 22px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  color: var(--ink-soft);
+  font-size: var(--t-3);
+}
+
+.focus-sent b {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.focus-sent .icon {
+  flex: none;
+  color: var(--ink-faint);
+}
+
+.focus-blank {
+  display: grid;
+  place-items: center;
+  padding: 60px 0;
+}
+
+.focus-foot {
+  display: flex;
+  justify-content: center;
+}
+
+/* On a phone the two columns are one: a message and then the box under it, which is the order you
+   read them in anyway. */
+:root[data-phone] .focus {
+  padding: 24px 16px 40px;
+}
+
+:root[data-phone] .focus-item {
+  grid-template-columns: 1fr;
+}
+
+:root[data-phone] .focus-reply {
+  border-left: 0;
+  border-top: 1px solid var(--line);
+}

@@ -1,0 +1,29 @@
+Return-Path: <clare.dunn@fieldnotes.example>
+MIME-Version: 1.0
+Date: Mon, 31 Aug 2026 14:22:07 +0100
+Message-ID: <AM6PR03MB4419D1E@fieldnotes.example>
+Subject: The signature block, and one photo
+From: Clare Dunn <clare.dunn@fieldnotes.example>
+To: Priyanshu Jain <pj@73ai.org>
+Content-Type: multipart/related; type="text/html"; boundary="_004_AM6PR03MB4419_"
+
+--_004_AM6PR03MB4419_
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+<html><body>
+<p>The photo you asked for is below.</p>
+<p><img src="cid:photo001@fieldnotes.example" width="600" height="400" alt="The site"></p>
+<p>Clare</p>
+</body></html>
+
+--_004_AM6PR03MB4419_
+Content-Type: image/png; name="site.png"
+Content-Description: site.png
+Content-Disposition: attachment; filename="site.png"; size=70
+Content-ID: <photo001@fieldnotes.example>
+Content-Transfer-Encoding: base64
+
+iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==
+
+--_004_AM6PR03MB4419_--

@@ -1,0 +1,61 @@
+render-version: 2
+message-id: CAJ8sam-piano-07@mail.sunnydaymusic.example
+in-reply-to: CAJ8pj-piano-06@mail.73ai.org
+references-first: sunny-enrol-01@sunnydaymusic.example
+from: Sam Okafor <sam@sunnydaymusic.example>
+to: Priyanshu Jain <pj@73ai.org>
+cc: -
+bcc: -
+reply-to: -
+date-ms: 1788343802000
+subject: Re: Fw: (no subject)
+is-html: false
+surface: theme
+snippet: Got it, thank you. Wednesdays at five work for us. The first lesson is on the 9th, nothing to prepare. The invitation is attached, it should land in your calendar. Sam
+list-id: -
+auto-submitted: -
+precedence: -
+unsubscribe: -
+blocked-images: 0
+
+--- html ---
+<p>Got it, thank you. Wednesdays at five work for us.</p>
+<p>The first lesson is on the 9th, nothing to prepare. The invitation is attached, it should land in your calendar.</p>
+<p>Sam</p>
+
+--- quoted ---
+<p>On Mon, 31 Aug 2026 at 09:12, Priyanshu Jain &lt;pj@73ai.org&gt; wrote:<br>
+&gt; Hi Sam, form signed and attached. Would a weekday after school suit<br>
+&gt; Cooper? He finishes at four and we are ten minutes away on foot.<br>
+&gt;<br>
+&gt; On Wed, 12 Aug 2026 at 11:02, Sunny Day Music<br>
+&gt; &lt;enrolments@sunnydaymusic.example&gt; wrote:<br>
+&gt; &gt; Enrolment received for Cooper. Term starts the week of 8 September<br>
+&gt; &gt; and your teacher will be in touch to fix a weekly slot.<br>
+&gt; &gt;<br>
+&gt; &gt; Nothing further is needed from you today.<br>
+&gt;<br>
+&gt; Thanks,<br>
+&gt; Priyanshu</p>
+
+--- text ---
+Got it, thank you. Wednesdays at five work for us.
+
+The first lesson is on the 9th, nothing to prepare. The invitation is
+attached, it should land in your calendar.
+
+Sam
+
+On Mon, 31 Aug 2026 at 09:12, Priyanshu Jain <pj@73ai.org> wrote:
+> Hi Sam, form signed and attached. Would a weekday after school suit
+> Cooper? He finishes at four and we are ten minutes away on foot.
+>
+> On Wed, 12 Aug 2026 at 11:02, Sunny Day Music
+> <enrolments@sunnydaymusic.example> wrote:
+> > Enrolment received for Cooper. Term starts the week of 8 September
+> > and your teacher will be in touch to fix a weekly slot.
+> >
+> > Nothing further is needed from you today.
+>
+> Thanks,
+> Priyanshu

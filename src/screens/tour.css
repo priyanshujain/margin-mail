@@ -1,0 +1,439 @@
+/* The tour. Layout only: every colour and radius is a token.
+ *
+ * Half of this file is the figures, which are diagrams of screens the app already draws: a Screener
+ * card, the three boxes, the two piles, the snooze picker, the palette, a toast. They are built out
+ * of the same tokens those screens use, so they follow the theme, they stay small and quiet, and
+ * they cannot drift from the app the way a picture of it would. */
+
+.tour {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Held at the tallest slide's height, so the panel does not change size under the hand between one
+   slide and the next and the foot's controls stay where they were pressed. */
+.tour-slide {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 350px;
+  animation: tour-in 180ms var(--ease);
+}
+
+@keyframes tour-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tour-slide {
+    animation: none;
+  }
+}
+
+.tour-title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: var(--t-4);
+}
+
+.tour-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tour-copy p {
+  margin: 0;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+
+.tour-copy p:first-child {
+  color: var(--ink);
+}
+
+/* The figures
+   --------------------------------------------------------------------------------------------- */
+
+/* The shell surface behind them, so what is drawn on it reads as the app's own paper. The heading
+   holds the top and the copy holds the foot, and whatever room a short figure leaves over is split
+   around it rather than left in a heap at the bottom. */
+.tour-fig {
+  display: flex;
+  justify-content: center;
+  margin-block: auto;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--shell);
+}
+
+/* A run of text, wherever a figure needs one and the words would be an illustration. */
+.tour-bar {
+  height: 6px;
+  border-radius: var(--r-pill);
+  background: var(--line);
+}
+
+.tour-bar[data-w="name"] {
+  width: 96px;
+  background: var(--line-strong);
+}
+
+.tour-bar[data-w="subject"] {
+  width: 150px;
+}
+
+.tour-bar[data-w="row"] {
+  flex: 1;
+}
+
+.tour-bar[data-w="query"] {
+  width: 78px;
+  background: var(--line-strong);
+}
+
+/* A Screener card: who wrote, what the suggestion is, and the three answers with their keys. */
+.tour-card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--raised);
+}
+
+.tour-avatar {
+  width: var(--avatar);
+  height: var(--avatar);
+  border-radius: var(--r-pill);
+  background: var(--accent-wash);
+}
+
+.tour-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  min-width: 0;
+}
+
+.tour-tag {
+  padding: 1px 9px;
+  border-radius: var(--r-pill);
+  background: var(--accent-wash);
+  color: var(--ink-faint);
+  font-size: var(--t-1);
+}
+
+.tour-choices {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tour-chip,
+.tour-verb {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 9px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm);
+  background: var(--raised);
+  color: var(--ink-soft);
+  font-size: var(--t-2);
+  white-space: nowrap;
+}
+
+/* The three boxes, as the header's own switch. */
+.tour-boxes {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  border-radius: var(--r-md);
+  background: var(--accent-wash);
+}
+
+.tour-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 12px;
+  border-radius: var(--r-sm);
+  color: var(--ink-soft);
+  font-size: var(--t-2);
+}
+
+.tour-box[data-on] {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+/* The two stacks at the foot of the list, with an edge showing behind each top card. */
+.tour-piles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  width: 100%;
+}
+
+.tour-pile {
+  position: relative;
+  padding-top: 7px;
+}
+
+.tour-pile-edge {
+  position: absolute;
+  top: 0;
+  left: 7px;
+  right: 7px;
+  height: 8px;
+  border: 1px solid var(--line-strong);
+  border-bottom: 0;
+  border-radius: var(--r-md) var(--r-md) 0 0;
+  background: var(--raised);
+}
+
+.tour-pile-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md);
+  background: var(--raised);
+}
+
+.tour-pile-label {
+  color: var(--ink-faint);
+  font-size: var(--t-1);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* The snooze picker, which is a small popover of moments. */
+.tour-menu {
+  display: flex;
+  flex-direction: column;
+  width: 210px;
+  padding: 5px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--paper);
+}
+
+.tour-menu-row {
+  padding: 4px 9px;
+  color: var(--ink-soft);
+  font-size: var(--t-2);
+}
+
+/* The date and the reminder are a choice about something else, so the picker keeps them apart. */
+.tour-menu-row[data-apart] {
+  margin-top: 5px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+  color: var(--ink);
+}
+
+.tour-verbs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+}
+
+/* The palette: the field, then the groups it lists under. */
+.tour-palette {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  width: 280px;
+  padding: 9px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--paper);
+}
+
+.tour-field {
+  display: flex;
+  align-items: center;
+  height: 26px;
+  margin-bottom: 2px;
+  padding: 0 3px;
+  border-bottom: 1px solid var(--line);
+}
+
+.tour-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tour-group-label {
+  width: 58px;
+  color: var(--ink-faint);
+  font-size: var(--t-1);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.tour-kept {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.tour-kept-item {
+  padding: 5px 11px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--raised);
+  color: var(--ink-soft);
+  font-size: var(--t-2);
+}
+
+/* The one thing in the app that is not paper, because a note is yours and not the sender's. */
+.tour-kept-item[data-note] {
+  border-color: var(--note-line);
+  background: var(--note-surface);
+  color: var(--ink);
+}
+
+/* A message with its images held back. */
+.tour-message {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  width: 300px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--raised);
+}
+
+.tour-message .tour-bar[data-w="row"] {
+  align-self: stretch;
+  flex: none;
+}
+
+.tour-banner {
+  padding: 2px 9px;
+  border-radius: var(--r-pill);
+  background: var(--accent-wash);
+  color: var(--ink-faint);
+  font-size: var(--t-1);
+}
+
+.tour-blocked {
+  width: 100%;
+  height: 46px;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--r-sm);
+}
+
+/* The toast, which is the acknowledgement every hidden action gives and the way back from it. */
+.tour-toast {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 9px 14px 9px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--paper);
+  color: var(--ink);
+  font-size: var(--t-3);
+}
+
+.tour-toast-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+}
+
+/* The foot
+   --------------------------------------------------------------------------------------------- */
+
+.tour-foot {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.tour-dots {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin: 0 auto;
+}
+
+.tour-dot {
+  display: grid;
+  place-items: center;
+  padding: 7px 3px;
+}
+
+.tour-dot::after {
+  content: "";
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--r-pill);
+  background: var(--line-strong);
+  transition: width 120ms var(--ease), background 120ms var(--ease);
+}
+
+.tour-dot:hover::after {
+  background: var(--ink-faint);
+}
+
+.tour-dot[data-on]::after {
+  width: 16px;
+  background: var(--accent);
+}
+
+:root[data-touch] .tour-dot {
+  min-height: var(--touch-h);
+}
+
+/* On a phone
+   --------------------------------------------------------------------------------------------- */
+
+/* There is no room for a card's three answers beside it, and no keys on them to teach anyway. */
+:root[data-phone] .tour-card {
+  grid-template-columns: auto 1fr;
+  row-gap: 10px;
+}
+
+:root[data-phone] .tour-choices {
+  grid-column: 1 / -1;
+}
+
+:root[data-phone] .tour-slide {
+  min-height: 0;
+}
+
+:root[data-phone] .tour-palette,
+:root[data-phone] .tour-message {
+  width: 100%;
+}
+
+:root[data-phone] .tour-foot {
+  gap: 8px;
+}

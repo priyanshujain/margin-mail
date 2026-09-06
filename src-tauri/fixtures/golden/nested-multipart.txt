@@ -1,0 +1,44 @@
+render-version: 2
+message-id: 116400046977232.1756846291@citypower.example
+in-reply-to: -
+references-first: -
+from: City Power <billing@citypower.example>
+to: Priyanshu Jain <pj@73ai.org>
+cc: -
+bcc: -
+reply-to: -
+date-ms: 1788383091000
+subject: Bill payment pending
+is-html: true
+surface: theme
+snippet: Dear Customer, Your one-time electronic payment of 98.26 for your City Power bill has been received and is pending. Your payment will be posted within two business days. Confirmation number…
+list-id: -
+auto-submitted: auto-generated
+precedence: -
+unsubscribe: -
+blocked-images: 0
+attachment: part=2 name="Statement-August.pdf" type=application/pdf size=193 inline=false cid=- sha256=e5a636ac00ea3c17
+
+--- html ---
+
+<p>Dear Customer,</p>
+<p>Your one-time electronic payment of <b>98.26</b> for your City Power bill has been received and is pending. Your payment will be posted within two business days.</p>
+<p>Confirmation number 116400046977232</p>
+<p>Thank you,<br>City Power Customer Care</p>
+
+--- quoted: none ---
+
+--- text ---
+Dear Customer,
+
+Your one-time electronic payment of 98.26 for your City Power bill has
+been received and is pending. Your payment will be posted within two
+business days.
+
+Confirmation number 116400046977232
+
+Please keep this message for your records. If you did not make this
+payment, call us on the number printed on your statement.
+
+Thank you,
+City Power Customer Care

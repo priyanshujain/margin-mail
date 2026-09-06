@@ -1,0 +1,76 @@
+/* The help launcher and its menu. Layout only: every colour and radius is a token.
+ *
+ * The surface is on the wrapper rather than on the button, so the button stays the ghost the rest
+ * of the app draws and keeps its own hover and its own active state without this file having to
+ * restate either of them. */
+
+.help-launcher {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  /* Over the stage, under the scrim an overlay puts up and under the compose card, which takes
+     this corner and is the reason the button hides while it is open. */
+  z-index: 15;
+  display: flex;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: var(--paper);
+}
+
+.help-launcher .button {
+  border-radius: var(--r-pill);
+}
+
+:root[data-phone] .help-launcher {
+  display: none;
+}
+
+/* The menu. The frame, the surface and the shadow are the Popover primitive's; this is only the
+   list inside it, and it is the More menu's list with an icon in front of each row. */
+
+.help-menu {
+  padding: 6px;
+}
+
+.help-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.help-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 6px 8px;
+  border-radius: var(--r-sm);
+  color: var(--ink);
+  font-size: var(--t-3);
+  text-align: left;
+  transition: background 120ms var(--ease);
+}
+
+/* The arrow keys walk the rows, so the row the keyboard is on reads the way the row the pointer is
+   over does. */
+.help-option:hover,
+.help-option:focus-visible {
+  background: var(--accent-wash);
+}
+
+.help-option .icon {
+  flex: none;
+  color: var(--ink-soft);
+}
+
+.help-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:root[data-touch] .help-option {
+  min-height: var(--touch-h);
+}

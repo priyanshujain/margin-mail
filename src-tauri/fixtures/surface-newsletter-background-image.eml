@@ -1,0 +1,24 @@
+Return-Path: <bounces+9912@mail.harbourmarket.example>
+MIME-Version: 1.0
+Date: Wed, 2 Sep 2026 06:15:00 +0100
+Message-ID: <hm-2026-09-02-9912@harbourmarket.example>
+Subject: The autumn box is back
+From: Harbour Market <hello@harbourmarket.example>
+To: pj@73ai.org
+List-Id: Harbour Market <news.harbourmarket.example>
+Precedence: bulk
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+<html><body>
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-image:url(https://cdn.harbourmarket.example/paper.png)">
+<tr><td align="center" style="padding:20px 0">
+<table width="600" cellpadding="0" cellspacing="0" border="0">
+<tr><td style="padding:28px;color:#2b2b2b;font-family:Georgia,serif">
+<p style="margin:0 0 12px">The autumn box is back, and it is heavier than last year.</p>
+<p style="margin:0"><a href="https://harbourmarket.example/boxes">See what is in it</a></p>
+</td></tr>
+</table>
+</td></tr>
+</table>
+</body></html>

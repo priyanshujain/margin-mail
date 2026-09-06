@@ -1,0 +1,47 @@
+render-version: 2
+message-id: 000000000000a1b2c3@google.com
+in-reply-to: -
+references-first: -
+from: Sam Okafor <sam@sunnydaymusic.example>
+to: Priyanshu Jain <pj@73ai.org>
+cc: -
+bcc: -
+reply-to: -
+date-ms: 1788343811000
+subject: Invitation: Piano lesson: Cooper @ Wed 9 Sep 2026 17:00 - 17:45 (IST) (pj@73ai.org)
+is-html: true
+surface: theme
+snippet: You have been invited to the following event. Piano lesson: Cooper When Wed 9 Sep 2026 17:00 to 17:45 India Standard Time Where Sunny Day Music, Bandra Who Sam Okafor, Priyanshu Jain
+list-id: -
+auto-submitted: -
+precedence: -
+unsubscribe: -
+blocked-images: 0
+invite-uid: 4c9b2f7a-piano-cooper@sunnydaymusic.example
+invite-summary: Piano lesson: Cooper
+invite-start-ms: 1788953400000
+invite-end-ms: 1788956100000
+invite-all-day: false
+invite-location: Sunny Day Music, Bandra
+invite-organizer: Sunny Day Music <lessons@sunnydaymusic.example>
+invite-my-response: NeedsAction
+invite-description: First lesson for Cooper. Nothing to prepare, and there is a piano here, so nothing to carry either.
+
+--- html ---
+<div style="padding:16px">
+<p>You have been invited to the following event.</p>
+<h3>Piano lesson: Cooper</h3>
+<p><b>When</b> Wed 9 Sep 2026 17:00 to 17:45 India Standard Time<br>
+<b>Where</b> Sunny Day Music, Bandra<br>
+<b>Who</b> Sam Okafor, Priyanshu Jain</p>
+</div>
+
+--- quoted: none ---
+
+--- text ---
+You have been invited to the following event.
+
+Piano lesson: Cooper
+When: Wed 9 Sep 2026 17:00 to 17:45 India Standard Time
+Where: Sunny Day Music, Bandra
+Who: Sam Okafor, Priyanshu Jain

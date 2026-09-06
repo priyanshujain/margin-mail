@@ -1,0 +1,139 @@
+/* The shell is .overlay and .panel in app.css, shared with the palette and with anything else that
+   takes the window. What is here is only what a titled sheet adds to it. */
+
+.sheet[data-size="mini"] {
+  width: min(292px, calc(100vw - 32px));
+}
+
+.sheet[data-size="wide"] {
+  width: min(620px, calc(100vw - 32px));
+}
+
+/* The guide. A library rather than a form, so it takes the window and leaves a margin of the app
+   showing around it, and its two columns scroll on their own: the body gives up the padding, the
+   gap and the scroll that every other sheet wants. */
+.sheet[data-size="full"] {
+  width: min(1280px, calc(100vw - 80px));
+  height: min(860px, calc(100vh - 80px));
+}
+
+.sheet[data-size="full"] .panel-body {
+  padding: 0;
+  gap: 0;
+  overflow: hidden;
+}
+
+:root[data-phone] .sheet[data-size="full"] {
+  height: var(--sheet-max-h);
+}
+
+.sheet[data-size="mini"] .panel-body {
+  gap: 10px;
+  padding: 12px 12px 14px;
+}
+
+.sheet:focus-visible {
+  outline: none;
+}
+
+/* The head is space-between, so a back control would centre the title. It keeps the left edge and
+   the close button holds the right. */
+.panel-head:has(.button[data-icon-only]:first-child) {
+  padding-left: 12px;
+}
+
+/* Confirmations
+   --------------------------------------------------------------------------------------------- */
+
+.confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.confirm-title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: var(--t-4);
+}
+
+.confirm-body {
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+
+.confirm-body p {
+  margin: 0;
+}
+
+.confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 4px;
+}
+
+/* A choice inside a confirmation: one box, ticked for what the button does by default, with the
+   consequence of unticking it on the line beneath. */
+.confirm-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 4px;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+/* Drawn here rather than left to the engine: WebKit picks the small control for this font size
+   and tints it with the accent, which in the dark palette is a 12px cream box on dark paper.
+   The box is the size, corner and blue the system draws, so it reads as a checkbox at a glance. */
+.confirm-option input {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 14px;
+  height: 14px;
+  margin: 2px 0 0;
+  appearance: none;
+  border: 1px solid var(--ink-faint);
+  border-radius: 4px;
+  background: var(--raised);
+  cursor: pointer;
+  transition: background 100ms var(--ease), border-color 100ms var(--ease);
+}
+
+.confirm-option input::after {
+  content: "";
+  width: 4px;
+  height: 8px;
+  border: solid var(--check-tick);
+  border-width: 0 2px 2px 0;
+  transform: translateY(-1px) rotate(45deg);
+  opacity: 0;
+}
+
+.confirm-option input:checked {
+  border-color: var(--check);
+  background: var(--check);
+}
+
+.confirm-option input:checked::after {
+  opacity: 1;
+}
+
+.confirm-option input:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.confirm-option:has(input:disabled) {
+  cursor: default;
+}
+
+.confirm-option-note {
+  display: block;
+  margin-top: 2px;
+  color: var(--ink-faint);
+  font-size: var(--t-2);
+}

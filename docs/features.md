@@ -21,14 +21,22 @@ reaches all of them.
 | `5` | Set aside | The Set aside pile |
 | `6` | Screener | First messages from senders with no decision yet |
 | `7` | Snoozed | Threads waiting to return, with their return time |
-| `0` | Everything | Every thread in the account, including archived, in date order |
-| palette | Sent, Drafts, Starred, Screened out, Spam, Trash | The usual folders |
+| `0` | Everything | Every thread on the device, including archived, spam and screened out, in date order |
+| palette | Sent, Drafts, Starred | The usual folders |
+| palette | Screened out, Spam, Trash | Under Other: the places you go looking in rather than read |
 | palette | All files, Clips, Contacts | The libraries |
 | palette | Labels | The provider's labels or folders, one place each |
 
 Every place except Feed, Screener and Focus & Reply is a list column beside the reading pane.
 Feed and Screener take the whole stage because their content is inline. A place remembers its
 scroll position and selection while the app is open.
+
+Every place is a view over what is on the device, and what is on the device is a window of the
+mailbox: the last 30 days by default, or 90, 180, 365 days or everything, set per account. Threads
+you have done something to are kept whatever their age. Only Everything says any of this out loud,
+in one quiet line at the foot of the list, "Showing the last month. Older mail is on Gmail.", with
+the setting one click away. The mechanism is in [architecture.md](architecture.md) and the setting
+is in [settings.md](settings.md).
 
 ## 2. Routing and the Screener
 
@@ -43,8 +51,8 @@ Two overrides apply before the sender rule:
 
 - A message whose `In-Reply-To` or `References` points at a thread the account is already in goes
   where that thread is, or to the Inbox if the thread was screened. A reply is never held.
-- A message from an address in the account's contacts, or one the account has ever sent to, is
-  screened in on first run and routed by the suggestion rules, never held.
+- A message from someone the account already knows is screened in on first run and routed by the
+  suggestion rules, never held. Who counts as known is settled under First run below.
 
 ### The Screener
 
@@ -60,9 +68,10 @@ subject, snippet, and a one-line reason with the suggested destination. Keys:
   sender into the Inbox and opens a reply.
 - Clear all screens out every sender currently waiting, after a confirmation.
 
-Screened out mail is kept for 90 days in the Screened out place, then trashed. Reversing a
-decision is done from the sender's contact card, and re-screening someone in brings back whatever
-they sent in the last 90 days.
+Screened out mail sits in the Screened out place for as long as the storage window keeps it and
+falls off the device with everything else of that age. There is no second retention rule to
+remember, and a wider window means a longer memory. Reversing a decision is done from the sender's
+contact card, and re-screening someone in brings back whatever they sent that is still here.
 
 ### Suggestions
 
@@ -85,10 +94,26 @@ wrong suggestion is a one-line fix.
 
 ### First run
 
-When an account is added, every sender in the mirror is screened in with a rule set by the same
-suggestion function, silently. The user can move any sender from the contact card, and the move
-applies to that sender's existing threads immediately. Only senders whose first message arrives
-after the account was added are held in the Screener.
+When an account is added, everyone it already knows is screened in with a rule set by the same
+suggestion function, silently. A month of mail is not by itself a good answer to who a person
+knows, so the seed is drawn from three cheap sources at once: every sender and every recipient
+inside the storage window, the People API's `connections` and `otherContacts` lists, and the Sent
+mail inside the window. Anyone in any of the three is screened in. All three are already fetched
+or already on the way, so this costs a pair of extra calls and no waiting.
+
+The pass runs at the end of the first sync rather than when the first-run panel is dismissed, so
+the Inbox fills as the mail arrives instead of sitting empty for as long as somebody takes to read
+a panel. It runs once per account and is guarded, which is the whole of what makes the Screener a
+gate: if it ran again on a later sync it would screen in every new sender the moment they wrote.
+The guard cuts the other way too: asked before the crawl has finished, as it is the moment an
+account is added from Settings, the seed answers "not yet" rather than marking itself done over a
+mirror with nothing in it, and the sync's own idle asks again. A seed on record as having
+screened in nobody is run once more when the mirror is ready, which repairs an account that was
+marked that way before the rule existed without anybody removing it and connecting it again.
+
+The user can move any sender from the contact card, and the move applies to that sender's existing
+threads immediately. Only senders whose first message arrives after the account was added are held
+in the Screener.
 
 Alongside this, a first-run panel offers "Start fresh": mark everything older than a chosen age
 (default one week) as seen, so New for you holds only what is recent. This is the only bulk
@@ -110,8 +135,12 @@ holds it until it is opened.
 - A new message in a Previously seen thread moves the thread to New for you.
 - `e` archives: the thread leaves the Inbox and lives in Everything. A new message in an archived
   thread brings it back to New for you. Archive is a provider change (Gmail: remove `INBOX`).
-- There are no counts on the groups, on the place, or on the app icon. A dock badge for New for
-  you exists as a setting and is off.
+- There are no counts on the groups or on the place. The one count anywhere is the dock badge,
+  which is the size of New for you across every account, and it is on by default and turns off in
+  Notifications. It is not the mailbox's unread count: a thread held in the Screener, routed to the
+  Feed or the Paper Trail, piled, snoozed or ignored is unread and is not waiting for you. Zero
+  takes the badge off rather than showing a nought. macOS and Linux carry it; Windows would need a
+  drawn overlay icon and does not have one yet.
 - A note on a thread shows as a single line under its row.
 
 Seen state is the provider's read state (Gmail: `UNREAD`), so it is not app state. Everything
@@ -200,12 +229,14 @@ focused message, `Shift+O` expands all. Quoted text is collapsed behind a pill.
 - Message bodies render in a sandboxed webview with scripts, forms and external styles removed.
   Remote images are blocked by default; a banner says how many trackers were stripped and names
   the vendor; Show images loads them for this message, and the contact card can allow them for a
-  sender always. Attachments are chips; images and PDFs preview inline on demand.
+  sender always. Attachments are chips; pressing one opens the file with whatever owns its type.
 - Attachments are fetched when the thread is opened, not during sync, and cached.
 - A calendar invite (`text/calendar` with `METHOD:REQUEST`) renders as a card: date, title,
   time, location, organiser, and Accept (`y`), Maybe (`m`), Decline (`n`), plus Open in Margin
   Calendar. RSVP goes through the Calendar API on the invited calendar; when the event is not
-  there yet it is imported first. Without the Calendar scope the card still renders read-only.
+  there yet it is imported first. The Calendar permission is not asked for when the account is
+  added, so the first RSVP says it needs it and runs the consent page again; until then the card
+  renders read-only.
 - Links show their real destination on hover and open with known tracking parameters removed.
 - Read together: select several threads with `x` and press `Enter`; the pane shows them one
   after another with a heading each.
@@ -290,15 +321,26 @@ focused. Built from the local index; nothing is fetched until you open one.
 
 ### Ignore
 
-`m` on a thread. New messages still arrive and append, but the thread never returns to New for
-you and never notifies. A banner on the thread says "You are ignoring this thread" with Stop
-ignoring. Local.
+`m` on a thread. New messages still arrive and append, and the thread rises with them because the
+Inbox is in time order, but it never reads as new, never counts on the badge and never notifies. A
+banner on the thread says "You are ignoring this thread" with Stop ignoring. Local.
 
 ### Notifications
 
 Off by default everywhere. `Shift+N` on a thread turns them on for that thread; the contact card
-turns them on for a person. A notification shows the sender and subject, and opening it opens the
-thread. There is no badge unless the setting is turned on. Local.
+turns them on for a person; Settings turns them on for a place, and has one switch over all of it
+for the machine, which is what "nothing on this laptop" means without touching a single thread. The
+sync pass that brings a message in is what posts the notification, and only for mail that arrived
+after the app came up, so a first sync, a rebuild or a week away says nothing about the backlog; one
+message is three lines, the app's name, the sender and the subject, and several in one pass are one
+notification counting them and naming the senders. On macOS the system asks once whether the app
+may notify at all, the first time anything here is turned on or the test button is pressed, and a
+refusal is undone in System Settings rather than here. Clicking one brings the app to the front and
+opens the thread in the list it shows in; a click on the grouped one opens the account's Inbox, and
+a click on the sample from Settings only brings the app to the front. The dock badge is a setting
+in the same section rather than a notification, it counts New for you, and it is the one thing here
+that is on. Local.
+
 
 ## 11. Contacts and the contact card
 
@@ -319,8 +361,38 @@ State: notes, delivery, notify are local. Provider: nothing.
   the app POSTs and confirms; with a `mailto:` header it sends the message; otherwise it opens the
   link. Either way it offers "and trash everything from them" and "and screen them out".
 - Screen out from the contact card is the block: future mail goes to Screened out. Nothing is sent.
-- `!` marks spam (provider), `#` trashes (provider), both with undo. Trash empties after 30 days
-  on the provider's schedule; the Trash place has an Empty button.
+- `!` marks spam and `#` trashes, both provider changes, both with an undo toast.
+
+### Screened out, Spam and Trash
+
+Three places under Other in the palette, below the daily ones and below the labels, with no number
+keys of their own. Where a place sits is the honest statement of how often you should be in it, and
+these are the ones you go looking in rather than the ones you read.
+
+None of them is a filter of ours. Gmail's spam filter runs on Gmail's side before the app sees a
+message, and the mirror takes what the mailbox holds: every list call sets `includeSpamTrash`, so a
+junked message is already on the device with its body indexed whether or not anything shows it.
+Screened out is the one we own, and it is a routing destination rather than a folder, so its rules
+are in section 2.
+
+Getting mail back out is the point of all three, and the verb that puts it back is the verb that
+put it there, the way the piles already work. `#` in Trash puts a thread back, `!` in Spam takes
+the spam mark off. Gmail restores a message's labels when the `TRASH` label comes off, so a thread
+put back lands where it was rather than in the Inbox. A thread taken out of Spam is routed like any
+other: to its sender's box if that sender has a rule, and to the Screener if they do not, which is
+the decision you still owe them.
+
+There are three ways back, in the order you will want them. A wrong keystroke is the toast that is
+already up, "Trashed · Undo" and `z`. A rescue a week later is the place and the verb. After thirty
+days Gmail empties its own trash, the message leaves the mirror with it, and nothing local changes
+that.
+
+There is no Empty button. Permanently deleting through the Gmail API needs the
+`https://mail.google.com/` scope, which is total access to the mailbox, and asking every account
+for that so a button can destroy things thirty days earlier than Gmail will anyway is a bad trade.
+Each place states the rule instead, in one line at the foot of the list: "Gmail empties this after
+30 days." Screened out carries no such line, because it falls off with the storage window like
+everything else of its age and there is no second retention rule to learn.
 
 ## 13. Selection and bulk actions
 
@@ -332,16 +404,28 @@ Enter for Read together. Every bulk action is one undo.
 ## 14. Search
 
 `/` focuses search. Results replace the list column and the reading pane works as usual. Search
-is local over the full mirror: subject, participants, snippet and body text, with operators
+is local over what is on the device: subject, participants, snippet and body text, with operators
 `from:`, `to:`, `subject:`, `has:attachment`, `filename:`, `in:` (any place), `before:` and
-`after:`, `label:`. When the query touches mail that is not yet hydrated, the provider's search
-runs as a second pass and its results append with a note. Results open in place and `Esc`
-returns to the previous place.
+`after:`, `label:`.
+
+Because the device holds a window, a local result set is a partial answer and says so. Every list
+of results ends with "Search older mail on Gmail", which runs the provider's search, appends the
+hits and hydrates them as they arrive. Those rows behave like any other row, and the next eviction
+pass takes them away again unless they picked up a pile, a note or some other decision in the
+meantime. A query whose `before:` or `after:` falls outside the window skips the local index
+entirely and goes to the provider, because a local answer to that question would be wrong rather
+than merely short. Results open in place and `Esc` returns to the previous place.
+
+Search reaches Spam, Trash and Screened out, and names the place on the row when it does. The
+message you most need to find is the one something else decided you should not see, and a search
+that skipped those three would be one you had to already know the answer to use. `in:` narrows to
+a single place when that is what you meant.
 
 ## 15. Accounts
 
-Add as many Gmail accounts as you like. Each has its own places, sender rules, piles and
-Screener. The account chip in the title bar switches (`Ctrl+1` to `Ctrl+9`) and offers All
+Add as many Gmail accounts as you like. Each has its own places, sender rules, piles, Screener,
+storage window and granted permissions, so a work account can keep a year while a personal one
+keeps a month. The account chip in the title bar switches (`Ctrl+1` to `Ctrl+9`) and offers All
 accounts (`Ctrl+0`), which merges every account's version of the current place into one list with
 a coloured edge on each row. Compose picks the account from the thread you are replying to, or
 the account you are looking at, and the From field switches it. Sent mail goes through the
@@ -355,13 +439,38 @@ are the provider's, they roam with the mailbox, and they are not how Margin orga
 
 ## 17. Settings and export
 
-`Cmd+,` opens settings as a panel: Accounts (add, remove, signature, aliases), Backup (Google
-Drive or Cloudflare R2, and the recovery phrase), Appearance (theme, reading pane, row density
-for the phone), Sending (undo delay, reply-all default, instant intro text), Privacy (remote
-images, link cleaning, per-sender allowances), Notifications (badge, sound), Keyboard (the keymap
-file), Data (export mail as mbox per account, export app state as JSON, import app state).
+Settings is a place, not a panel. `Cmd+,`, the palette, the account chip and the app menu all lead
+to the same full-stage screen, with a rail of sections down the left and one section at a time on
+the right. Twelve sections cover the accounts and their permissions, appearance, the storage
+window, privacy, the Screener, the piles and snooze, writing, notifications, the keymap, backup and
+the recovery phrase, every export the app offers, and the version. Each is specified in
+[settings.md](settings.md), including which of them live on the device and which roam.
 
-## 18. Not in version one
+## 18. Help
+
+The app is unlike the mail clients people arrive from, and none of the differences are
+discoverable by poking at the interface, so there is a tour, a question mark in the corner, and a
+guide behind it. Each is specified in [help.md](help.md).
+
+The tour is nine slides in a sheet, over the Inbox, run once for every account that is added and
+skipped with one key. It follows the first-run panel above and names the Screener, the three
+boxes, the two piles, snooze, the keyboard, the palette, the things kept beside the mail, what is
+off by default, and undo.
+
+The corner button opens the tour again, the guide, and the keyboard shortcuts. It is not drawn
+while the compose card is open, while an overlay is up, in the guide itself, or on a phone.
+
+The guide is a panel over the whole window: a search field, a rail of sections, and one article at
+a time. How to do each thing the app does, and last, the questions people actually ask. Every
+article leads with its answer and shows it in a drawn figure, a screenshot or a table of keys, and
+a search nothing answers offers to file the question against the repository. Closing it puts back
+the place, the open thread and the scroll. Its pictures come from the dev fixture through
+`just guide-shots` and are committed, because they ship in the bundle.
+
+State: which accounts have had their first run, and therefore their tour, is a device fact in
+localStorage beside the first-run panel's own flag. Provider: nothing.
+
+## 19. Not in version one
 
 Send later. Snippets. Any AI. Shared threads, team comments, read statuses. Workflows, collections,
 cover art. A calendar sidebar. Unified search across accounts (search is per account until the

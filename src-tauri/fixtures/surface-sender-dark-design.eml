@@ -1,0 +1,24 @@
+Return-Path: <news@stationhouse.example>
+MIME-Version: 1.0
+Date: Fri, 4 Sep 2026 09:30:00 +0100
+Message-ID: <sh-2026-09-04-114@stationhouse.example>
+Subject: Tonight at the Station House
+From: Station House <news@stationhouse.example>
+To: pj@73ai.org
+List-Id: Station House <news.stationhouse.example>
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+<html><head><style>
+@media (prefers-color-scheme: dark) {
+  .shell { background-color: #12100d !important; }
+  .copy  { color: #ece6da !important; }
+}
+</style></head>
+<body>
+<div class="shell">
+<p class="copy" style="color:#1f1f1f">Doors at seven, the band at eight.</p>
+<p class="copy" style="color:#1f1f1f">Tickets on the door only, cash or card.</p>
+<p style="color:#d32f2f">Sold out on Saturday.</p>
+</div>
+</body></html>

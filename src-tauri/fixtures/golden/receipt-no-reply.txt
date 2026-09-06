@@ -1,0 +1,32 @@
+render-version: 2
+message-id: 20260903063018.4d2a1f9c@mail.spotify.example
+in-reply-to: -
+references-first: -
+from: Spotify <no-reply@spotify.example>
+to: <pj@73ai.org>
+cc: -
+bcc: -
+reply-to: -
+date-ms: 1788417018000
+subject: Your receipt
+is-html: false
+surface: theme
+snippet: Thank you for purchasing Spotify Premium. Amount charged 11.99, on the card ending 4417. Your next payment is due on 3 October 2026. This mailbox is not monitored. Manage your subscription from the…
+list-id: -
+auto-submitted: auto-generated
+precedence: bulk
+unsubscribe: -
+blocked-images: 0
+
+--- html ---
+<p>Thank you for purchasing Spotify Premium. Amount charged 11.99, on the card ending 4417. Your next payment is due on 3 October 2026.</p>
+<p>This mailbox is not monitored. Manage your subscription from the account page.</p>
+
+--- quoted: none ---
+
+--- text ---
+Thank you for purchasing Spotify Premium. Amount charged 11.99, on the
+card ending 4417. Your next payment is due on 3 October 2026.
+
+This mailbox is not monitored. Manage your subscription from the account
+page.

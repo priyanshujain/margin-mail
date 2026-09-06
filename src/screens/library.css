@@ -1,0 +1,218 @@
+/* The two libraries, Clips and All files. Both borrow the list column's head so a place is read the
+   same way wherever it is, and both take the whole stage because neither is a list of threads with
+   a reading pane beside it. */
+
+.library {
+  flex-direction: column;
+}
+
+/* Clips
+   ----------------------------------------------------------------------------------------------- */
+
+.clips-list {
+  padding: 8px 0 40px;
+}
+
+.clip {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 4px 18px;
+}
+
+.clip-open {
+  flex: 1;
+  min-width: 0;
+  padding: 12px 16px;
+  border-radius: var(--r-md);
+  text-align: left;
+  transition: background 120ms var(--ease);
+}
+
+.clip-open:hover {
+  background: var(--row-hover);
+}
+
+/* The passage in the text face, because it is somebody else's prose and it was worth keeping for
+   the way it was written. The rule at its left is the quotation mark. */
+.clip-text {
+  margin: 0;
+  padding-left: 14px;
+  border-left: 2px solid var(--note-line);
+  color: var(--ink);
+  font-family: var(--font-book);
+  font-size: var(--body-size);
+  line-height: 1.55;
+}
+
+.clip-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 8px 0 0 16px;
+  color: var(--ink-faint);
+  font-size: var(--t-2);
+}
+
+.clip-sender {
+  flex: none;
+  color: var(--ink-soft);
+}
+
+.clip-subject {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.clip-date {
+  flex: none;
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The delete is only offered where the pointer is: a library of things you chose to keep should
+   not print a way to throw each of them away down its whole right edge. */
+.clip .button {
+  opacity: 0;
+  transition: opacity 120ms var(--ease);
+}
+
+.clip:hover .button,
+.clip .button:focus-visible {
+  opacity: 1;
+}
+
+:root[data-touch] .clip .button {
+  opacity: 1;
+}
+
+/* All files
+   ----------------------------------------------------------------------------------------------- */
+
+.files-filters {
+  flex: none;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 10px 22px;
+  border-bottom: 1px solid var(--line);
+}
+
+.files-gap {
+  flex: 1;
+}
+
+.files-sender {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink-faint);
+  font-size: var(--t-2);
+}
+
+.files-picker {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  max-width: 220px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--raised);
+  color: var(--ink-faint);
+  transition: border-color 120ms var(--ease);
+}
+
+.files-picker:hover,
+.files-picker:focus-within {
+  border-color: var(--line-strong);
+}
+
+.files-picker .icon {
+  position: absolute;
+  right: 6px;
+  pointer-events: none;
+}
+
+.files-picker select {
+  appearance: none;
+  width: 100%;
+  padding: 4px 24px 4px 8px;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: none;
+  color: var(--ink);
+  font-size: var(--t-2);
+}
+
+.files-picker select:focus {
+  outline: none;
+}
+
+.files-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--file-card-w), 1fr));
+  gap: 12px;
+  align-content: start;
+  padding: 22px;
+}
+
+.file-card {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--raised);
+  text-align: left;
+  transition: border-color 120ms var(--ease);
+}
+
+.file-card:hover {
+  border-color: var(--line-strong);
+}
+
+/* The type, in the same box the attachment chip in the pane draws, so a file is recognised the
+   same way in both places. */
+.file-mark {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin-bottom: 7px;
+  border-radius: var(--r-sm);
+  background: var(--accent-wash);
+  color: var(--ink-soft);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.file-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink);
+  font-size: var(--t-3);
+}
+
+.file-meta {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink-faint);
+  font-size: var(--t-2);
+}
+
+:root[data-phone] .files-grid {
+  padding: 14px;
+}
+
+:root[data-touch] .files-picker select {
+  min-height: var(--touch-h);
+}

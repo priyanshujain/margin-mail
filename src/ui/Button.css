@@ -1,0 +1,104 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm);
+  background: var(--raised);
+  color: var(--ink);
+  font-size: var(--t-2);
+  white-space: nowrap;
+  transition: background 120ms var(--ease), border-color 120ms var(--ease), color 120ms var(--ease);
+}
+
+.button[data-size="sm"] {
+  min-height: 26px;
+  padding: 0 9px;
+}
+
+.button[data-size="md"] {
+  min-height: 28px;
+  padding: 0 12px;
+}
+
+.button[data-size="lg"] {
+  min-height: 32px;
+  padding: 0 14px;
+  font-size: var(--t-3);
+}
+
+/* A square control the icon sits in the middle of. The width follows whatever the height turned
+   out to be, so touch and phone do not need to say it again. */
+.button[data-icon-only] {
+  gap: 0;
+  padding: 0;
+  aspect-ratio: 1;
+}
+
+.button:hover {
+  background: var(--accent-wash);
+}
+
+.button[data-variant="primary"] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+.button[data-variant="primary"]:hover {
+  background: var(--accent-ink);
+  border-color: var(--accent-ink);
+}
+
+/* The cap on a filled button cannot keep its own surface: a raised chip on the accent reads as a
+   hole. It borrows the label's colour and steps back with opacity instead. */
+.button[data-variant="primary"] .key {
+  border-color: currentColor;
+  background: transparent;
+  color: inherit;
+  opacity: 0.7;
+}
+
+.button[data-variant="ghost"] {
+  border-color: transparent;
+  background: none;
+  color: var(--ink-soft);
+}
+
+.button[data-variant="ghost"]:hover,
+.button[data-variant="ghost"][data-active] {
+  background: var(--accent-wash);
+  color: var(--ink);
+}
+
+.button[data-variant="danger"] {
+  color: var(--danger-ink);
+}
+
+.button[data-variant="danger"]:hover {
+  border-color: var(--danger);
+  background: var(--danger-wash);
+}
+
+.button:disabled {
+  background: var(--raised);
+  color: var(--ink-faint);
+  cursor: default;
+}
+
+.button[data-variant="primary"]:disabled {
+  border-color: var(--line-strong);
+  background: var(--raised);
+  color: var(--ink-faint);
+}
+
+.button[data-variant="ghost"]:disabled {
+  background: none;
+}
+
+/* 28px is a pointer's target. A finger is nearer 44, and a tablet gets the desktop layout with
+   none of the desktop's aim. */
+:root[data-touch] .button {
+  min-height: var(--touch-h);
+}

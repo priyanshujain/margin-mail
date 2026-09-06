@@ -1,0 +1,31 @@
+render-version: 2
+message-id: evite-99120-8f2@evite.example
+in-reply-to: -
+references-first: -
+from: Evite on behalf of Robyn Madison <invitations@evite.example>
+to: <pj@73ai.org>
+cc: -
+bcc: -
+reply-to: Robyn Madison <robyn.madison@example.com>
+date-ms: 1788315761000
+subject: You have an invitation from Robyn Madison
+is-html: false
+surface: theme
+snippet: Join us for Jack's 8th birthday! Robyn Madison needs your RSVP. Saturday 19 September, from two in the afternoon, at the park by the lake. Bring nothing but a hat.
+list-id: -
+auto-submitted: -
+precedence: bulk
+unsubscribe: one-click=false mailto=- url=https://evite.example/optout/99120
+blocked-images: 0
+
+--- html ---
+<p>Join us for Jack's 8th birthday! Robyn Madison needs your RSVP.</p>
+<p>Saturday 19 September, from two in the afternoon, at the park by the lake. Bring nothing but a hat.</p>
+
+--- quoted: none ---
+
+--- text ---
+Join us for Jack's 8th birthday! Robyn Madison needs your RSVP.
+
+Saturday 19 September, from two in the afternoon, at the park by the
+lake. Bring nothing but a hat.

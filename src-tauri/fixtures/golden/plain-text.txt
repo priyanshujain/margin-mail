@@ -1,0 +1,36 @@
+render-version: 2
+message-id: CAF7q9maya-3f2a1c@mail.example.com
+in-reply-to: -
+references-first: -
+from: Maya Raghunathan <maya.raghunathan@example.com>
+to: Priyanshu Jain <pj@73ai.org>
+cc: -
+bcc: -
+reply-to: -
+date-ms: 1788415929000
+subject: Dinner on Thursday?
+is-html: false
+surface: theme
+snippet: Priya said the place on Church Street takes bookings now, want me to put us down for four at eight? Everyone can make Thursday except Karthik, who has the badminton thing and says he will come late…
+list-id: -
+auto-submitted: -
+precedence: -
+unsubscribe: -
+blocked-images: 0
+
+--- html ---
+<p>Priya said the place on Church Street takes bookings now, want me to put us down for four at eight? Everyone can make Thursday except Karthik, who has the badminton thing and says he will come late.</p>
+<p>If you would rather somewhere quieter there is the Malleswaram place we went to in June. Say by tomorrow and I will call them.</p>
+<p>Maya</p>
+
+--- quoted: none ---
+
+--- text ---
+Priya said the place on Church Street takes bookings now, want me to put
+us down for four at eight? Everyone can make Thursday except Karthik, who
+has the badminton thing and says he will come late.
+
+If you would rather somewhere quieter there is the Malleswaram place we
+went to in June. Say by tomorrow and I will call them.
+
+Maya

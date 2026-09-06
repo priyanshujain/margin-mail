@@ -1,0 +1,33 @@
+Return-Path: <lena@brandt-tischlerei.example>
+MIME-Version: 1.0
+Date: Wed, 2 Sep 2026 09:12:00 +0200
+Message-ID: <20260902071200.2B7C4@brandt-tischlerei.example>
+Subject: Kitchen bench quote
+From: Lena Brandt <lena@brandt-tischlerei.example>
+To: Priyanshu Jain <pj@73ai.org>
+Content-Type: multipart/mixed; boundary="----=_Part_9021_1471903384.1756800720"
+
+------=_Part_9021_1471903384.1756800720
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+The quote is attached. Prices hold for thirty days.
+
+Lena
+
+------=_Part_9021_1471903384.1756800720
+Content-Type: application/pdf;
+ name*0*=utf-8'de'Angebot%20K%C3%BCchenarbeitsplatte%20;
+ name*1*=Eiche%20massiv%202026.pdf
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename*0*=utf-8'de'Angebot%20K%C3%BCchenarbeitsplatte%20;
+ filename*1*=Eiche%20massiv%202026.pdf;
+ size=248
+
+JVBERi0xLjQKMSAwIG9iajw8L1R5cGUvQ2F0YWxvZy9QYWdlcyAyIDAgUj4+ZW5kb2JqCjIgMCBv
+Ymo8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PmVuZG9iagozIDAgb2JqPDwvVHlw
+ZS9QYWdlL1BhcmVudCAyIDAgUi9NZWRpYUJveFswIDAgNTk1IDg0Ml0+PmVuZG9iagp0cmFpbGVy
+PDwvUm9vdCAxIDAgUj4+CiUlRU9GCg==
+
+------=_Part_9021_1471903384.1756800720--

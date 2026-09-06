@@ -1,0 +1,36 @@
+render-version: 2
+message-id: c41e77a9-todd@harborlife.example
+in-reply-to: -
+references-first: -
+from: Todd Markham <todd@harborlife.example>
+to: Priyanshu Jain <pj@73ai.org>
+cc: -
+bcc: -
+reply-to: -
+date-ms: 1788187692000
+subject: Re: Life insurance quote
+is-html: false
+surface: theme
+snippet: Hello Ms. Young, I hope all is well with you. I wanted to touch base on our conversation from a few weeks ago. Following up on the quote I sent through last week for the twenty year term policy. If…
+list-id: -
+auto-submitted: -
+precedence: -
+unsubscribe: -
+blocked-images: 0
+
+--- html ---
+<p>Hello Ms. Young, I hope all is well with you. I wanted to touch base on our conversation from a few weeks ago.</p>
+<p>Following up on the quote I sent through last week for the twenty year term policy. If the premium looks right, I can start the paperwork whenever you are ready.</p>
+<p>Todd</p>
+
+--- quoted: none ---
+
+--- text ---
+Hello Ms. Young, I hope all is well with you. I wanted to touch base on
+our conversation from a few weeks ago.
+
+Following up on the quote I sent through last week for the twenty year
+term policy. If the premium looks right, I can start the paperwork
+whenever you are ready.
+
+Todd

@@ -1,0 +1,33 @@
+render-version: 2
+message-id: sh-2026-09-04-114@stationhouse.example
+in-reply-to: -
+references-first: -
+from: Station House <news@stationhouse.example>
+to: <pj@73ai.org>
+cc: -
+bcc: -
+reply-to: -
+date-ms: 1788510600000
+subject: Tonight at the Station House
+is-html: true
+surface: theme
+snippet: Doors at seven, the band at eight. Tickets on the door only, cash or card. Sold out on Saturday.
+list-id: news.stationhouse.example
+auto-submitted: -
+precedence: -
+unsubscribe: -
+blocked-images: 0
+
+--- html ---
+
+
+<div>
+<p>Doors at seven, the band at eight.</p>
+<p>Tickets on the door only, cash or card.</p>
+<p style="color:#d32f2f">Sold out on Saturday.</p>
+</div>
+
+--- quoted: none ---
+
+--- text ---
+Doors at seven, the band at eight. Tickets on the door only, cash or card. Sold out on Saturday.

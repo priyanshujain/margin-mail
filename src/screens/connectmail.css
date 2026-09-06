@@ -1,0 +1,217 @@
+/* The add-account flow: the address on the same centred stage as the welcome, then the sign-in
+   panel, and the servers in a sheet over it. The type, the ink and the paragraph widths are the
+   welcome screen's own and are shared with it rather than restated, so the panels are one screen.
+   What is here is the arrangement of the pieces, plus the two columns the sheet needs. */
+
+/* The address, which is the whole of the first step: one field and one button, each as wide as
+   the column they are in and so as wide as each other, so the two read as one gesture. On the
+   stage the button is larger than a button anywhere else in the app, for the same reason it is the
+   only one there, and the field is a size up with it. In a sheet they are the panel's ordinary
+   size and the panel's full width, like every other field in one. */
+.imap-address {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  max-width: 26em;
+  text-align: left;
+}
+
+.imap-address .field {
+  width: 100%;
+}
+
+.welcome .imap-address .field-input {
+  padding: 9px 12px;
+  font-size: var(--t-4);
+}
+
+.welcome .imap-address .button {
+  min-height: 38px;
+  padding: 0 20px;
+  border-radius: var(--r-md);
+  font-size: var(--t-4);
+}
+
+.sheet .imap-address {
+  max-width: none;
+}
+
+/* The button, the field's width, and while a lookup is out the way to stop it beside it at its
+   own. */
+.imap-go {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.imap-go .button[data-variant="primary"] {
+  flex: 1;
+}
+
+/* The way to skip the lookup, under everything else on the address step: a ghost button in a
+   paragraph of its own, so it reads as an aside rather than as a second way in. */
+.imap-aside {
+  margin: 14px 0 0;
+}
+
+.imap-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  max-width: 26em;
+  text-align: left;
+}
+
+.imap-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+/* Centred only on the stage, which is a column of centred text. Settings hosts the same flow in a
+   sheet, where everything else in the panel starts at the left edge and a row of buttons floating
+   in the middle would be the only thing that did not. */
+.welcome .imap-actions {
+  justify-content: center;
+}
+
+/* The same panels in a sheet. On the stage each of these paragraphs holds itself off whatever is
+   above it, because a centred column has no other spacing; a panel body is a flex column with a gap
+   already, so the margins would be counted twice. Nothing else about the flow changes between the
+   two hosts, which is the point of it being one component. */
+.sheet .welcome-line,
+.sheet .welcome-privacy,
+.sheet .welcome-trouble,
+.sheet .imap-aside {
+  margin: 0;
+}
+
+/* The one thing a left edge exposes that a centred column hid. A ghost button carries the same
+   horizontal padding as a filled one, so on its own on a line it starts a button's padding in from
+   everything above it, and the field that does start at the edge is right there to compare it
+   with. Pulled back by exactly that padding rather than by an eyeballed number. */
+.sheet .imap-aside .button {
+  margin-left: -12px;
+}
+
+/* A name and a value: the two servers on the panel that says what was found, and the four facts on
+   a certificate. The names line up in a column narrow enough that the values still read as a list
+   rather than as a table. */
+.imap-facts {
+  margin: 0;
+  width: 100%;
+  max-width: 34em;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  text-align: left;
+}
+
+/* On the stage the list sits between a paragraph and the form, neither of which is a sheet's
+   evenly spaced body, so it carries its own room, and it is the form's width so the two share a
+   left edge in the centred column. */
+.welcome .imap-facts {
+  margin: 6px 0 20px;
+  max-width: 26em;
+}
+
+.imap-fact {
+  display: grid;
+  grid-template-columns: 8.5em 1fr;
+  gap: 10px;
+  align-items: baseline;
+}
+
+.imap-fact dt {
+  color: var(--ink-faint);
+  font-size: var(--t-1);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.imap-fact dd {
+  margin: 0;
+  min-width: 0;
+  font-size: var(--t-3);
+  font-variant-numeric: tabular-nums;
+  /* Somebody else's string, which is worth being able to select and paste. */
+  user-select: text;
+}
+
+/* A fingerprint is sixty-four characters that have to be compared against another sixty-four, so
+   it wraps wherever it must rather than pushing the panel wider than the window. */
+.imap-fact dd[data-wrap] {
+  overflow-wrap: anywhere;
+  line-height: 1.5;
+}
+
+.imap-lead {
+  margin: 0;
+  font-size: var(--t-4);
+  line-height: 1.5;
+}
+
+.imap-note {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: var(--t-2);
+  line-height: 1.55;
+}
+
+/* The server's own words, verbatim. They are usually written for whoever runs the server rather
+   than for the person holding the laptop, which is why the sentence above them is ours. */
+.imap-said {
+  margin: -6px 0 0;
+  color: var(--danger-ink);
+  font-size: var(--t-2);
+  line-height: 1.5;
+  user-select: text;
+}
+
+.imap-advice {
+  margin: -6px 0 0;
+  font-size: var(--t-3);
+  line-height: 1.5;
+}
+
+.imap-legs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.imap-leg {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.imap-leg-title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: var(--t-4);
+}
+
+/* The sheet's buttons live in its foot, outside the form, so this is what Enter presses. */
+.imap-enter {
+  display: none;
+}
+
+/* Two columns of five fields do not fit beside each other on a phone, and stacking them keeps the
+   order they are asked in: everything about incoming mail, then everything about outgoing. */
+:root[data-phone] .imap-legs {
+  grid-template-columns: 1fr;
+}
+
+:root[data-phone] .imap-fact {
+  grid-template-columns: 1fr;
+  gap: 2px;
+}

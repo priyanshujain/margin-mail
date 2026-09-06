@@ -1,0 +1,8 @@
+.empty-state {
+  margin: 0;
+  padding: 40px 24px;
+  text-align: center;
+  color: var(--ink-faint);
+  font-family: var(--font-heading);
+  font-size: var(--t-4);
+}

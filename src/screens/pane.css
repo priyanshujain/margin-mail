@@ -1,0 +1,402 @@
+/* The reading pane: a bar of verbs, then the thread on a 720px measure.
+ *
+ * The pane is the only column that scrolls as one page. Each message body is an iframe whose height
+ * the parent sets from its content, which is what keeps a thread from becoming a stack of little
+ * scrolling boxes. */
+
+.pane {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--paper);
+}
+
+.pane-blank {
+  flex: 1;
+  display: grid;
+  place-items: center;
+}
+
+/* With the card open the label moves up out from under it, rather than sitting behind a card that
+   is exactly where the middle of the pane is. */
+.pane:has(.compose) .pane-blank {
+  align-items: start;
+  padding-top: 22vh;
+}
+
+/* A thread opened from somewhere with no row behind it has nothing to draw a head from while its
+   view is read, so the skeleton stands in for the whole pane rather than leaving it blank: at the
+   top, where the message is about to be, on the thread's own measure and padding. */
+.pane-blank .msg-pending {
+  align-self: start;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 800px;
+  padding: 18px 40px 0;
+}
+
+.pane-bar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 42px;
+  padding: 0 12px 0 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.pane-gap {
+  flex: 1;
+}
+
+/* The vertical rhythm here is deliberately tighter than a page of prose wants to be. The face, the
+   size and the paper are the product and they do not move, but a mail client is read in a column
+   420px from a list of forty other things and every band of air is a message you cannot see. */
+.thread {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 18px 40px 32px;
+}
+
+.thread-inner {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.thread-head {
+  margin-bottom: 12px;
+}
+
+/* A row rather than a paragraph, so the rename note keeps its place beside a subject that is now
+   allowed to be shorter than what the sender typed. */
+.thread-subject {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0 0 4px;
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 22px;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+/* The subject is the control that renames it, so it is a button that looks like the heading it is
+   inside. No underline and no hover box: the affordance is the pointer and the title, because a
+   heading that lit up on the way past would be a heading you flinched at.
+
+   Two lines at most, and the whole of it stays in the heading's title. Senders put the date, the
+   room and your own address in a subject, and three lines of that at 22px is a third of the pane
+   spent before the message starts. The clamp is here rather than on the heading because a button
+   always lays out in a formatting context of its own and a clamp cannot see into one. */
+.thread-name {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  min-width: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: text;
+}
+
+/* The rename beside the subject, in the interface face: it is a note about the thread rather than
+   part of its title. */
+.thread-subject .renamed {
+  flex: none;
+  color: var(--ink-faint);
+  font-family: var(--font-ui);
+  font-weight: 400;
+  font-size: var(--t-2);
+}
+
+/* One line, always. A row of faces is `flex: none` and the names take what is left, so a thread
+   addressed to forty people cannot turn the head into a column of forty addresses with the faces
+   floating at the middle of it. That was the bug, and `min-width: 0` on the names is the fix:
+   without it a flex item refuses to shrink below its content and there is nothing to ellipsis. */
+.thread-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink-faint);
+  font-size: var(--t-2);
+  white-space: nowrap;
+}
+
+.thread-meta > span {
+  flex: none;
+}
+
+.thread-meta .thread-people {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.thread-banner {
+  margin-bottom: 12px;
+}
+
+/* Messages, separated by hairlines. Older ones are one line each. */
+
+.msg {
+  padding: 12px 0 14px;
+  border-top: 1px solid var(--line);
+}
+
+.msg[data-collapsed] {
+  padding: 7px 0;
+}
+
+.msg[data-collapsed] .msg-head {
+  cursor: default;
+}
+
+/* Where `n` and `p` left off. It is an edge rather than a wash, because the message beside it is
+   already the widest thing on the page and a tinted block would read as a quote. */
+.msg[data-focus] {
+  position: relative;
+}
+
+.msg[data-focus]::before {
+  content: "";
+  position: absolute;
+  left: -14px;
+  top: 12px;
+  bottom: 12px;
+  width: 2px;
+  border-radius: 0 2px 2px 0;
+  background: var(--accent-wash);
+}
+
+.msg-head {
+  display: grid;
+  grid-template-columns: var(--avatar) 1fr auto;
+  gap: 0 12px;
+  align-items: center;
+  margin-bottom: 9px;
+}
+
+.msg[data-collapsed] .msg-head {
+  margin-bottom: 0;
+}
+
+.msg-who {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.msg-name {
+  font-size: var(--t-3);
+  font-weight: 600;
+}
+
+.msg-name .addr {
+  margin-left: 6px;
+  color: var(--ink-faint);
+  font-weight: 400;
+}
+
+.msg-to {
+  color: var(--ink-faint);
+  font-size: var(--t-2);
+}
+
+/* The time and, in dark, the one control that overrules the surface the body was decided onto.
+   One box rather than a fourth grid column, so a head with no control in it puts the time exactly
+   where every other head puts it. */
+.msg-aside {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.msg-time {
+  color: var(--ink-faint);
+  font-size: var(--t-2);
+  white-space: nowrap;
+}
+
+.msg-preview {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink-faint);
+  font-size: var(--t-2);
+}
+
+/* The measure is set inside the frame, where the em is the reading size rather than the interface
+   size, so it is not set again out here on a box that would compute it smaller. */
+/* The frame carries no border and no background of its own: it is a pane of glass over the body,
+   and its height is written by the ResizeObserver in MessageBody.tsx. */
+.msg-frame {
+  display: block;
+  width: 100%;
+  border: 0;
+  background: none;
+}
+
+/* The scheme is on the frame as well as inside it, because what a child document is told about
+   `prefers-color-scheme` is decided by the element embedding it rather than by its own root.
+   `data-surface` comes from the body row: `paper` is a page the sender painted, and it is pinned
+   light in both palettes. */
+.msg-frame[data-surface="paper"] {
+  color-scheme: only light;
+}
+
+.msg-frame[data-surface="theme"] {
+  color-scheme: light;
+}
+
+[data-theme="dark"] .msg-frame[data-surface="theme"] {
+  color-scheme: dark;
+}
+
+/* A body that has not arrived, in the shape of the paragraph it will be. The wash is the one the
+   focus edge and an attachment's kind mark already take, so nothing new is being declared and the
+   placeholder reads as part of the paper rather than as a widget. */
+.msg-pending {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 4px 0 8px;
+}
+
+.msg-pending > span {
+  height: 9px;
+  border-radius: var(--r-sm);
+  background: var(--accent-wash);
+  animation: body-pending 1100ms var(--ease) infinite alternate;
+}
+
+.msg-pending > span:nth-child(2) {
+  width: 94%;
+  animation-delay: 140ms;
+}
+
+.msg-pending > span:nth-child(3) {
+  width: 61%;
+  animation-delay: 280ms;
+}
+
+@keyframes body-pending {
+  to {
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .msg-pending > span {
+    animation: none;
+  }
+}
+
+/* The same slot once the fetch has come back with nothing: a line in the interface face and the
+   way to ask again, where the bars were. */
+.msg-pending[data-state="error"] {
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  color: var(--ink-faint);
+  font-size: var(--t-2);
+}
+
+.msg-quoted {
+  margin-top: 8px;
+}
+
+.attachments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.attachment {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--raised);
+  font-size: var(--t-2);
+  transition: border-color 120ms var(--ease);
+}
+
+.attachment:hover {
+  border-color: var(--line-strong);
+}
+
+/* Pressed and waiting on the bytes, which is a network round trip when nobody has opened this file
+   before. The pulse is the banner action's, for the same reason: a chip that looks the same before
+   and after being pressed is a chip that looks stuck. */
+.attachment[data-phase="opening"] {
+  cursor: default;
+  animation: attachment-opening 1.2s var(--ease) infinite;
+}
+
+.attachment[data-phase="opening"]:hover {
+  border-color: var(--line);
+}
+
+@keyframes attachment-opening {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .attachment[data-phase="opening"] {
+    animation: none;
+  }
+}
+
+.attachment .ext {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--r-sm);
+  background: var(--accent-wash);
+  color: var(--ink-soft);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.attachment .size {
+  color: var(--ink-faint);
+}
+
+/* A note is yours and the message above it is the sender's, so it takes the one surface in the app
+   that is not paper. */
+.note {
+  margin: 10px 0;
+  padding: 9px 14px;
+  border: 1px solid var(--note-line);
+  border-radius: var(--r-md);
+  background: var(--note-surface);
+  color: var(--ink);
+  font-size: var(--t-3);
+  line-height: 1.45;
+}
+
+.note-label {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--ink-faint);
+  font-size: var(--t-1);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}

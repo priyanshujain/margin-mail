@@ -1,0 +1,38 @@
+render-version: 2
+message-id: oak-ptc-2026-114@oakridge-school.example
+in-reply-to: oak-ptc-2026-098@oakridge-school.example
+references-first: oak-ptc-2026-098@oakridge-school.example
+from: Jeff Wolfe <jeff.wolfe@oakridge-school.example>
+to: <pj@73ai.org>, <hannah.weiss@example.net>, Bauhaus, Caroline <caroline@bauhaus-tickets.example>
+cc: <office@oakridge-school.example>
+bcc: -
+reply-to: -
+date-ms: 1788382927000
+subject: Re: Cooper's parent-teacher conference
+is-html: false
+surface: theme
+snippet: Mr. and Mrs. Young, this is just a reminder to schedule your parent-teacher conference with me. You can feel free to do that here. If you would prefer a video call instead of meeting at school, I am…
+list-id: -
+auto-submitted: -
+precedence: -
+unsubscribe: -
+blocked-images: 0
+
+--- html ---
+<p>Mr. and Mrs. Young, this is just a reminder to schedule your parent-teacher conference with me. You can feel free to do that here.</p>
+<p>If you would prefer a video call instead of meeting at school, I am happy to do that as well. Please let me know what date and time works best for you.</p>
+<p>Jeff Wolfe<br>
+Year 4, Oakridge</p>
+
+--- quoted: none ---
+
+--- text ---
+Mr. and Mrs. Young, this is just a reminder to schedule your
+parent-teacher conference with me. You can feel free to do that here.
+
+If you would prefer a video call instead of meeting at school, I am happy
+to do that as well. Please let me know what date and time works best for
+you.
+
+Jeff Wolfe
+Year 4, Oakridge

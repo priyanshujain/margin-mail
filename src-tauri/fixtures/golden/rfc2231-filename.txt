@@ -1,0 +1,31 @@
+render-version: 2
+message-id: 20260902071200.2B7C4@brandt-tischlerei.example
+in-reply-to: -
+references-first: -
+from: Lena Brandt <lena@brandt-tischlerei.example>
+to: Priyanshu Jain <pj@73ai.org>
+cc: -
+bcc: -
+reply-to: -
+date-ms: 1788333120000
+subject: Kitchen bench quote
+is-html: false
+surface: theme
+snippet: The quote is attached. Prices hold for thirty days. Lena
+list-id: -
+auto-submitted: -
+precedence: -
+unsubscribe: -
+blocked-images: 0
+attachment: part=2 name="Angebot Küchenarbeitsplatte Eiche massiv 2026.pdf" type=application/pdf size=193 inline=false cid=- sha256=e5a636ac00ea3c17
+
+--- html ---
+<p>The quote is attached. Prices hold for thirty days.</p>
+<p>Lena</p>
+
+--- quoted: none ---
+
+--- text ---
+The quote is attached. Prices hold for thirty days.
+
+Lena

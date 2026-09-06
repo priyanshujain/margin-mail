@@ -1,0 +1,79 @@
+/* The first run panel. Everything under it is the Inbox as it already is, so this is three
+   paragraphs, one row of choices and three switches and nothing else. */
+
+/* Carries the phase and takes no room, so the panel body still lays the paragraphs out. */
+.onboard {
+  display: contents;
+}
+
+.onboard-lead {
+  margin: 0;
+  font-size: var(--t-4);
+  line-height: 1.5;
+}
+
+.onboard-sub {
+  margin: 0;
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+
+.field .onboard-sub {
+  margin: -1px 0 3px;
+}
+
+.choice {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.choice-label {
+  margin-right: 2px;
+  color: var(--ink-faint);
+  font-size: var(--t-2);
+}
+
+.choice-option {
+  padding: 4px 11px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-pill);
+  background: var(--raised);
+  color: var(--ink-soft);
+  font-size: var(--t-2);
+  transition: background 120ms var(--ease), border-color 120ms var(--ease), color 120ms var(--ease);
+}
+
+.choice-option:hover {
+  color: var(--ink);
+}
+
+.choice-option[data-on] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+:root[data-touch] .choice-option {
+  min-height: var(--touch-h);
+}
+
+/* The three places, each a switch with its own label and note, stacked like a settings section. */
+.onboard-toggles {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.onboard-toggles .toggle-note {
+  color: var(--ink-faint);
+  font-size: var(--t-2);
+}
+
+.onboard-quiet {
+  margin-top: 6px;
+  color: var(--ink-faint);
+  font-size: var(--t-2);
+}

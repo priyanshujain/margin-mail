@@ -1,0 +1,34 @@
+render-version: 2
+message-id: 20260902152641.9F3A1@brandt-tischlerei.example
+in-reply-to: -
+references-first: -
+from: Lena Brandt (Tischlerei München) <lena@brandt-tischlerei.example>
+to: Priyanshu Jain <pj@73ai.org>
+cc: -
+bcc: -
+reply-to: -
+date-ms: 1788362801000
+subject: Angebot: Küchenarbeitsplatte in Eiche massiv (Nachtrag)
+is-html: false
+surface: theme
+snippet: Sounds good, Julie. Any afternoon next week works for me. Der Nachtrag betrifft nur die Oberflaeche: geoelt statt lackiert, wie besprochen. Die Kante bleibt gerade. Lena
+list-id: -
+auto-submitted: -
+precedence: -
+unsubscribe: -
+blocked-images: 0
+
+--- html ---
+<p>Sounds good, Julie. Any afternoon next week works for me.</p>
+<p>Der Nachtrag betrifft nur die Oberflaeche: geoelt statt lackiert, wie besprochen. Die Kante bleibt gerade.</p>
+<p>Lena</p>
+
+--- quoted: none ---
+
+--- text ---
+Sounds good, Julie. Any afternoon next week works for me.
+
+Der Nachtrag betrifft nur die Oberflaeche: geoelt statt lackiert, wie
+besprochen. Die Kante bleibt gerade.
+
+Lena

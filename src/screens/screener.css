@@ -1,0 +1,198 @@
+/* The Screener: the whole stage, a centred title, and a column of cards on the paper.
+ *
+ * There is no list column here and no pane. A card carries the message it is about, so the width is
+ * whatever fits a name, a subject, a snippet and three buttons on one line, which is wider than a
+ * thread and narrower than the window. */
+
+.screener {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.screen-intro {
+  padding: 22px 40px 6px;
+  text-align: center;
+}
+
+.screen-intro h1 {
+  margin: 0 0 6px;
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 24px;
+  letter-spacing: -0.01em;
+}
+
+.screen-intro p {
+  margin: 0;
+  color: var(--ink-soft);
+}
+
+.screen-blank {
+  display: grid;
+  place-items: start center;
+  padding-top: 30px;
+}
+
+.screen-list {
+  max-width: 880px;
+  margin: 18px auto 0;
+  padding: 0 40px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.screen-tools {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: -2px;
+}
+
+.screen-card {
+  display: grid;
+  grid-template-columns: var(--avatar) 1fr auto;
+  gap: 0 14px;
+  align-items: start;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--raised);
+  transition: border-color 120ms var(--ease), box-shadow 120ms var(--ease);
+}
+
+/* The card the keyboard is on. A ring rather than a wash: the card is already the widest thing on
+   the page and tinting it would read as a different kind of card rather than as this one. */
+.screen-card[data-selected] {
+  border-color: var(--line-strong);
+  box-shadow: var(--card-ring);
+}
+
+/* A card whose decision is out. It stays exactly where it is so nothing else can arrive under the
+   pointer, and it fades a little so the wait reads as the card's rather than the app's. */
+.screen-card[data-state="deciding"] {
+  opacity: 0.6;
+  transition: opacity 120ms var(--ease);
+}
+
+.screen-who {
+  min-width: 0;
+}
+
+.screen-name {
+  font-weight: 600;
+}
+
+.screen-name .addr {
+  margin-left: 6px;
+  color: var(--ink-faint);
+  font-weight: 400;
+}
+
+.screen-subject {
+  margin-top: 3px;
+  color: var(--ink);
+  font-size: var(--t-2);
+}
+
+.screen-snippet {
+  margin-top: 1px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink-faint);
+  font-size: var(--t-2);
+}
+
+.screen-who .pill {
+  margin-top: 9px;
+}
+
+.screen-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* The whole message, under the three buttons and across the card. Enter opens it and Enter closes
+   it, so it is a state of the card rather than somewhere you went. */
+.screen-message {
+  grid-column: 1 / -1;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.screen-message-foot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.screen-message-note {
+  color: var(--ink-faint);
+  font-size: var(--t-2);
+}
+
+/* The one faint sentence the list closes with: how long a screened-out sender's mail stays and
+   where the decision can be taken back. */
+.screen-note {
+  margin: 8px 0 0;
+  color: var(--ink-faint);
+  font-size: var(--t-2);
+  text-align: center;
+}
+
+/* The destination picker behind `v`. The same shape as the label picker, because they are the same
+   question asked about two different things. */
+.screen-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.screen-option {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 7px 8px;
+  border-radius: var(--r-sm);
+  color: var(--ink);
+  font-size: var(--t-3);
+  text-align: left;
+  transition: background 120ms var(--ease);
+}
+
+.screen-option:hover {
+  background: var(--accent-wash);
+}
+
+:root[data-touch] .screen-option {
+  min-height: var(--touch-h);
+}
+
+/* A phone has no room for three buttons beside the sender, so the card stacks and the actions take
+   the width under it. The keycaps are gone there anyway. */
+:root[data-phone] .screen-intro,
+:root[data-phone] .screen-list {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+:root[data-phone] .screen-card {
+  grid-template-columns: var(--avatar) 1fr;
+}
+
+:root[data-phone] .screen-actions {
+  grid-column: 1 / -1;
+  margin-top: 12px;
+}
+
+:root[data-phone] .screen-actions .button {
+  flex: 1;
+}

@@ -1,0 +1,37 @@
+render-version: 2
+message-id: 00000000000091f2ab@google.com
+in-reply-to: -
+references-first: -
+from: Nadia Osei <nadia@westferry.example>
+to: Priyanshu Jain <pj@73ai.org>
+cc: -
+bcc: -
+reply-to: -
+date-ms: 1788343491000
+subject: Invitation: Quarterly review @ Thu 15 Oct 2026 14:00 - 15:00 (BST)
+is-html: false
+surface: theme
+snippet: You have been invited to Quarterly review on Thursday 15 October 2026, 14:00 to 15:00 London time.
+list-id: -
+auto-submitted: -
+precedence: -
+unsubscribe: -
+blocked-images: 0
+invite-uid: 5m1q9c3k8p7v@google.com
+invite-summary: Quarterly review
+invite-start-ms: 1792069200000
+invite-end-ms: 1792072800000
+invite-all-day: false
+invite-location: Westferry, meeting room 2
+invite-organizer: Nadia Osei <nadia@westferry.example>
+invite-my-response: NeedsAction
+invite-description: The quarterly numbers, then the roadmap. Bring the deck.
+
+--- html ---
+<p>You have been invited to Quarterly review on Thursday 15 October 2026, 14:00 to 15:00 London time.</p>
+
+--- quoted: none ---
+
+--- text ---
+You have been invited to Quarterly review on Thursday 15 October 2026,
+14:00 to 15:00 London time.

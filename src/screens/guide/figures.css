@@ -1,0 +1,1226 @@
+/* The figures. Layout only: every colour, radius and size goes through a token.
+ *
+ * The whole file is one vocabulary drawn eighteen ways: a run of words, a row, a chip, a hairline
+ * with a head on it. That is deliberate, because a reader who has understood one figure has then
+ * understood the parts of the next one, and a diagram that invented its own shapes every time
+ * would be eighteen things to learn rather than eighteen sentences to read.
+ *
+ * The frame holds the prose measure rather than the whole column. A figure is read with the
+ * sentence under it, and one that ran wider than the paragraph it belongs to would read as a
+ * picture of something else. */
+
+.fig {
+  max-width: var(--measure);
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--shell);
+  font-family: var(--font-ui);
+  color: var(--ink-soft);
+}
+
+/* The parts
+   --------------------------------------------------------------------------------------------- */
+
+/* A run of text, wherever a figure needs one and the words themselves would be an illustration. */
+.fig-bar {
+  flex: none;
+  height: 5px;
+  border-radius: var(--r-pill);
+  background: var(--line);
+}
+
+.fig-bar[data-w="name"] {
+  width: 62px;
+  background: var(--line-strong);
+}
+
+.fig-bar[data-w="subject"] {
+  width: 104px;
+}
+
+.fig-bar[data-w="short"] {
+  width: 88px;
+}
+
+.fig-bar[data-w="wide"] {
+  width: 100%;
+}
+
+.fig-bar[data-w="line"] {
+  flex: 1;
+  min-width: 20px;
+}
+
+.fig-bar[data-w="time"] {
+  width: 26px;
+  margin-left: auto;
+}
+
+.fig-bar[data-w="query"] {
+  width: 78px;
+  background: var(--line-strong);
+}
+
+.fig-bar[data-strong] {
+  height: 7px;
+  background: var(--line-strong);
+}
+
+/* The name of a part, in the register the app labels a group of threads or a pile in. */
+.fig-mark {
+  color: var(--ink-faint);
+  font-size: var(--t-1);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.fig-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 9px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm);
+  background: var(--raised);
+  color: var(--ink-soft);
+  font-size: var(--t-2);
+  white-space: nowrap;
+}
+
+/* Somewhere mail is not delivered, and something that never happens: both are drawn as an outline
+   with nothing inside it, because that is what they are. */
+.fig-chip[data-out] {
+  border-style: dashed;
+  background: none;
+  color: var(--ink-faint);
+}
+
+.fig-chip[data-action] {
+  color: var(--ink);
+}
+
+.fig-avatar {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  border-radius: var(--r-pill);
+  background: var(--accent-wash);
+}
+
+.fig-avatar[data-lg] {
+  width: var(--avatar);
+  height: var(--avatar);
+}
+
+.fig-lines {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  min-width: 0;
+}
+
+.fig-tag {
+  padding: 2px 9px;
+  border-radius: var(--r-pill);
+  background: var(--accent-wash);
+  color: var(--ink-faint);
+  font-size: var(--t-1);
+}
+
+/* A thread as it reads down a list, and the two things that can happen to it: it is picked, or it
+   has gone somewhere and left its place behind. */
+.fig-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  border-radius: var(--r-sm);
+}
+
+.fig-row[data-state="selected"] {
+  background: var(--row-selected);
+}
+
+/* The list's own selected edge, which stops short of the row's ends the way the row draws it. */
+.fig-row[data-state="selected"]::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 5px;
+  bottom: 5px;
+  width: 2px;
+  background: var(--accent);
+}
+
+.fig-row[data-state="gone"] {
+  border: 1px dashed var(--line-strong);
+  padding: 4px 7px;
+}
+
+.fig-row[data-state="gone"] > * {
+  visibility: hidden;
+}
+
+.fig-tick-box {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 14px;
+  height: 14px;
+  border-radius: var(--r-sm);
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+/* The list column, and the two stacks at its foot. */
+.fig-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--paper);
+}
+
+.fig-piles {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 8px;
+}
+
+.fig-list .fig-piles {
+  margin-top: auto;
+  padding-top: 7px;
+  border-top: 1px solid var(--line);
+}
+
+.fig-pile {
+  position: relative;
+  padding-top: 5px;
+  min-width: 0;
+}
+
+.fig-pile-edge {
+  position: absolute;
+  top: 0;
+  left: 5px;
+  right: 5px;
+  height: 7px;
+  border: 1px solid var(--line-strong);
+  border-bottom: 0;
+  border-radius: var(--r-sm) var(--r-sm) 0 0;
+  background: var(--raised);
+}
+
+.fig-pile-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 6px 9px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm);
+  background: var(--raised);
+  overflow: hidden;
+}
+
+/* A hairline with a head on it, which is every connection in this file. Horizontal by default,
+   because that is the reading direction a step takes. */
+.fig-arrow {
+  position: relative;
+  flex: 1;
+  min-width: 26px;
+  height: 1px;
+  background: var(--line-strong);
+}
+
+.fig-arrow::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 0;
+  width: 5px;
+  height: 5px;
+  border-top: 1px solid var(--line-strong);
+  border-right: 1px solid var(--line-strong);
+  transform: translate(0, -50%) rotate(45deg);
+}
+
+.fig-arrow[data-back]::after {
+  right: auto;
+  left: 0;
+  transform: translate(0, -50%) rotate(-135deg);
+}
+
+.fig-drop {
+  position: relative;
+  width: 1px;
+  height: 18px;
+  background: var(--line-strong);
+}
+
+.fig-drop::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 5px;
+  height: 5px;
+  border-right: 1px solid var(--line-strong);
+  border-bottom: 1px solid var(--line-strong);
+  transform: translate(-50%, 0) rotate(45deg);
+}
+
+/* A step that only happens when it is asked for, and a step that did not happen at all. */
+.fig-drop[data-ask],
+.fig-drop[data-faint] {
+  width: 0;
+  border-left: 1px dashed var(--line-strong);
+  background: none;
+}
+
+.fig-drop[data-faint] {
+  border-left-color: var(--line);
+}
+
+.fig-drop[data-faint]::after {
+  border-color: var(--line);
+}
+
+.fig-way {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* A key, printed as the app prints it and again as bare text. The cap is not drawn on a phone, and
+   a figure whose meaning rides on its keys has to keep saying it there. */
+.fig-cap {
+  display: inline-flex;
+  align-items: center;
+}
+
+.fig-cap-flat {
+  display: none;
+  color: var(--ink-faint);
+  font-size: var(--t-1);
+  font-weight: 600;
+}
+
+:root[data-phone] .fig-cap-flat {
+  display: inline;
+}
+
+/* Where mail goes
+   --------------------------------------------------------------------------------------------- */
+
+.fig[data-fig="routing"] {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* The gate runs the width, because everything crosses it and nothing goes round it. */
+.fig-gate {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 0;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md);
+  background: var(--raised);
+  color: var(--ink);
+  font-size: var(--t-3);
+}
+
+.fig-legs,
+.fig-ends {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  width: 100%;
+}
+
+.fig-ends {
+  gap: 8px;
+}
+
+.fig-leg {
+  justify-self: center;
+  width: 1px;
+  height: 16px;
+  background: var(--line-strong);
+}
+
+.fig-end {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+  padding: 7px 4px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm);
+  background: var(--raised);
+  font-size: var(--t-2);
+}
+
+.fig-end[data-out] {
+  border-style: dashed;
+  background: none;
+  color: var(--ink-faint);
+}
+
+/* The three boxes
+   --------------------------------------------------------------------------------------------- */
+
+.fig[data-fig="boxes"] {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.fig-box {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--raised);
+}
+
+.fig-box-name {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--ink);
+  font-size: var(--t-3);
+  font-weight: 600;
+}
+
+.fig-box-holds {
+  color: var(--ink-faint);
+  font-size: var(--t-2);
+  line-height: 1.45;
+}
+
+/* The shape of the window
+   --------------------------------------------------------------------------------------------- */
+
+.fig-window {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.fig-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 5px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--paper);
+}
+
+.fig-seg {
+  display: flex;
+  gap: 2px;
+  margin: 0 auto;
+  padding: 2px;
+  border-radius: var(--r-sm);
+  background: var(--accent-wash);
+  font-size: var(--t-1);
+}
+
+.fig-seg > span {
+  padding: 2px 9px;
+  border-radius: var(--r-sm);
+}
+
+.fig-seg-on {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.fig-stage {
+  display: grid;
+  grid-template-columns: 2fr 3fr;
+  gap: 8px;
+}
+
+.fig-pane {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 9px 11px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--paper);
+}
+
+/* The keyboard
+   --------------------------------------------------------------------------------------------- */
+
+/* One cap over one word, eight times. The argument the figure is making is in the shape: every
+   verb is a single key standing on its own, and there is nothing to hold down with it. */
+.fig[data-fig="keyboard"] {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px 10px;
+}
+
+.fig-verb {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.fig-verb-name {
+  color: var(--ink-soft);
+  font-size: var(--t-2);
+}
+
+/* A Screener card, named part by part
+   --------------------------------------------------------------------------------------------- */
+
+/* The frame is the card here, so the labels sit in a gutter beside it rather than inside a second
+   box drawn within the first. */
+.fig[data-fig="screener-card"] {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  align-items: center;
+  gap: 12px 16px;
+  background: var(--raised);
+}
+
+.fig-card-who {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.fig-answers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* A thread in the pane
+   --------------------------------------------------------------------------------------------- */
+
+.fig-thread {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--paper);
+}
+
+.fig-thread > .fig-bar[data-strong] {
+  margin-bottom: 12px;
+}
+
+.fig-msg {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 0;
+  border-top: 1px solid var(--line);
+}
+
+/* The body sits under the name rather than under the avatar, which is the one line of difference
+   between a message that is open and a message that is a line. */
+.fig-msg[data-open] {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding-bottom: 2px;
+}
+
+.fig-msg[data-open] > .fig-bar {
+  width: calc(100% - 23px);
+  margin-left: 23px;
+}
+
+.fig-msg[data-open] > .fig-bar[data-w="short"] {
+  width: 88px;
+}
+
+.fig-msg-head {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  align-self: stretch;
+}
+
+/* A message with its images held back
+   --------------------------------------------------------------------------------------------- */
+
+.fig-message {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--paper);
+}
+
+.fig-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  align-self: stretch;
+  width: 100%;
+  padding: 7px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--raised);
+  color: var(--ink-soft);
+  font-size: var(--t-2);
+}
+
+/* The one surface in the app that is not paper, which is what the merge banner sits on. */
+.fig-banner[data-note] {
+  border-color: var(--note-line);
+  background: var(--note-surface);
+}
+
+.fig-banner-action {
+  margin-left: auto;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.fig-blocked {
+  width: 200px;
+  height: 56px;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--r-sm);
+}
+
+/* The piles
+   --------------------------------------------------------------------------------------------- */
+
+.fig[data-fig="piles"] {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Out and back on the same key, one line above the other, because the reversibility is the whole
+   of what this figure has to say. */
+.fig-both-ways {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 116px;
+}
+
+/* Snooze
+   --------------------------------------------------------------------------------------------- */
+
+.fig[data-fig="snooze"] {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.fig-time {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  align-items: end;
+  width: 100%;
+  border-bottom: 1px solid var(--line-strong);
+}
+
+.fig-stop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.fig-stop-name {
+  color: var(--ink-soft);
+  font-size: var(--t-2);
+}
+
+.fig-tick {
+  width: 1px;
+  height: 9px;
+  background: var(--line-strong);
+}
+
+/* The date you pick is not a fixed distance along the line, so its tick is not a solid one. */
+.fig-stop[data-open] .fig-tick {
+  width: 0;
+  border-left: 1px dashed var(--line-strong);
+  background: none;
+}
+
+.fig-axis {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  color: var(--ink-faint);
+  font-size: var(--t-1);
+}
+
+/* A selection
+   --------------------------------------------------------------------------------------------- */
+
+.fig[data-fig="selection"] {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: stretch;
+  gap: 12px;
+}
+
+.fig[data-fig="selection"] .fig-way {
+  align-self: center;
+}
+
+/* The bar takes the piles' footprint exactly, which is the point: the foot of the list does not
+   move when a selection appears. */
+.fig-action-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-top: auto;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.fig-verbs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+}
+
+.fig-verbs .fig-chip {
+  justify-content: center;
+  gap: 4px;
+  min-width: 0;
+  padding: 4px 5px;
+  font-size: var(--t-1);
+  overflow: hidden;
+}
+
+/* Focus and Reply
+   --------------------------------------------------------------------------------------------- */
+
+.fig[data-fig="focus"] {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.fig-item {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--raised);
+}
+
+.fig-reply {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm);
+  background: var(--paper);
+}
+
+.fig-send {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: var(--r-sm);
+  background: var(--accent);
+  color: var(--accent-contrast);
+  font-size: var(--t-2);
+}
+
+/* The filled button's rule, for the same reason it has one: a raised cap on the accent reads as a
+   hole punched in the button. */
+.fig-send .key {
+  border-color: currentColor;
+  background: transparent;
+  color: inherit;
+  opacity: 0.7;
+}
+
+/* The ten seconds
+   --------------------------------------------------------------------------------------------- */
+
+.fig[data-fig="undo"] {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+.fig-toast {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 12px 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--paper);
+  color: var(--ink);
+  font-size: var(--t-3);
+}
+
+.fig-toast-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.fig-line {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.fig-clock {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+
+.fig-track {
+  display: flex;
+  height: 24px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-pill);
+  background: var(--raised);
+  overflow: hidden;
+}
+
+/* The held part is drawn as long as it is, so ten seconds reads as a length of time rather than as
+   a number in a sentence. */
+.fig-held {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 62%;
+  border-right: 1px solid var(--line-strong);
+  background: var(--accent-wash);
+  color: var(--ink);
+  font-size: var(--t-1);
+}
+
+.fig-clock .fig-axis {
+  display: grid;
+  grid-template-columns: 62% 38%;
+  text-align: center;
+}
+
+/* Two threads becoming one
+   --------------------------------------------------------------------------------------------- */
+
+.fig[data-fig="merge"] {
+  display: grid;
+  grid-template-columns: 1fr auto auto 1fr;
+  align-items: center;
+  gap: 10px;
+}
+
+.fig-brace {
+  width: 10px;
+  height: 54px;
+  border: 1px solid var(--line-strong);
+  border-left: 0;
+  border-radius: 0 var(--r-md) var(--r-md) 0;
+}
+
+.fig-merged {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--paper);
+}
+
+/* Where a search looks
+   --------------------------------------------------------------------------------------------- */
+
+.fig[data-fig="search-reach"] {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.fig[data-fig="search-reach"] .fig-drop {
+  height: 14px;
+}
+
+.fig-field {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 5px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: var(--raised);
+}
+
+.fig-zone {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  width: 100%;
+  padding: 8px 11px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--paper);
+}
+
+/* The provider is somewhere else and it is only reached on request, so its box is drawn as one
+   that is not on this device. */
+.fig-zone[data-remote] {
+  border-style: dashed;
+  background: none;
+}
+
+.fig-zone-body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* The window of mail
+   --------------------------------------------------------------------------------------------- */
+
+.fig[data-fig="storage"] {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.fig-mailbox {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 68px;
+  padding: 0 16px;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--r-md);
+}
+
+.fig-held-mail {
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  bottom: -1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34%;
+  padding: 0 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md);
+  background: var(--raised);
+  text-align: center;
+}
+
+.fig-mailbox-name {
+  color: var(--ink-faint);
+  font-size: var(--t-2);
+  line-height: 1.4;
+}
+
+/* The whole mailbox is what is left over beside the window, so its name has to stop where the
+   window starts rather than run under it. */
+.fig-mailbox > .fig-mailbox-name {
+  max-width: 58%;
+}
+
+.fig-held-mail .fig-mailbox-name {
+  color: var(--ink);
+}
+
+/* Several mailboxes in one window
+   --------------------------------------------------------------------------------------------- */
+
+.fig[data-fig="accounts"] {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: 16px;
+}
+
+.fig-switcher {
+  display: flex;
+  flex-direction: column;
+  width: 172px;
+  padding: 5px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--paper);
+}
+
+.fig-menu-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 6px 9px;
+  border-radius: var(--r-sm);
+  color: var(--ink-soft);
+  font-size: var(--t-2);
+}
+
+.fig-menu-row[data-on] {
+  background: var(--accent-wash);
+  color: var(--ink);
+}
+
+/* All accounts is a different kind of answer to the same question, so the menu keeps it apart. */
+.fig-menu-row[data-apart] {
+  margin-top: 5px;
+  padding-top: 9px;
+  border-top: 1px solid var(--line);
+}
+
+.fig-menu-row .fig-cap {
+  margin-left: auto;
+}
+
+.fig-hue {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--r-pill);
+  background: var(--hue-1);
+}
+
+.fig-hue[data-hue="hue-2"] {
+  background: var(--hue-2);
+}
+
+.fig-hue[data-hue="hue-4"] {
+  background: var(--hue-4);
+}
+
+.fig-mailboxes {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.fig-mailbox-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 9px 11px;
+  border: 1px solid var(--line);
+  border-left: 2px solid var(--hue-1);
+  border-radius: var(--r-sm);
+  background: var(--raised);
+}
+
+.fig-mailbox-card[data-hue="hue-2"] {
+  border-left-color: var(--hue-2);
+}
+
+.fig-mailbox-card[data-hue="hue-4"] {
+  border-left-color: var(--hue-4);
+}
+
+/* The three switches
+   --------------------------------------------------------------------------------------------- */
+
+.fig[data-fig="notify"] {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.fig-gates {
+  display: flex;
+  align-items: stretch;
+  gap: 28px;
+  padding: 14px 22px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--paper);
+}
+
+.fig-switch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.fig-toggle {
+  display: flex;
+  align-items: center;
+  width: 30px;
+  padding: 2px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-pill);
+  background: var(--raised);
+}
+
+.fig-knob {
+  width: 13px;
+  height: 13px;
+  border-radius: var(--r-pill);
+  background: var(--ink-faint);
+}
+
+.fig-switch-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--ink-soft);
+  font-size: var(--t-2);
+}
+
+/* What stays and what leaves
+   --------------------------------------------------------------------------------------------- */
+
+.fig[data-fig="privacy"] {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.fig-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding-right: 20px;
+}
+
+.fig-side[data-leaves] {
+  padding-right: 0;
+  padding-left: 20px;
+  border-left: 1px solid var(--line);
+}
+
+/* On a phone
+   --------------------------------------------------------------------------------------------- */
+
+/* Two lists side by side is two columns of nothing at this width, and a row of four destinations
+   is four clipped words, so everything that was a row becomes a column and the arrows turn with
+   it. What a figure may not do here is lose its sentence, which is why the caps keep printing as
+   text and the shapes keep their meaning. */
+:root[data-phone] .fig {
+  padding: 12px;
+}
+
+:root[data-phone] .fig-arrow {
+  flex: none;
+  align-self: center;
+  width: 1px;
+  min-width: 0;
+  height: 18px;
+  background: var(--line-strong);
+}
+
+:root[data-phone] .fig-arrow::after {
+  top: auto;
+  right: 50%;
+  bottom: 0;
+  transform: translate(50%, 0) rotate(135deg);
+}
+
+:root[data-phone] .fig-arrow[data-back]::after {
+  top: 0;
+  bottom: auto;
+  left: auto;
+  transform: translate(50%, 0) rotate(-45deg);
+}
+
+:root[data-phone] .fig-way,
+:root[data-phone] .fig-both-ways {
+  flex-direction: column;
+  width: auto;
+}
+
+:root[data-phone] .fig[data-fig="routing"] .fig-legs {
+  display: none;
+}
+
+:root[data-phone] .fig[data-fig="routing"] .fig-ends,
+:root[data-phone] .fig[data-fig="boxes"],
+:root[data-phone] .fig[data-fig="keyboard"] {
+  grid-template-columns: 1fr 1fr;
+}
+
+:root[data-phone] .fig[data-fig="routing"] .fig-ends {
+  gap: 6px;
+}
+
+:root[data-phone] .fig[data-fig="piles"],
+:root[data-phone] .fig[data-fig="selection"],
+:root[data-phone] .fig[data-fig="merge"],
+:root[data-phone] .fig[data-fig="accounts"],
+:root[data-phone] .fig[data-fig="privacy"],
+:root[data-phone] .fig-item,
+:root[data-phone] .fig-stage {
+  grid-template-columns: 1fr;
+}
+
+:root[data-phone] .fig[data-fig="screener-card"] {
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+:root[data-phone] .fig-side {
+  padding: 0 0 12px;
+}
+
+:root[data-phone] .fig-side[data-leaves] {
+  padding: 12px 0 0;
+  border-left: 0;
+  border-top: 1px solid var(--line);
+}
+
+:root[data-phone] .fig-switcher {
+  width: 100%;
+}
+
+:root[data-phone] .fig-gates {
+  flex-direction: column;
+  align-self: stretch;
+}
+
+:root[data-phone] .fig-brace {
+  display: none;
+}

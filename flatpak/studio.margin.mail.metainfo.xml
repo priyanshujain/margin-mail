@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>studio.margin.mail</id>
+  <name>Margin Mail</name>
+  <summary>A calm, keyboard-first mail client for Gmail</summary>
+
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>LicenseRef-proprietary=https://github.com/priyanshujain/margin-mail/blob/main/LICENSE</project_license>
+
+  <developer id="studio.margin">
+    <name>Margin</name>
+  </developer>
+
+  <description>
+    <p>
+      New senders wait at the door until you let them in, people and newsletters and receipts live
+      in three separate boxes, and every decision you make is kept beside the mail rather than
+      inside it.
+    </p>
+    <p>
+      Trackers are stripped from what you read and never sent from what you write. The mirror of
+      your mail and every decision you have made about a sender are files on your own disk, so
+      changing provider costs you nothing.
+    </p>
+  </description>
+
+  <launchable type="desktop-id">studio.margin.mail.desktop</launchable>
+  <url type="homepage">https://github.com/priyanshujain/margin-mail</url>
+  <url type="bugtracker">https://github.com/priyanshujain/margin-mail/issues</url>
+
+  <categories>
+    <category>Office</category>
+    <category>Email</category>
+  </categories>
+
+  <content_rating type="oars-1.1"/>
+</component>

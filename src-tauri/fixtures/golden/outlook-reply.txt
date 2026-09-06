@@ -1,0 +1,48 @@
+render-version: 2
+message-id: AM0PR07MB5218F1C0D9E2A4E1B@AM0PR07MB5218.eurprd07.prod.outlook.com
+in-reply-to: 20260901120044.7F1@73ai.org
+references-first: 20260901120044.7F1@73ai.org
+from: Young, Russell <russell.young@northgate-legal.example>
+to: Priyanshu Jain <pj@73ai.org>
+cc: -
+bcc: -
+reply-to: -
+date-ms: 1788277269000
+subject: RE: The lease, clause 14
+is-html: true
+surface: theme
+snippet: Clause 14 is the standard form. I would not sign it as drafted. Russell
+list-id: -
+auto-submitted: -
+precedence: -
+unsubscribe: -
+blocked-images: 0
+
+--- html ---
+
+<p>Clause 14 is the standard form. I would not sign it as drafted.</p>
+<p>Russell</p>
+<div style="border:none;border-top:solid #E1E1E1 1.0pt;padding:3.0pt 0cm 0cm 0cm">
+</div>
+
+--- quoted ---
+<hr>
+<div>
+<p><b>From:</b> Priyanshu Jain &lt;pj@73ai.org&gt;<br>
+<b>Sent:</b> Tuesday, 1 September 2026 12:00<br>
+<b>Subject:</b> The lease, clause 14</p>
+<p>Russell, is clause 14 negotiable or is it the landlord's standard form?</p>
+</div>
+
+--- text ---
+Clause 14 is the standard form. I would not sign it as drafted.
+
+Russell
+
+-----Original Message-----
+From: Priyanshu Jain <pj@73ai.org>
+Sent: Tuesday, 1 September 2026 12:00
+To: Young, Russell <russell.young@northgate-legal.example>
+Subject: The lease, clause 14
+
+Russell, is clause 14 negotiable or is it the landlord's standard form?

@@ -1,0 +1,32 @@
+render-version: 2
+message-id: 20260831170533.4C1A@brandt-tischlerei.example
+in-reply-to: -
+references-first: -
+from: Lena Brandt <lena.brandt@brandt-tischlerei.example>
+to: Priyanshu Jain <pj@73ai.org>
+cc: -
+bcc: -
+reply-to: -
+date-ms: 1788188733000
+subject: The worktop, and one more thing
+is-html: true
+surface: theme
+snippet: The worktop is oiled rather than lacquered, as we agreed. The delivery slot moved to the fourteenth. Everything else is unchanged. Lena Brandt, Brandt Tischlerei
+list-id: -
+auto-submitted: -
+precedence: -
+unsubscribe: -
+blocked-images: 0
+
+--- html ---
+<div style="font-family:Arial , sans-serif">
+<p>The worktop is oiled rather than lacquered, as we agreed.</p>
+<p style="color:#d32f2f">The delivery slot moved to the fourteenth.</p>
+<p><font>Everything else is unchanged.</font></p>
+<p style="color:#666666">Lena Brandt, Brandt Tischlerei</p>
+</div>
+
+--- quoted: none ---
+
+--- text ---
+The worktop is oiled rather than lacquered, as we agreed. The delivery slot moved to the fourteenth. Everything else is unchanged. Lena Brandt, Brandt Tischlerei

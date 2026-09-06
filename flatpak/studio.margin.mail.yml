@@ -1,0 +1,54 @@
+# The flatpak, built by repackaging the deb rather than from source. Tauri has no flatpak bundler,
+# and building from source here would produce an app that runs and then says Google is not set up:
+# the OAuth client is embedded at compile time from a file that is deliberately not in the repo.
+#
+# GNOME 48 is the runtime because it is the newest that still carries webkit2gtk-4.1, which is the
+# GTK3 WebKit wry links against. When that stops being true the answer is a GTK4 wry, not an older
+# runtime.
+id: studio.margin.mail
+runtime: org.gnome.Platform
+runtime-version: '48'
+sdk: org.gnome.Sdk
+command: margin-mail
+
+finish-args:
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --share=ipc
+  - --device=dri
+  # Gmail, IMAP, SMTP, and the loopback listener that catches Google's OAuth redirect. The redirect
+  # comes back to 127.0.0.1 inside the sandbox, which is where the app is listening, so this is the
+  # whole of what the connect flow needs; the consent page itself opens in the host's browser
+  # through the OpenURI portal, which needs no permission of its own.
+  - --share=network
+  - --talk-name=org.freedesktop.Notifications
+  # Saved attachments and exports go to the downloads directory and nowhere else.
+  - --filesystem=xdg-download
+
+modules:
+  - name: margin-mail
+    buildsystem: simple
+    build-commands:
+      - mkdir -p deb
+      - ar x margin-mail.deb --output deb
+      - tar -C deb -xf deb/data.tar.gz
+
+      - install -Dm755 deb/usr/bin/margin-mail /app/bin/margin-mail
+
+      # Flatpak wants the desktop file and every icon named for the app id, and the deb names them
+      # after the product and the binary, so both are renamed on the way in.
+      - install -Dm644 "deb/usr/share/applications/Margin Mail.desktop" /app/share/applications/studio.margin.mail.desktop
+      - desktop-file-edit --set-icon=studio.margin.mail /app/share/applications/studio.margin.mail.desktop
+      - |
+        for src in deb/usr/share/icons/hicolor/*/apps/margin-mail.png; do
+          size=$(basename "$(dirname "$(dirname "$src")")")
+          install -Dm644 "$src" "/app/share/icons/hicolor/$size/apps/studio.margin.mail.png"
+        done
+
+      - install -Dm644 studio.margin.mail.metainfo.xml /app/share/metainfo/studio.margin.mail.metainfo.xml
+
+    sources:
+      - type: file
+        path: margin-mail.deb
+      - type: file
+        path: studio.margin.mail.metainfo.xml

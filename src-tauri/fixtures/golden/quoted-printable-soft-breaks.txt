@@ -1,0 +1,34 @@
+render-version: 2
+message-id: fn-2026-09-dispatch@fieldnotes.example
+in-reply-to: -
+references-first: -
+from: Field Notes Dispatch <dispatch@fieldnotes.example>
+to: <pj@73ai.org>
+cc: -
+bcc: -
+reply-to: -
+date-ms: 1788168600000
+subject: September: the notebook that survived a washing machine
+is-html: false
+surface: theme
+snippet: A reader in Tromsø sent us a photo of a pocket notebook that went through a full cycle at forty degrees, in a coat, with the coat. Every page is still legible. Also this month: the autumn edition…
+list-id: dispatch.fieldnotes.example
+auto-submitted: -
+precedence: -
+unsubscribe: one-click=false mailto=- url=https://fieldnotes.example/u/7712
+blocked-images: 0
+
+--- html ---
+<p>A reader in Tromsø sent us a photo of a pocket notebook that went through a full cycle at forty degrees, in a coat, with the coat. Every page is still legible.</p>
+<p>Also this month: the autumn edition ships on the 15th. Three colours, the usual count. The paper weight is unchanged at 100 g/m², and the price stays at €12 for the three pack.</p>
+<p>The equals sign is written = when it stands alone, which is the part of this encoding that catches parsers out. Trailing whitespace is kept by encoding it, like the space at the end of the previous line.</p>
+
+--- quoted: none ---
+
+--- text ---
+A reader in Tromsø sent us a photo of a pocket notebook that went through a full cycle at forty degrees, in a coat, with the coat. Every page is still legible.
+
+Also this month: the autumn edition ships on the 15th. Three colours, the usual count. The paper weight is unchanged at 100 g/m², and the price stays at €12 for the three pack.
+
+The equals sign is written = when it stands alone, which is the part of this encoding that catches parsers out. Trailing whitespace is kept 
+by encoding it, like the space at the end of the previous line.

@@ -1,0 +1,41 @@
+render-version: 2
+message-id: lease-2026-004@meridianproperties.in
+in-reply-to: lease-2026-003@73ai.org
+references-first: lease-2026-001@meridianproperties.in
+from: Arun Kulkarni <arun@meridianproperties.in>
+to: Priyanshu Jain <pj@73ai.org>
+cc: Meridian Leasing <leasing@meridianproperties.in>
+bcc: -
+reply-to: -
+date-ms: 1788410702000
+subject: Re: Lease renewal for the studio
+is-html: false
+surface: theme
+snippet: Hi Priyanshu, Attached the revised draft. The only change is clause 7, which now reads three months either side rather than six. The rent review in clause 12 stays as it was, tied to the index and…
+list-id: -
+auto-submitted: -
+precedence: -
+unsubscribe: -
+blocked-images: 0
+
+--- html ---
+<p>Hi Priyanshu,</p>
+<p>Attached the revised draft. The only change is clause 7, which now reads three months either side rather than six. The rent review in clause 12 stays as it was, tied to the index and capped at four percent.</p>
+<p>If that works, sign when you get a moment and I will countersign the same day. Happy to walk through anything on a call, Thursday afternoon is open.</p>
+<p>Best,<br>
+Arun</p>
+
+--- quoted: none ---
+
+--- text ---
+Hi Priyanshu,
+
+Attached the revised draft. The only change is clause 7, which now reads
+three months either side rather than six. The rent review in clause 12
+stays as it was, tied to the index and capped at four percent.
+
+If that works, sign when you get a moment and I will countersign the same
+day. Happy to walk through anything on a call, Thursday afternoon is open.
+
+Best,
+Arun

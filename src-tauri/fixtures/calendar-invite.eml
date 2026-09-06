@@ -1,0 +1,106 @@
+Return-Path: <sam@sunnydaymusic.example>
+MIME-Version: 1.0
+Date: Wed, 2 Sep 2026 15:40:11 +0530
+Message-ID: <000000000000a1b2c3@google.com>
+Subject: Invitation: Piano lesson: Cooper @ Wed 9 Sep 2026 17:00 - 17:45 (IST)
+ (pj@73ai.org)
+From: Sam Okafor <sam@sunnydaymusic.example>
+To: Priyanshu Jain <pj@73ai.org>
+Content-Type: multipart/mixed; boundary="mixed-piano-0001"
+
+--mixed-piano-0001
+Content-Type: multipart/alternative; boundary="alt-piano-0001"
+
+--alt-piano-0001
+Content-Type: text/plain; charset=UTF-8; format=flowed; delsp=yes
+Content-Transfer-Encoding: 7bit
+
+You have been invited to the following event.
+
+Piano lesson: Cooper
+When: Wed 9 Sep 2026 17:00 to 17:45 India Standard Time
+Where: Sunny Day Music, Bandra
+Who: Sam Okafor, Priyanshu Jain
+
+--alt-piano-0001
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+<html><body><div style=3D"padding:16px">
+<p>You have been invited to the following event.</p>
+<h3>Piano lesson: Cooper</h3>
+<p><b>When</b> Wed 9 Sep 2026 17:00 to 17:45 India Standard Time<br>
+<b>Where</b> Sunny Day Music, Bandra<br>
+<b>Who</b> Sam Okafor, Priyanshu Jain</p>
+</div></body></html>
+
+--alt-piano-0001
+Content-Type: text/calendar; charset=UTF-8; method=REQUEST
+Content-Transfer-Encoding: 7bit
+
+BEGIN:VCALENDAR
+PRODID:-//Google Inc//Google Calendar 70.9054//EN
+VERSION:2.0
+CALSCALE:GREGORIAN
+METHOD:REQUEST
+BEGIN:VTIMEZONE
+TZID:Asia/Kolkata
+X-LIC-LOCATION:Asia/Kolkata
+BEGIN:STANDARD
+TZOFFSETFROM:+0530
+TZOFFSETTO:+0530
+TZNAME:IST
+DTSTART:19700101T000000
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+DTSTART;TZID=Asia/Kolkata:20260909T170000
+DTEND;TZID=Asia/Kolkata:20260909T174500
+DTSTAMP:20260902T101500Z
+ORGANIZER;CN=Sunny Day Music:mailto:lessons@sunnydaymusic.example
+UID:4c9b2f7a-piano-cooper@sunnydaymusic.example
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=T
+ RUE;CN=Priyanshu Jain;X-NUM-GUESTS=0:mailto:pj@73ai.org
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=Sam Oka
+ for;X-NUM-GUESTS=0:mailto:sam@sunnydaymusic.example
+CREATED:20260902T101500Z
+DESCRIPTION:First lesson for Cooper. Nothing to prepare\, and there is a pia
+ no here\, so nothing to carry either.
+LAST-MODIFIED:20260902T101500Z
+LOCATION:Sunny Day Music\, Bandra
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Piano lesson: Cooper
+TRANSP:OPAQUE
+END:VEVENT
+END:VCALENDAR
+
+--alt-piano-0001--
+
+--mixed-piano-0001
+Content-Type: application/ics; name="invite.ics"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="invite.ics"
+
+QkVHSU46VkNBTEVOREFSDQpQUk9ESUQ6LS8vR29vZ2xlIEluYy8vR29vZ2xlIENhbGVuZGFyIDcw
+LjkwNTQvL0VODQpWRVJTSU9OOjIuMA0KQ0FMU0NBTEU6R1JFR09SSUFODQpNRVRIT0Q6UkVRVUVT
+VA0KQkVHSU46VlRJTUVaT05FDQpUWklEOkFzaWEvS29sa2F0YQ0KWC1MSUMtTE9DQVRJT046QXNp
+YS9Lb2xrYXRhDQpCRUdJTjpTVEFOREFSRA0KVFpPRkZTRVRGUk9NOiswNTMwDQpUWk9GRlNFVFRP
+OiswNTMwDQpUWk5BTUU6SVNUDQpEVFNUQVJUOjE5NzAwMTAxVDAwMDAwMA0KRU5EOlNUQU5EQVJE
+DQpFTkQ6VlRJTUVaT05FDQpCRUdJTjpWRVZFTlQNCkRUU1RBUlQ7VFpJRD1Bc2lhL0tvbGthdGE6
+MjAyNjA5MDlUMTcwMDAwDQpEVEVORDtUWklEPUFzaWEvS29sa2F0YToyMDI2MDkwOVQxNzQ1MDAN
+CkRUU1RBTVA6MjAyNjA5MDJUMTAxNTAwWg0KT1JHQU5JWkVSO0NOPVN1bm55IERheSBNdXNpYzpt
+YWlsdG86bGVzc29uc0BzdW5ueWRheW11c2ljLmV4YW1wbGUNClVJRDo0YzliMmY3YS1waWFuby1j
+b29wZXJAc3VubnlkYXltdXNpYy5leGFtcGxlDQpBVFRFTkRFRTtDVVRZUEU9SU5ESVZJRFVBTDtS
+T0xFPVJFUS1QQVJUSUNJUEFOVDtQQVJUU1RBVD1ORUVEUy1BQ1RJT047UlNWUD1UDQogUlVFO0NO
+PVByaXlhbnNodSBKYWluO1gtTlVNLUdVRVNUUz0wOm1haWx0bzpwakA3M2FpLm9yZw0KQVRURU5E
+RUU7Q1VUWVBFPUlORElWSURVQUw7Uk9MRT1SRVEtUEFSVElDSVBBTlQ7UEFSVFNUQVQ9QUNDRVBU
+RUQ7Q049U2FtIE9rYQ0KIGZvcjtYLU5VTS1HVUVTVFM9MDptYWlsdG86c2FtQHN1bm55ZGF5bXVz
+aWMuZXhhbXBsZQ0KQ1JFQVRFRDoyMDI2MDkwMlQxMDE1MDBaDQpERVNDUklQVElPTjpGaXJzdCBs
+ZXNzb24gZm9yIENvb3Blci4gTm90aGluZyB0byBwcmVwYXJlXCwgYW5kIHRoZXJlIGlzIGEgcGlh
+DQogbm8gaGVyZVwsIHNvIG5vdGhpbmcgdG8gY2FycnkgZWl0aGVyLg0KTEFTVC1NT0RJRklFRDoy
+MDI2MDkwMlQxMDE1MDBaDQpMT0NBVElPTjpTdW5ueSBEYXkgTXVzaWNcLCBCYW5kcmENClNFUVVF
+TkNFOjANClNUQVRVUzpDT05GSVJNRUQNClNVTU1BUlk6UGlhbm8gbGVzc29uOiBDb29wZXINClRS
+QU5TUDpPUEFRVUUNCkVORDpWRVZFTlQNCkVORDpWQ0FMRU5EQVINCg==
+
+--mixed-piano-0001--

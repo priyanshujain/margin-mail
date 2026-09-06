@@ -1,0 +1,42 @@
+render-version: 2
+message-id: 20260830173812.C4A19@chatelet.example
+in-reply-to: -
+references-first: -
+from: Théâtre du Châtelet <billetterie@chatelet.example>
+to: <caroline@bauhaus-tickets.example>
+cc: -
+bcc: -
+reply-to: -
+date-ms: 1788111492000
+subject: Votre réservation est confirmée
+is-html: false
+surface: theme
+snippet: Bonjour, Votre réservation est confirmée pour la deuxième soirée. Les places sont au rang H, côté jardin, et le théâtre ouvre à dix-neuf heures. Merci de présenter ce message à l'entrée. Aucun billet…
+list-id: -
+auto-submitted: -
+precedence: -
+unsubscribe: -
+blocked-images: 0
+
+--- html ---
+<p>Bonjour,</p>
+<p>Votre réservation est confirmée pour la deuxième soirée. Les places sont au rang H, côté jardin, et le théâtre ouvre à dix-neuf heures.</p>
+<p>Merci de présenter ce message à l'entrée. Aucun billet papier ne sera envoyé.</p>
+<p>Bien cordialement,<br>
+La billetterie<br>
+Théâtre du Châtelet</p>
+
+--- quoted: none ---
+
+--- text ---
+Bonjour,
+
+Votre réservation est confirmée pour la deuxième soirée. Les places sont
+au rang H, côté jardin, et le théâtre ouvre à dix-neuf heures.
+
+Merci de présenter ce message à l'entrée. Aucun billet papier ne sera
+envoyé.
+
+Bien cordialement,
+La billetterie
+Théâtre du Châtelet

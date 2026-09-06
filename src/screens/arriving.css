@@ -1,0 +1,84 @@
+/* The panel over the window while an added account brings its mail in. The welcome screen's bar
+   and count, at the panel's width and twice the height, because this is the only thing on the
+   screen and it should read from across the room. */
+
+.arrive {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.arrive-line {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--t-4);
+  line-height: 1.5;
+}
+
+.arrive-bar {
+  position: relative;
+  width: 100%;
+  height: 6px;
+  border-radius: var(--r-pill);
+  background: var(--accent-wash);
+  overflow: hidden;
+}
+
+.arrive-fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--r-pill);
+  background: var(--accent);
+  transform-origin: left center;
+  transition: transform 180ms var(--ease);
+}
+
+/* Before there is a total there is nothing to fill against, so a run of the bar walks the track. */
+.arrive-bar[data-counting] .arrive-fill {
+  width: 40%;
+  animation: arrive-walk 1.4s var(--ease) infinite;
+}
+
+@keyframes arrive-walk {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(250%);
+  }
+}
+
+.arrive-count {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: var(--t-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.arrive-quiet {
+  margin: 0;
+  color: var(--ink-faint);
+  font-size: var(--t-2);
+  line-height: 1.5;
+}
+
+/* The provider's own sentence, verbatim, in the voice a refusal is printed in elsewhere. */
+.arrive-trouble {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: var(--r-md);
+  background: var(--raised);
+  color: var(--ink-soft);
+  font-size: var(--t-2);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arrive-bar[data-counting] .arrive-fill {
+    width: 100%;
+    animation: none;
+    opacity: 0.5;
+  }
+}

@@ -1,0 +1,142 @@
+/* The Feed: the whole stage, one column of cards on the Feed's own measure.
+ *
+ * A card is not a row that opens a message, it is the message, so the geometry is a page's rather
+ * than a list's: a head, a title in the text face, the body, and a foot of verbs. */
+
+.feed {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 22px 40px 40px;
+}
+
+.feed-inner {
+  max-width: var(--feed-w);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+/* The banner is the top of the column rather than a strip over it, so it takes the column's gap
+   instead of a margin of its own. */
+.feed-inner > .banner {
+  margin: 0;
+}
+
+.feed-card {
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--raised);
+  overflow: hidden;
+  transition: border-color 120ms var(--ease), box-shadow 120ms var(--ease);
+}
+
+/* The card the keyboard is on, the same ring the Screener's cards take. */
+.feed-card[data-selected] {
+  border-color: var(--line-strong);
+  box-shadow: var(--card-ring);
+}
+
+.feed-head {
+  display: grid;
+  grid-template-columns: var(--avatar) 1fr auto;
+  gap: 0 12px;
+  align-items: center;
+  padding: 14px 18px 0;
+}
+
+.feed-title {
+  margin: 10px 18px 4px;
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+/* A card whose body has not arrived yet carries the pane's skeleton where the body will go, or the
+   one line that says it did not come, on the body's own inset. Nothing spins. */
+.feed-wait {
+  padding: 6px 18px 8px;
+}
+
+/* `--feed-body-h` is the frame's real content height, written on the element by the card.
+ *
+ * An iframe never lays out shorter than its own box, so a two paragraph newsletter measures as the
+ * frame's default height and MessageBody sizes it to that; the blank tail is clipped out here
+ * rather than argued with there. The max-height is on the content box so the clip is a length of
+ * prose rather than a length of prose plus this file's padding. */
+.feed-body {
+  position: relative;
+  box-sizing: content-box;
+  max-height: min(var(--feed-clip), var(--feed-body-h, var(--feed-clip)));
+  padding: 6px 18px 0;
+  overflow: hidden;
+}
+
+.feed-body[data-open] {
+  max-height: var(--feed-body-h, none);
+}
+
+/* The clip is a fade rather than a cut, because a sentence sliced through the middle reads as a
+   rendering fault and a fade reads as a decision. */
+/* Inset to the body's own padding rather than the card's edge, because the surface it fades into
+   is the message's and the message starts where the padding ends. */
+.feed-fade {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  bottom: 0;
+  height: 70px;
+  background: linear-gradient(to bottom, transparent, var(--raised));
+}
+
+/* A body that painted its own page keeps it in both palettes, so in dark the fade has to end on
+   the paper it is fading into rather than on the card behind it. */
+.feed-body[data-paper] .feed-fade {
+  background: linear-gradient(to bottom, transparent, var(--message-paper));
+}
+
+.feed-foot {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px 10px 18px;
+  border-top: 1px solid var(--line);
+}
+
+.feed-gap {
+  flex: 1;
+}
+
+/* Where the last visit ended. A hairline with a label in it rather than a banner: it marks a place
+   in the column and has nothing to say. */
+.left-off {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: -8px 0;
+  color: var(--ink-faint);
+  font-size: var(--t-1);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.left-off::before,
+.left-off::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+:root[data-phone] .feed {
+  padding: 14px 12px 24px;
+}
+
+:root[data-phone] .feed-inner {
+  gap: 16px;
+}

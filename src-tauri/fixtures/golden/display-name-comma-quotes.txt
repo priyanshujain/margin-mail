@@ -1,0 +1,35 @@
+render-version: 2
+message-id: e7f1a9c2-pumpkin@example.net
+in-reply-to: -
+references-first: -
+from: Young, Russell "Russ" <russell.young@example.net>
+to: Jain, Priyanshu <pj@73ai.org>, Weiss, Hannah (nee Fischer) <hannah.weiss@example.net>
+cc: -
+bcc: -
+reply-to: Young, Russell "Russ" <russ@example.net>
+date-ms: 1787608530000
+subject: Pumpkin bread recipe
+is-html: false
+surface: theme
+snippet: From my mother's card, transcribed as best I could. Bake at 175 for fifty minutes, and do not open the oven before forty. Two loaves, or one loaf and twelve muffins. The muffins take half the time…
+list-id: -
+auto-submitted: -
+precedence: -
+unsubscribe: -
+blocked-images: 0
+
+--- html ---
+<p>From my mother's card, transcribed as best I could. Bake at 175 for fifty minutes, and do not open the oven before forty.</p>
+<p>Two loaves, or one loaf and twelve muffins. The muffins take half the time and are better the next day.</p>
+<p>Russ</p>
+
+--- quoted: none ---
+
+--- text ---
+From my mother's card, transcribed as best I could. Bake at 175 for
+fifty minutes, and do not open the oven before forty.
+
+Two loaves, or one loaf and twelve muffins. The muffins take half the
+time and are better the next day.
+
+Russ

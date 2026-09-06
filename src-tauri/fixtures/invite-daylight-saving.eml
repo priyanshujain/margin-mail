@@ -1,0 +1,65 @@
+Return-Path: <calendar-notification@google.com>
+MIME-Version: 1.0
+Date: Wed, 2 Sep 2026 11:04:51 +0100
+Message-ID: <00000000000091f2ab@google.com>
+Subject: Invitation: Quarterly review @ Thu 15 Oct 2026 14:00 - 15:00 (BST)
+From: Nadia Osei <nadia@westferry.example>
+To: Priyanshu Jain <pj@73ai.org>
+Content-Type: multipart/alternative; boundary="000000000000c1a4"
+
+--000000000000c1a4
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+
+You have been invited to Quarterly review on Thursday 15 October 2026,
+14:00 to 15:00 London time.
+
+--000000000000c1a4
+Content-Type: text/calendar; charset="UTF-8"; method=REQUEST
+Content-Transfer-Encoding: 7bit
+
+BEGIN:VCALENDAR
+PRODID:-//Google Inc//Google Calendar 70.9054//EN
+VERSION:2.0
+CALSCALE:GREGORIAN
+METHOD:REQUEST
+BEGIN:VTIMEZONE
+TZID:Europe/London
+X-LIC-LOCATION:Europe/London
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0000
+TZOFFSETTO:+0100
+TZNAME:BST
+DTSTART:19700329T010000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0000
+TZNAME:GMT
+DTSTART:19701025T020000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+DTSTART;TZID=Europe/London:20261015T140000
+DTEND;TZID=Europe/London:20261015T150000
+DTSTAMP:20260902T100451Z
+ORGANIZER;CN=Nadia Osei:mailto:nadia@westferry.example
+UID:5m1q9c3k8p7v@google.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=
+ TRUE;CN=Priyanshu Jain;X-NUM-GUESTS=0:mailto:pj@73ai.org
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=Nadia
+  Osei;X-NUM-GUESTS=0:mailto:nadia@westferry.example
+CREATED:20260902T100450Z
+DESCRIPTION:The quarterly numbers\, then the roadmap. Bring the deck.
+LAST-MODIFIED:20260902T100450Z
+LOCATION:Westferry\, meeting room 2
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Quarterly review
+TRANSP:OPAQUE
+END:VEVENT
+END:VCALENDAR
+
+--000000000000c1a4--

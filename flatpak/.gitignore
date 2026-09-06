@@ -1,0 +1,5 @@
+margin-mail.deb
+build/
+repo/
+*.flatpak
+.flatpak-builder/

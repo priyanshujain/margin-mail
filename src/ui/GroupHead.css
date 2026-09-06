@@ -1,0 +1,37 @@
+.group-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px 6px;
+  color: var(--ink-faint);
+  font-size: var(--t-1);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.group-head-rule {
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+/* An action beside a heading is not a heading, so it drops the uppercase and the tracking and
+   reads as the sentence it is. */
+.group-head-action {
+  margin-left: auto;
+  color: var(--ink-faint);
+  font-size: var(--t-1);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  transition: color 120ms var(--ease);
+}
+
+.group-head-action:hover {
+  color: var(--ink);
+}
+
+:root[data-touch] .group-head-action {
+  min-height: var(--touch-h);
+}

@@ -1,0 +1,24 @@
+Return-Path: <dispatch@fieldnotes.example>
+MIME-Version: 1.0
+Date: Mon, 31 Aug 2026 09:30:00 +0000
+Message-ID: <fn-2026-09-dispatch@fieldnotes.example>
+Subject: =?utf-8?Q?September=3A_the_notebook_that_survived_a_washin?=
+ =?utf-8?Q?g_machine?=
+From: Field Notes Dispatch <dispatch@fieldnotes.example>
+To: pj@73ai.org
+List-Id: <dispatch.fieldnotes.example>
+List-Unsubscribe: <https://fieldnotes.example/u/7712>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+A reader in Troms=C3=B8 sent us a photo of a pocket noteb=
+ook that went through a full cycle at forty degrees, in a coat, with the=
+ coat. Every page is still legible.
+
+Also this month: the autumn edition ships on the 15th. Three colours, th=
+e usual count. The paper weight is unchanged at 100 g/m=C2=B2, and the p=
+rice stays at =E2=82=AC12 for the three pack.
+
+The equals sign is written =3D when it stands alone, which is the part o=
+f this encoding that catches parsers out. Trailing whitespace is kept=20
+by encoding it, like the space at the end of the previous line.

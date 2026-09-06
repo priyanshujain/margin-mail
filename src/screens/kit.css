@@ -1,0 +1,170 @@
+/* The Kit's own layout, and nothing else. Every colour, radius and size that describes a primitive
+   is in that primitive's stylesheet; what is here is the bench they sit on. */
+
+/* The one page in the app that scrolls the document. app.css pins the body so the app itself never
+   does, which is right for a window with its own scrolling regions and wrong for a page whose whole
+   job is to be captured in a single image. */
+:root:has(.kit),
+:root:has(.kit) body,
+:root:has(.kit) #root {
+  height: auto;
+}
+
+:root:has(.kit) body {
+  position: static;
+  overflow: auto;
+  background: var(--paper);
+}
+
+.kit {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 28px 32px 80px;
+}
+
+.kit-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.kit-heading {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 22px;
+  letter-spacing: -0.01em;
+}
+
+.kit-controls {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+.kit-section {
+  padding: 26px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.kit-title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: var(--t-4);
+}
+
+.kit-note {
+  margin: 3px 0 0;
+  color: var(--ink-faint);
+  font-size: var(--t-2);
+}
+
+.kit-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.kit-bench {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+}
+
+/* A popover hangs out of the flow, so the bench it is anchored in keeps the room for it. */
+.kit-hang {
+  min-height: 230px;
+}
+
+/* The name of the state, in the same small uppercase every label in the family uses. */
+.kit-label {
+  flex: none;
+  width: 168px;
+  padding-top: 6px;
+  color: var(--ink-faint);
+  font-size: var(--t-1);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.kit-items {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.kit-quiet {
+  color: var(--ink-faint);
+  font-size: var(--t-2);
+}
+
+/* A strip of paper with a hairline round it, so a row is seen on the surface it really sits on. */
+.kit-list {
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--paper);
+  overflow: hidden;
+}
+
+.kit-column {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 720px;
+}
+
+.kit-form,
+.kit-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  max-width: 480px;
+}
+
+.kit-anchor {
+  display: inline-flex;
+}
+
+.kit-icons {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+  gap: 14px 10px;
+}
+
+.kit-icon {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--ink);
+}
+
+/* A transform makes this the containing block for anything fixed inside it, which is what lets an
+   overlay, a sheet and a toast be looked at in place rather than over the page. */
+.kit-stage {
+  position: relative;
+  transform: translate(0);
+  flex: 1;
+  min-width: 0;
+  height: 420px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--shell);
+  overflow: hidden;
+}
+
+.kit-stage[data-short] {
+  height: 150px;
+}
+
+.kit-stage[data-tall] {
+  height: 720px;
+}

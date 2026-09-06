@@ -34,8 +34,8 @@ app. Bindings live in a keymap file the user can edit; the defaults are what fol
 | `e` | Archive | yes |
 | `u` | Toggle seen | yes |
 | `Shift+S` | Toggle star | yes |
-| `#` | Trash | yes |
-| `!` | Spam | yes |
+| `#` | Trash, and put back in Trash (toggle) | yes |
+| `!` | Spam, and not spam in Spam (toggle) | yes |
 | `l` | Reply later (toggle) | no |
 | `s` | Set aside (toggle) | no |
 | `b` | Snooze… | no |

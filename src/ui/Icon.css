@@ -1,0 +1,4 @@
+/* An icon is never the thing that gives way when a row runs out of room; the label beside it is. */
+.icon {
+  flex: none;
+}

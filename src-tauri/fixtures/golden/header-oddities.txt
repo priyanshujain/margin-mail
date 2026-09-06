@@ -1,0 +1,31 @@
+render-version: 2
+message-id: ll-2026-08-30@ledgerlines.example
+in-reply-to: -
+references-first: -
+from: Ledger Lines <weekly@ledgerlines.example>
+to: <pj@73ai.org>
+cc: -
+bcc: -
+reply-to: -
+date-ms: 1788067838000
+subject: The bond market, again
+is-html: false
+surface: theme
+snippet: Rates did the one thing nobody had written a note about, which is nothing at all. Here is what that means for the long end. The full piece is on the site. This mail is the summary.
+list-id: weekly.ledgerlines.example
+auto-submitted: -
+precedence: -
+unsubscribe: one-click=false mailto=mailto:stop@ledgerlines.example url=-
+blocked-images: 0
+
+--- html ---
+<p>Rates did the one thing nobody had written a note about, which is nothing at all. Here is what that means for the long end.</p>
+<p>The full piece is on the site. This mail is the summary.</p>
+
+--- quoted: none ---
+
+--- text ---
+Rates did the one thing nobody had written a note about, which is
+nothing at all. Here is what that means for the long end.
+
+The full piece is on the site. This mail is the summary.

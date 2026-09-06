@@ -1,0 +1,43 @@
+render-version: 2
+message-id: camp-4471-8821@discounttire.example
+in-reply-to: -
+references-first: -
+from: Discount Tire <specials@discounttire.example>
+to: <pj@73ai.org>
+cc: -
+bcc: -
+reply-to: -
+date-ms: 1787752800000
+subject: Your air pressure reminder
+is-html: true
+surface: theme
+snippet: It has been 30 days since your last check. Stop by any store for a free air pressure check, no appointment needed. Book now Find a store near you
+list-id: -
+auto-submitted: -
+precedence: -
+unsubscribe: one-click=false mailto=- url=https://discounttire.example/u/4471
+blocked-images: 0
+
+--- html ---
+
+
+
+
+
+
+
+
+<div>
+<p>It has been 30 days since your last check.
+Stop by any store for a free air pressure check, no appointment needed.</p>
+</div>
+
+
+<p><a target="_blank" rel="noopener noreferrer">Book
+now</a></p>
+<p><a href="https://discounttire.example/stores" target="_blank" rel="noopener noreferrer">Find a store near you</a></p>
+
+--- quoted: none ---
+
+--- text ---
+It has been 30 days since your last check. Stop by any store for a free air pressure check, no appointment needed. Book now Find a store near you

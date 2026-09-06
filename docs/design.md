@@ -17,10 +17,10 @@ named. We refused HEY's layout (one column, a page per thread, a round trip for 
 insistence that routing is per sender only, and its refusal to let you archive.
 
 From Superhuman: speed and the keyboard. One key per verb, the key printed on every button, and a
-command palette that is the whole settings and discovery surface, so the app teaches itself. A
-list beside a reading pane, so you triage without leaving the list. Remind me if no reply, undo
-send, the contact card. We refused the tracking pixels, the AI surface that ships your mail to a
-vendor, the inbox-zero streak, the tiny fixed type, and the price.
+command palette that reaches every place, every command and every setting, so the app teaches
+itself. A list beside a reading pane, so you triage without leaving the list. Remind me if no
+reply, undo send, the contact card. We refused the tracking pixels, the AI surface that ships your
+mail to a vendor, the inbox-zero streak, the tiny fixed type, and the price.
 
 From neither: the app is the only place your state lives, and that state is yours. Your piles,
 screening decisions, notes, renames and clips are keyed on the mail itself (the RFC Message-ID
@@ -34,9 +34,9 @@ There are three boxes and one gate, and every sender has exactly one destination
 
 **Inbox** is for people and for the few services you want to hear from as they arrive. It is a
 stream, not a queue: what you have not looked at sits under New for you at the top, and
-everything you have opened or sent sinks to Previously seen beneath it. Nothing counts anything.
-A reply pulls a thread back up. There is an archive key, because some people need an empty list
-to feel finished, but nothing in the design pushes you towards it.
+everything you have opened or sent sinks to Previously seen beneath it. Neither group carries a
+count. A reply pulls a thread back up. There is an archive key, because some people need an empty
+list to feel finished, but nothing in the design pushes you towards it.
 
 **Feed** is for newsletters and long reads. Every item is already open, in one scrolling column,
 newest first, with a marker where you left off. There is no read state and no obligation. You
@@ -53,9 +53,10 @@ decision can be per address or per domain, which is the thing HEY's users ask fo
 will not give them. Replies to a thread you are already in bypass the whole system and land in
 the Inbox, because the sender rule is about first contact, not about conversations.
 
-On first run there is no Screener avalanche. Everyone who has ever written to you is screened in,
-routed by the same suggestion rules, and movable later from their contact card. Only genuinely
-new senders from that point on are held.
+On first run there is no Screener avalanche. Everyone the account already knows is screened in,
+routed by the same suggestion rules, and movable later from their contact card: your Google
+contacts, everyone in the mail that came down with the first sync, and everyone you wrote to in
+it. Only genuinely new senders from that point on are held.
 
 ## The two piles
 
@@ -76,16 +77,20 @@ Every verb is one unmodified key, the same key Gmail and Superhuman use where th
 (`j`, `k`, `e`, `r`, `a`, `f`, `c`, `/`, `x`, `u`, `z`) and HEY's letters for HEY's verbs (`l`
 Reply Later, `s` Set Aside, `b` snooze, `y` note, `m` ignore). Number keys go to places. There
 are no two-key chords, nothing is modal, and the key is printed on every button so the mouse
-teaches the keyboard. Cmd-K opens the palette, which also lists every place, every command and
-every setting. The full map and the reasoning for each conflict are in [keyboard.md](keyboard.md).
+teaches the keyboard. Cmd-K opens the palette, which reaches every place, every command and
+every setting, though settings itself is a screen you can sit in rather than a list you pass
+through. The full map and the reasoning for each conflict are in [keyboard.md](keyboard.md).
 
 ## Quiet by design
 
-No badge, no unread count, no streak, no photograph when the list is empty. No notification
-unless you turned it on for that thread or that person. Remote images do not load until you ask,
-tracking pixels are removed before the message renders, and the banner tells you whose pixel it
-was. Nothing you send carries a tracker and nothing reports when it was opened. Links open with
-their tracking parameters removed.
+No unread count, no streak, no photograph when the list is empty. No notification unless you
+turned it on for that thread or that person. The one number anywhere is the dock badge, and it
+counts New for you rather than unread mail: what is waiting for a decision once the Screener, the
+Feed and the Paper Trail have taken everything that is not. That is a fact about your Inbox rather
+than a reason to open the app, and it turns off in Notifications. Remote images do not load until
+you ask, tracking pixels are removed before the message renders, and the banner tells you whose
+pixel it was. Nothing you send carries a tracker and nothing reports when it was opened. Links open
+with their tracking parameters removed.
 
 There is no AI in this version. Classification is by headers and by your decisions, the way HEY
 does it, and it is explainable in a sentence on every Screener card. The design leaves a seat for
@@ -113,15 +118,17 @@ passage with a link back. All of it roams through the backup store, none of it t
 
 Not a team tool: no shared threads, comments, or read statuses. Not a calendar: invites hand off
 to Margin Calendar. Not a scheduler: no send later in this version. Not an assistant: nothing is
-summarised or drafted for you. Not a Gmail skin: the Gmail web UI is not a consideration, since
-the whole point is never opening it.
+summarised or drafted for you. Not an archive: the device keeps a window of recent mail, a month
+unless you ask for more, and the rest stays on Gmail where a search still reaches it. Not a Gmail
+skin: the Gmail web UI is not a consideration, since the whole point is never opening it.
 
 ## Visual language
 
 Lifted from margin and the calendar unchanged: warm paper, ink and two softer inks, hairline
 borders, a four-step type scale, three radii, one easing curve, light and dark driven by
 `data-theme`. Hanken Grotesk for the interface, Literata for the subject line and for message
-bodies, because mail is reading and reading deserves a text face. The additions are mail-specific:
+bodies, because mail is reading and reading deserves a text face. Both are the default rather than
+the law: Appearance offers the six faces the suite bundles and whatever else is on the machine. The additions are mail-specific:
 a row hover and a row selection wash, a warmer band for Previously seen, a note surface, a dot
 colour for new mail, and the eight muted hues the calendar already uses, here for avatars and
 account edges. No CSS framework, no component library, hand-written CSS on tokens.

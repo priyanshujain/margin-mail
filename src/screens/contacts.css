@@ -1,0 +1,348 @@
+/* The contact card and the Contacts place.
+ *
+ * The card's frame, its rows and its two-column rhythm are the Popover primitive's; what is here is
+ * only what a card of decisions adds to it: the picker, the note, and the two quiet lists at its
+ * foot. The place borrows the list column's head and the mail list's row, so a person is read the
+ * same way a thread is. */
+
+/* -- the card ---------------------------------------------------------------------------------- */
+
+.contact-who {
+  min-width: 0;
+}
+
+/* Before the card has arrived. A popover that measured zero would place itself, then jump when the
+   answer came back, so it holds a card's worth of height while it waits, and three faint lines
+   breathe in it so the wait reads as a wait rather than as a card with nothing on it. The lines
+   are the pane's pending body, drawn at a card's width. */
+.contact-waiting {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 120px;
+  padding: 20px 16px;
+}
+
+.contact-waiting span {
+  height: 9px;
+  border-radius: var(--r-sm);
+  background: var(--accent-wash);
+}
+
+.contact-waiting[data-phase="loading"] span {
+  animation: contact-waiting 1100ms var(--ease) infinite alternate;
+}
+
+.contact-waiting span:nth-child(1) {
+  width: 48%;
+}
+
+.contact-waiting span:nth-child(2) {
+  width: 86%;
+  animation-delay: 140ms;
+}
+
+.contact-waiting span:nth-child(3) {
+  width: 64%;
+  animation-delay: 280ms;
+}
+
+@keyframes contact-waiting {
+  to {
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contact-waiting[data-phase="loading"] span {
+    animation: none;
+  }
+}
+
+/* A switch is its own row: the label is on the left and the track on the right, which is the same
+   rhythm as a label and its value and needs nothing between them. */
+.contact-toggle {
+  padding: 2px 16px;
+  font-size: var(--t-2);
+}
+
+/* The one control on this card that changes where somebody's mail goes. Drawn as the row's value
+   rather than as a button, because it is a value: it says where the mail delivers and it is also
+   how that is changed. The platform's own picker chrome is dropped and the app's is put back, so
+   the chevron beside it is the same drawing as every other chevron here. */
+.contact-picker {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--raised);
+  color: var(--ink-faint);
+  transition: border-color 120ms var(--ease);
+}
+
+.contact-picker:hover,
+.contact-picker:focus-within {
+  border-color: var(--line-strong);
+}
+
+.contact-picker .icon {
+  position: absolute;
+  right: 6px;
+  pointer-events: none;
+}
+
+.contact-pick {
+  appearance: none;
+  width: 100%;
+  padding: 2px 24px 2px 8px;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: none;
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: var(--t-2);
+}
+
+.contact-note-row {
+  align-items: flex-start;
+}
+
+.contact-note-row .lab {
+  padding-top: 4px;
+}
+
+/* A note reads as what it says until somebody reaches for it, and then as the field it is. A note
+   is yours and not the sender's, so the surface it takes while it is being written is the same one
+   a note takes on a row. */
+.contact-note {
+  flex: 1;
+  min-width: 0;
+  padding: 3px 6px;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  background: none;
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: var(--t-2);
+  line-height: 1.45;
+  resize: none;
+  transition: background 120ms var(--ease), border-color 120ms var(--ease);
+}
+
+.contact-note::placeholder {
+  color: var(--ink-faint);
+}
+
+.contact-note:hover,
+.contact-note:focus {
+  border-color: var(--note-line);
+  background: var(--note-surface);
+}
+
+.contact-section {
+  border-top: 1px solid var(--line);
+  padding-bottom: 6px;
+}
+
+.contact-line {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  width: 100%;
+  padding: 3px 16px;
+  color: var(--ink);
+  font-size: var(--t-2);
+  text-align: left;
+}
+
+button.contact-line {
+  transition: background 120ms var(--ease);
+}
+
+button.contact-line:hover {
+  background: var(--row-hover);
+}
+
+.contact-line-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.contact-line-side {
+  flex: none;
+  color: var(--ink-faint);
+  font-size: var(--t-1);
+}
+
+.contact-foot {
+  border-top: 1px solid var(--line);
+  padding: 8px 16px;
+}
+
+.contact-unsub {
+  color: var(--ink-faint);
+  font-size: var(--t-2);
+  transition: color 120ms var(--ease);
+}
+
+.contact-unsub:hover {
+  color: var(--danger-ink);
+}
+
+/* Pressed and waiting on the sender's server. The label has already changed to say so; the pulse
+   is what keeps it from reading as a dead control while a slow host answers. */
+.contact-unsub[data-phase="unsubscribing"] {
+  color: var(--ink-faint);
+  cursor: default;
+  animation: contact-busy 1.2s var(--ease) infinite;
+}
+
+.contact-unsub[data-phase="unsubscribing"]:hover {
+  color: var(--ink-faint);
+}
+
+@keyframes contact-busy {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contact-unsub[data-phase="unsubscribing"] {
+    animation: none;
+  }
+}
+
+/* -- the place ---------------------------------------------------------------------------------- */
+
+.contacts {
+  flex-direction: column;
+}
+
+.contacts-head {
+  gap: 18px;
+}
+
+.contacts-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 280px;
+  padding: 3px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: var(--raised);
+  color: var(--ink-faint);
+}
+
+.contacts-search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: var(--t-3);
+}
+
+.contacts-search input::placeholder {
+  color: var(--ink-faint);
+}
+
+.contacts-list {
+  padding-bottom: 24px;
+}
+
+/* Asked again, with the last answer still on it. The whole list breathes rather than each row,
+   because a list of two hundred people is two hundred animations otherwise, and a quick answer
+   never gets far enough into the first breath to be seen at all. */
+.contacts-list[data-phase="loading"] {
+  animation: contacts-looking 1100ms var(--ease) infinite alternate;
+}
+
+/* The first open, before any answer: the row's shape, faintly, where the first rows will be. */
+.contacts-waiting {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 360px;
+  max-width: 100%;
+  padding: 8px 24px;
+}
+
+.contacts-waiting span {
+  height: 9px;
+  border-radius: var(--r-sm);
+  background: var(--accent-wash);
+}
+
+.contacts-waiting span:nth-child(2) {
+  width: 80%;
+}
+
+.contacts-waiting span:nth-child(3) {
+  width: 62%;
+}
+
+@keyframes contacts-looking {
+  to {
+    opacity: 0.5;
+  }
+}
+
+/* What went wrong, in the list's own quiet voice, above whatever was last on it. */
+.contacts-note {
+  margin: 0;
+  padding: 14px 24px;
+  color: var(--ink-faint);
+  font-size: var(--t-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contacts-list[data-phase="loading"] {
+    animation: none;
+  }
+}
+
+/* The mail list's row, with the two decisions worth changing without opening anything beside it. */
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-right: 24px;
+}
+
+/* The row keeps a measure of its own rather than stretching to the window, so the date stays with
+   the name it belongs to instead of drifting to the far edge of a wide screen. */
+.contact-item .row {
+  flex: 1;
+  min-width: 0;
+  max-width: 720px;
+}
+
+.contact-controls {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 16px;
+  width: 260px;
+}
+
+.contact-controls .contact-picker {
+  width: 140px;
+}
+
+/* There is no room for a picker and a switch beside a row on a phone, and the card is one tap away
+   on the row itself. */
+:root[data-phone] .contact-controls {
+  display: none;
+}
+
+:root[data-phone] .contacts-search {
+  width: auto;
+}

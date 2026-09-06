@@ -1,1 +1,7 @@
-/* Placeholder. The design system replaces this in F2. */
+/* Layer one. The shared package is the source of the values three apps hold in common, and this
+   file is only the seam: what margin-shared decided, then what mail adds on top of it.
+   Nothing else in the app may declare a token, and nothing outside this layer may write a literal
+   colour, radius or size. */
+
+@import "margin-shared/css/tokens.css";
+@import "./mail.css";

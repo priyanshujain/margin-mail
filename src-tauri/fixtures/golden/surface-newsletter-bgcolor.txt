@@ -1,0 +1,43 @@
+render-version: 2
+message-id: 01000198a3f1-longread@thelongread.example
+in-reply-to: -
+references-first: -
+from: The Long Read <hello@thelongread.example>
+to: <pj@73ai.org>
+cc: -
+bcc: -
+reply-to: -
+date-ms: 1788415211000
+subject: The weekend edition
+is-html: true
+surface: paper
+snippet: The weekend edition Three pieces to settle into, and one to argue with. The pencil, at length Why bridges hum You are getting this because you asked for it. Unsubscribe
+list-id: weekly.thelongread.example
+auto-submitted: -
+precedence: bulk
+unsubscribe: one-click=false mailto=- url=https://thelongread.example/unsubscribe?u=4471
+blocked-images: 0
+
+--- html ---
+
+<table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f4f1ea">
+<tbody><tr><td align="center" style="padding:24px 0">
+<table width="600" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff">
+<tbody><tr><td style="padding:32px">
+<h1 style="font-family:Georgia , serif;font-size:26px;color:#1a1a1a;margin:0 0 18px">The weekend edition</h1>
+<p style="font-family:Georgia , serif;font-size:16px;color:#333333;margin:0 0 14px">Three pieces to settle into, and one to argue with.</p>
+<p style="margin:0 0 14px"><a href="https://thelongread.example/pencil" style="color:#8a5a2b" target="_blank" rel="noopener noreferrer">The pencil, at length</a></p>
+<p style="margin:0"><a href="https://thelongread.example/bridges" style="color:#8a5a2b" target="_blank" rel="noopener noreferrer">Why bridges hum</a></p>
+</td></tr>
+<tr><td bgcolor="#efece4" style="padding:18px 32px;font-size:12px;color:#6b6b6b">
+You are getting this because you asked for it.
+<a href="https://thelongread.example/unsubscribe?u=4471" target="_blank" rel="noopener noreferrer">Unsubscribe</a>
+</td></tr>
+</tbody></table>
+</td></tr>
+</tbody></table>
+
+--- quoted: none ---
+
+--- text ---
+The weekend edition Three pieces to settle into, and one to argue with. The pencil, at length Why bridges hum You are getting this because you asked for it. Unsubscribe

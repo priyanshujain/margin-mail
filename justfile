@@ -24,6 +24,11 @@ test:
 test-ui:
     pnpm test:ui
 
+# Recapture the pictures the guide ships with, from the fixture rather than from anybody's mailbox.
+# They are committed, so this is not part of `test-ui`: an ordinary run must not rewrite the tree.
+guide-shots:
+    GUIDE_SHOTS=1 pnpm exec playwright test tests/guide-shots.spec.ts
+
 # The prose gate: no em dashes, no broken relative links, no directory trees.
 docs:
     node scripts/docs-check.mjs
@@ -35,6 +40,18 @@ build:
     # The .app on macOS, the .deb and AppImage on Linux. No dmg: nothing here needs a disk image to
     # copy a bundle into place, and building one is the slowest part of a mac bundle.
     pnpm install
+    # macOS shows no notifications from a bundle that is not signed, so tauri.conf.json ad-hoc signs
+    # at minimum and a real identity replaces that when this machine has one: the signing directory
+    # holds an env file naming it, and Tauri reads APPLE_SIGNING_IDENTITY over the config.
+    if [ "$(uname -s)" = Darwin ]; then
+      signing="${MARGIN_SIGNING_DIR:-$HOME/.margin-signing}/studio.margin.app.env"
+      if [ -f "$signing" ]; then
+        set -a; . "$signing"; set +a
+        echo "Signing as $APPLE_SIGNING_IDENTITY"
+      else
+        echo "No $signing; the bundle will be ad-hoc signed."
+      fi
+    fi
     case "$(uname -s)" in
       Darwin) pnpm tauri build --bundles app ;;
       Linux)  pnpm tauri build --bundles deb,appimage ;;

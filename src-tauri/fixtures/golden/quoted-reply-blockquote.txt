@@ -1,0 +1,47 @@
+render-version: 2
+message-id: CAG5dev-slides-03@mail.example.org
+in-reply-to: CAG5pj-slides-02@mail.73ai.org
+references-first: CAG5dev-slides-01@mail.example.org
+from: Dev Patel <dev.patel@example.org>
+to: Priyanshu Jain <pj@73ai.org>
+cc: -
+bcc: -
+reply-to: -
+date-ms: 1788191095000
+subject: Re: Slides from the talk
+is-html: true
+surface: theme
+snippet: Here they are, plus the reading list I mentioned. The paper on cache oblivious layouts is the one to start with.
+list-id: -
+auto-submitted: -
+precedence: -
+unsubscribe: -
+blocked-images: 0
+
+--- html ---
+<div dir="ltr">Here they are, plus the reading list I mentioned. The paper
+on cache oblivious layouts is the one to start with.</div>
+
+--- quoted ---
+<br>
+<div>
+<div dir="ltr">On Mon, 31 Aug 2026 at 18:40, Priyanshu
+Jain &lt;<a href="mailto:pj@73ai.org" target="_blank" rel="noopener noreferrer">pj@73ai.org</a>&gt; wrote:</div>
+<blockquote style="margin:0 0 0 0.8ex;border-left:1px solid #ccc;padding-left:1ex">
+<div dir="ltr">Good talk. Could you send the slides, and the reading list
+you put up at the end?</div>
+<br>
+<div>
+<div dir="ltr">On Fri, 28 Aug 2026 at 12:02, Dev Patel
+&lt;<a href="mailto:dev.patel@example.org" target="_blank" rel="noopener noreferrer">dev.patel@example.org</a>&gt;
+wrote:</div>
+<blockquote style="margin:0 0 0 0.8ex;border-left:1px solid #ccc;padding-left:1ex">
+<div dir="ltr">Talk is on Monday at six, room 4.02. Come if you are free.</div>
+</blockquote>
+</div>
+</blockquote>
+</div>
+
+--- text ---
+Here they are, plus the reading list I mentioned. The paper on cache
+oblivious layouts is the one to start with.

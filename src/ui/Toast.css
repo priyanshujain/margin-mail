@@ -1,0 +1,48 @@
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: min(560px, calc(100vw - 48px));
+  padding: 10px 14px 10px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  box-shadow: var(--shadow-pop);
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.toast-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.toast-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* Clear of the home indicator and of the floating action bar that sits above it. */
+:root[data-phone] .toast {
+  left: 12px;
+  right: 12px;
+  bottom: calc(var(--safe-bottom) + 12px);
+  max-width: none;
+  transform: none;
+}
+
+:root[data-touch] .toast-action {
+  min-height: var(--touch-h);
+}

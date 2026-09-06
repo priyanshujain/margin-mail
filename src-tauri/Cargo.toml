@@ -30,7 +30,7 @@ sha2 = "0.10"
 rand = "0.8"
 url = "2"
 chrono = { version = "0.4", features = ["serde"] }
-tokio = { version = "1", features = ["sync", "time"] }
+tokio = { version = "1", features = ["sync", "time", "net", "io-util", "rt"] }
 
 # gzip because Gmail's JSON compresses by an order of magnitude and hydration is thousands of
 # responses; http2 because a batch of 50 and the poll loop share one connection.
@@ -68,6 +68,68 @@ bip39 = { version = "2.2", features = ["rand"] }
 
 # The system families the Appearance section offers alongside the six bundled ones.
 fontdb = "0.24"
+
+# The second provider: a mailbox reached over IMAP and SMTP with a password, which is every
+# account that is not Google. Proton is one of these, through Bridge on the loopback.
+#
+# `async-imap` defaults to async-std, so both its default features are off and the tokio pair is
+# named instead: there is one runtime in this process and it is Tauri's.
+async-imap = { version = "0.11", default-features = false, features = ["runtime-tokio", "tokio"] }
+# `async-imap` speaks futures-io and `tokio-rustls` speaks tokio-io, so the stream is bridged.
+tokio-util = { version = "0.7", features = ["compat"] }
+# `async-imap` returns its responses as futures streams, so the combinators come with it.
+futures = "0.3"
+
+# TLS for both, and the seam where a self-signed certificate is decided about.
+#
+# Every `ClientConfig` in this crate must name `rustls::crypto::ring::default_provider()`
+# explicitly. Both crypto providers are in the tree because of what reqwest pulls, so rustls has
+# no process default to fall back on and building a config without one panics at runtime rather
+# than failing to compile.
+tokio-rustls = { version = "0.26", default-features = false, features = ["ring", "tls12", "logging"] }
+rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12", "logging"] }
+rustls-pki-types = "1"
+webpki-roots = "1"
+# The fingerprint shown in the certificate question, and the hostname check that decides whether
+# there is a question at all rather than a refusal.
+x509-parser = "0.18"
+
+# Sending. Same author as mail-parser and mail-builder, and pinned to ring for the same reason as
+# above. No `dkim`: nothing here signs outgoing mail.
+mail-send = { version = "0.6", default-features = false, features = ["ring", "tls12", "cram-md5", "digest-md5", "md5", "rand"] }
+
+# Autodiscovery. `hickory-resolver` is for the MX rung, which is what recognises a vanity domain
+# sitting on Google Workspace or Fastmail; `roxmltree` reads the clientConfig documents, which are
+# small, read-once and never written.
+hickory-resolver = { version = "0.26", default-features = false, features = ["system-config", "tokio"] }
+roxmltree = "0.21"
+
+# Notifications on macOS are posted through UserNotifications directly (notify/macos.rs says why the
+# plugin's own path shows nothing on macOS 26). These are the versions wry already resolves, so the
+# build keeps a single copy of objc2.
+[target.'cfg(target_os = "macos")'.dependencies]
+objc2 = "0.6"
+objc2-foundation = { version = "0.3", default-features = false, features = [
+  "std",
+  "NSDictionary",
+  "NSError",
+
+  "NSObject",
+  "NSString",
+] }
+objc2-user-notifications = { version = "0.3", default-features = false, features = [
+  "std",
+  "block2",
+  "UNUserNotificationCenter",
+  "UNNotification",
+  "UNNotificationContent",
+  "UNNotificationRequest",
+  "UNNotificationResponse",
+  "UNNotificationSettings",
+  "UNNotificationSound",
+  "UNNotificationTrigger",
+] }
+block2 = "0.6"
 
 # There is no auto-updater and no process to restart on a phone: the store is the update channel.
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]

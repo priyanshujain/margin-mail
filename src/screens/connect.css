@@ -1,0 +1,95 @@
+/* The welcome screen is the only place in the app that is not a list, a pane or an overlay, so
+   these are its own pieces. It is one column of centred text and whichever of the four states is
+   in force, which is why the states share the mark, the heading and the quiet paragraph. */
+
+.welcome {
+  margin: auto;
+  padding: 0 24px 56px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.welcome-mark {
+  margin-bottom: 24px;
+}
+
+.welcome-plate {
+  fill: var(--accent);
+}
+
+.welcome-glyph {
+  fill: none;
+  stroke: var(--accent-contrast);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.welcome-title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 32px;
+  letter-spacing: -0.02em;
+}
+
+.welcome-line {
+  margin: 9px 0 28px;
+  max-width: 30em;
+  color: var(--ink-soft);
+  font-size: var(--t-4);
+}
+
+.welcome-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.welcome-privacy {
+  margin: 22px 0 0;
+  max-width: 42em;
+  color: var(--ink-faint);
+  font-size: var(--t-2);
+  line-height: 1.6;
+}
+
+.welcome-trouble {
+  margin: 18px 0 0;
+  max-width: 36em;
+  color: var(--danger-ink);
+  font-size: var(--t-2);
+}
+
+/* The first sync. A bar rather than a spinner, because there is a real denominator, and a thin one
+   because it is a fact about the wait rather than the thing being waited for. */
+.welcome-bar {
+  width: 280px;
+  height: 3px;
+  border-radius: var(--r-pill);
+  background: var(--accent-wash);
+  overflow: hidden;
+}
+
+.welcome-bar-fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--r-pill);
+  background: var(--accent);
+  transform-origin: left center;
+  transition: transform 180ms var(--ease);
+}
+
+.welcome-count {
+  margin: 12px 0 0;
+  color: var(--ink-soft);
+  font-size: var(--t-2);
+  font-variant-numeric: tabular-nums;
+}
+
+:root[data-phone] .welcome-bar {
+  width: 100%;
+}

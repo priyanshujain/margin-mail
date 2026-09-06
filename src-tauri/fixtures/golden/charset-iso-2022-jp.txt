@@ -1,0 +1,35 @@
+render-version: 2
+message-id: 20260901050733.7E1B2@example.co.jp
+in-reply-to: -
+references-first: -
+from: 佐藤 花子 <hanako.sato@example.co.jp>
+to: Priyanshu Jain <pj@73ai.org>
+cc: -
+bcc: -
+reply-to: -
+date-ms: 1788239253000
+subject: 会議の資料を送ります
+is-html: false
+surface: theme
+snippet: お世話になっております。佐藤です。 来週の会議の資料をお送りします。ご確認のうえ、ご意見をいただけますと 幸いです。 よろしくお願いいたします。
+list-id: -
+auto-submitted: -
+precedence: -
+unsubscribe: -
+blocked-images: 0
+
+--- html ---
+<p>お世話になっております。佐藤です。</p>
+<p>来週の会議の資料をお送りします。ご確認のうえ、ご意見をいただけますと<br>
+幸いです。</p>
+<p>よろしくお願いいたします。</p>
+
+--- quoted: none ---
+
+--- text ---
+お世話になっております。佐藤です。
+
+来週の会議の資料をお送りします。ご確認のうえ、ご意見をいただけますと
+幸いです。
+
+よろしくお願いいたします。

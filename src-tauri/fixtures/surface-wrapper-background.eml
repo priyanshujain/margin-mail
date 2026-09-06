@@ -1,0 +1,19 @@
+Return-Path: <receipts@bramblecoffee.example>
+MIME-Version: 1.0
+Date: Tue, 1 Sep 2026 08:22:47 +0100
+Message-ID: <rcpt-2026-09-01-8812@bramblecoffee.example>
+Subject: Your receipt from Bramble Coffee
+From: Bramble Coffee <receipts@bramblecoffee.example>
+To: pj@73ai.org
+Auto-Submitted: auto-generated
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+<div style="background-color:#faf7f0;padding:28px;font-family:Helvetica,Arial,sans-serif">
+<div style="max-width:520px;margin:0 auto">
+<p style="font-size:18px;margin:0 0 16px">Thanks, that is paid.</p>
+<p style="margin:0 0 8px">Flat white and a cardamom bun</p>
+<p style="margin:0 0 16px">&pound;6.40 on the card ending 4417</p>
+<p style="font-size:12px;color:#7a7a7a;margin:0">Bramble Coffee, 14 Rivington Street</p>
+</div>
+</div>

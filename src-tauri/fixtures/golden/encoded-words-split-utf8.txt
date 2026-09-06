@@ -1,0 +1,35 @@
+render-version: 2
+message-id: a1b2c3d4-e5f6-4a7b-8c9d-000000000001@airbnb.example
+in-reply-to: -
+references-first: -
+from: Airbnb <automated@airbnb.example>
+to: <pj@73ai.org>
+cc: -
+bcc: -
+reply-to: Inês <ines@guests.airbnb.example>
+date-ms: 1788406400000
+subject: Your reservation in Lisbon is confirmed, Inês is expecting you
+is-html: false
+surface: theme
+snippet: Check-in Friday 12 September after 15:00. Your host Inês will send the door code the evening before. Rua da Bica de Duarte Belo 42, Lisboa. The tram stops at the top of the street and the walk down…
+list-id: -
+auto-submitted: -
+precedence: -
+unsubscribe: -
+blocked-images: 0
+
+--- html ---
+<p>Check-in Friday 12 September after 15:00. Your host Inês will send the door code the evening before.</p>
+<p>Rua da Bica de Duarte Belo 42, Lisboa. The tram stops at the top of the street and the walk down is five minutes.</p>
+<p>Airbnb</p>
+
+--- quoted: none ---
+
+--- text ---
+Check-in Friday 12 September after 15:00. Your host Inês will send the
+door code the evening before.
+
+Rua da Bica de Duarte Belo 42, Lisboa. The tram stops at the top of the
+street and the walk down is five minutes.
+
+Airbnb

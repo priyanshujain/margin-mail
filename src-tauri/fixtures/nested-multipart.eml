@@ -1,0 +1,57 @@
+Return-Path: <billing@citypower.example>
+MIME-Version: 1.0
+Date: Wed, 2 Sep 2026 16:04:51 -0500
+Message-ID: <116400046977232.1756846291@citypower.example>
+Subject: Bill payment pending
+From: City Power <billing@citypower.example>
+To: Priyanshu Jain <pj@73ai.org>
+Auto-Submitted: auto-generated
+Content-Type: multipart/mixed; boundary="outer-116400046977232"
+
+--outer-116400046977232
+Content-Type: multipart/alternative; boundary="inner-116400046977232"
+
+--inner-116400046977232
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+Dear Customer,
+
+Your one-time electronic payment of 98.26 for your City Power bill has
+been received and is pending. Your payment will be posted within two
+business days.
+
+Confirmation number 116400046977232
+
+Please keep this message for your records. If you did not make this
+payment, call us on the number printed on your statement.
+
+Thank you,
+City Power Customer Care
+
+--inner-116400046977232
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+<html><body style=3D"font-family:Arial,sans-serif">
+<p>Dear Customer,</p>
+<p>Your one-time electronic payment of <b>98.26</b> for your City Power =
+bill has been received and is pending. Your payment will be posted with=
+in two business days.</p>
+<p>Confirmation number 116400046977232</p>
+<p>Thank you,<br>City Power Customer Care</p>
+</body></html>
+
+--inner-116400046977232--
+
+--outer-116400046977232
+Content-Type: application/pdf; name="Statement-August.pdf"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="Statement-August.pdf"
+
+JVBERi0xLjQKMSAwIG9iajw8L1R5cGUvQ2F0YWxvZy9QYWdlcyAyIDAgUj4+ZW5kb2JqCjIgMCBv
+Ymo8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PmVuZG9iagozIDAgb2JqPDwvVHlw
+ZS9QYWdlL1BhcmVudCAyIDAgUi9NZWRpYUJveFswIDAgNTk1IDg0Ml0+PmVuZG9iagp0cmFpbGVy
+PDwvUm9vdCAxIDAgUj4+CiUlRU9GCg==
+
+--outer-116400046977232--

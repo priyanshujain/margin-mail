@@ -1,0 +1,127 @@
+/* The stylesheet inside a message's iframe.
+ *
+ * It is served raw out of public/ rather than bundled, because the frame is a document of its own
+ * and cannot see the app's stylesheets. Every value it uses is a custom property that
+ * src/screens/MessageBody.tsx writes onto the frame's root from the app's own computed tokens, so
+ * this file holds the shape of a message body and no colour, no face and no size of its own.
+ *
+ * The two faces are declared again for the same reason: a child document does not inherit the
+ * parent's @font-face rules, and without these a message renders in Georgia. They are the two
+ * default slots; a face chosen in settings needs its declaration here as well. */
+
+@font-face {
+  font-family: "Hanken Grotesk";
+  src: url("/fonts/HankenGrotesk-VF.ttf") format("truetype-variations");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "Literata";
+  src: url("/fonts/Literata-VF.ttf") format("truetype-variations");
+  font-weight: 200 900;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "Literata";
+  src: url("/fonts/Literata-Italic-VF.ttf") format("truetype-variations");
+  font-weight: 200 900;
+  font-style: italic;
+  font-display: block;
+}
+
+html {
+  /* The parent measures scrollHeight to size the frame, so nothing in here may scroll itself. */
+  overflow: hidden;
+  /* What this document is, in its own words: `only light` for a page the sender painted and ours
+     for everything else. It decides the canvas the browser paints before the body does, the colours
+     it gives anything it draws itself, and what a rule inside the message would be told about
+     `prefers-color-scheme`. Written from MessageBody.tsx the way every other value here is.
+
+     The `only light` half is the one no mail client ships. A body pinned to a white page in a dark
+     window is still a document, and a document with nothing to say about its own scheme gets the
+     machine's, which puts a dark canvas and dark user agent colours under a page we just painted
+     white. */
+  color-scheme: var(--m-color-scheme);
+}
+
+body {
+  margin: 0;
+  max-width: var(--m-measure);
+  /* Painted rather than left transparent, because a message that painted its own page is pinned to
+     the light surface in both palettes and has to bring that surface with it. On the theme the
+     value is the app's own paper and this rule is invisible. */
+  background: var(--m-paper);
+  color: var(--m-ink);
+  font-family: var(--m-font-text);
+  font-size: var(--m-size);
+  /* 1.5 rather than the 1.6 this was drawn at. At 15px that is 22.5px a line against 24px, which
+     is worth more on a long message than every margin in the pane put together, and it is still
+     prose rather than a spreadsheet. Anything tighter than 1.45 and the text face stops being
+     worth having. */
+  line-height: 1.5;
+  overflow-wrap: break-word;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Transactional mail is data rather than prose, so it reads in the interface face. */
+body[data-plain] {
+  font-family: var(--m-font-ui);
+  font-size: var(--m-size-plain);
+  line-height: 1.55;
+}
+
+p {
+  margin: 0 0 12px;
+}
+
+p:last-child {
+  margin-bottom: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* A sender's image is whatever size the sender made it, and the pane is not that wide. */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+table {
+  max-width: 100%;
+  border-collapse: collapse;
+}
+
+blockquote {
+  margin: 0 0 12px;
+  padding-left: 14px;
+  border-left: 2px solid var(--m-line);
+  color: var(--m-faint);
+}
+
+pre,
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.92em;
+}
+
+pre {
+  padding: 10px 12px;
+  border-radius: 5px;
+  background: var(--m-wash);
+  overflow-x: auto;
+}
+
+hr {
+  height: 1px;
+  margin: 16px 0;
+  border: 0;
+  background: var(--m-line);
+}

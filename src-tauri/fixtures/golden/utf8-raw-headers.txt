@@ -1,0 +1,37 @@
+render-version: 2
+message-id: 20260904071200.aa91@lisbonstays.example
+in-reply-to: -
+references-first: -
+from: Inês Carvalho <ines@lisbonstays.example>
+to: Priyanshu Jain <pj@73ai.org>
+cc: -
+bcc: -
+reply-to: -
+date-ms: 1788505920000
+subject: Instruções para a chegada, com um café à espera
+is-html: false
+surface: theme
+snippet: Olá Priyanshu, O código da porta é 4417 e o elevador está do lado direito. Deixo café e pão na cozinha para a manhã seguinte. Se o comboio atrasar, telefone. Não há problema nenhum. Inês
+list-id: -
+auto-submitted: -
+precedence: -
+unsubscribe: -
+blocked-images: 0
+
+--- html ---
+<p>Olá Priyanshu,</p>
+<p>O código da porta é 4417 e o elevador está do lado direito. Deixo café e pão na cozinha para a manhã seguinte.</p>
+<p>Se o comboio atrasar, telefone. Não há problema nenhum.</p>
+<p>Inês</p>
+
+--- quoted: none ---
+
+--- text ---
+Olá Priyanshu,
+
+O código da porta é 4417 e o elevador está do lado direito. Deixo café e
+pão na cozinha para a manhã seguinte.
+
+Se o comboio atrasar, telefone. Não há problema nenhum.
+
+Inês

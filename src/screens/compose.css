@@ -1,0 +1,405 @@
+/* The compose card and the reply box in the thread.
+ *
+ * Two shapes of one thing. The card floats over the stage at the bottom right and can take the
+ * whole window; the box sits in the thread at the thread's own measure, under what it answers. The
+ * fields, the chips, the foot and the editor are shared, so they are written once here and the two
+ * containers differ only in where they are and what holds them up.
+ *
+ * A draft's attachments carry `.attachment` and `.attachments`, which pane.css already styles for
+ * the ones on a received message. That is deliberate reuse and not a collision: a file on the way
+ * out and a file that arrived are the same chip, and giving them two rules is how they stop being. */
+
+.compose {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 30;
+  width: var(--compose-w);
+  max-height: var(--compose-max-h);
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-page);
+  overflow: hidden;
+}
+
+/* The whole window, which is Cmd+Shift+P. Inset rather than edge to edge: a card that touched the
+   frame would stop reading as something in front of the mailbox. */
+.compose[data-expanded] {
+  top: calc(var(--titlebar-h) + 16px);
+  right: 16px;
+  bottom: 16px;
+  left: 16px;
+  width: auto;
+  max-height: none;
+}
+
+.compose-head {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 8px 8px 16px;
+  border-bottom: 1px solid var(--line);
+  background: var(--shell);
+}
+
+.compose-head h2 {
+  margin: 0;
+  flex: 1;
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: var(--t-4);
+}
+
+/* One row of the head: a label, what is in it, and whatever hangs off the right. */
+.compose-field {
+  position: relative;
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 36px;
+  padding: 4px 16px;
+  border-bottom: 1px solid var(--line);
+  font-size: var(--t-3);
+}
+
+.compose-field .lab {
+  flex: none;
+  align-self: flex-start;
+  padding-top: 6px;
+  width: 52px;
+  color: var(--ink-faint);
+  font-size: var(--t-2);
+}
+
+.compose-field .chips {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  cursor: text;
+}
+
+.compose-field .more {
+  flex: none;
+  align-self: flex-start;
+  padding: 6px 0 0;
+  color: var(--ink-faint);
+  font-size: var(--t-2);
+}
+
+.compose-field .more:hover {
+  color: var(--ink);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  padding: 0 6px 0 3px;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: var(--accent-wash);
+  color: var(--ink);
+  font-size: var(--t-2);
+  white-space: nowrap;
+}
+
+.chip-off {
+  display: grid;
+  place-items: center;
+  color: var(--ink-faint);
+}
+
+.chip-off:hover {
+  color: var(--ink);
+}
+
+/* The field the caret is in, which grows with what is typed rather than scrolling a fixed box. */
+.chip-input {
+  flex: 1;
+  min-width: 140px;
+  height: 24px;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: var(--t-3);
+}
+
+.chip-input:focus {
+  outline: none;
+}
+
+.compose-subject {
+  flex: 1;
+  min-width: 0;
+  height: 28px;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: var(--t-3);
+}
+
+.compose-subject:focus {
+  outline: none;
+}
+
+/* Autocomplete, hanging under the field it is about. It is not a Popover: a popover is anchored in
+   fixed coordinates and closes on a pointer down anywhere else, and this has to stay open while the
+   caret keeps typing into the field above it. */
+.suggest {
+  position: absolute;
+  z-index: 2;
+  left: 62px;
+  right: 16px;
+  top: 100%;
+  margin: 2px 0 0;
+  padding: 4px;
+  list-style: none;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md);
+  background: var(--paper);
+  box-shadow: var(--shadow-pop);
+}
+
+.suggest-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 8px;
+  border-radius: var(--r-sm);
+  text-align: left;
+  font-size: var(--t-2);
+}
+
+.suggest-row[data-on],
+.suggest-row:hover {
+  background: var(--accent-wash);
+}
+
+.suggest-name {
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.suggest-addr {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink-faint);
+}
+
+.from-list {
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+}
+
+.from-option {
+  display: block;
+  width: 100%;
+  padding: 7px 9px;
+  border-radius: var(--r-sm);
+  text-align: left;
+  font-size: var(--t-3);
+}
+
+.from-option:hover,
+.from-option[data-on] {
+  background: var(--accent-wash);
+}
+
+/* The body. It scrolls rather than the card, so the head and the foot stay where the hand left
+   them however long the message gets. */
+.compose-body {
+  flex: 1;
+  min-height: var(--compose-body-h);
+  overflow-y: auto;
+  padding: 14px 16px;
+}
+
+.compose-foot {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px 8px 12px;
+  border-top: 1px solid var(--line);
+  background: var(--raised);
+}
+
+.compose-foot .spacer {
+  flex: 1;
+}
+
+.compose-delay {
+  color: var(--ink-faint);
+  font-size: var(--t-1);
+  white-space: nowrap;
+}
+
+/* Said before the send rather than after it, which is the whole point of the provider's limit
+   being checked on every save. */
+.compose-warn {
+  color: var(--danger-ink);
+  font-size: var(--t-1);
+  white-space: nowrap;
+}
+
+.compose-date {
+  height: 26px;
+  padding: 0 6px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm);
+  background: var(--paper);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: var(--t-2);
+}
+
+/* The reply box, at the foot of the thread. */
+
+.reply {
+  margin-top: 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-lg);
+  background: var(--raised);
+  overflow: hidden;
+}
+
+.reply-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px 10px 14px;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink-soft);
+  font-size: var(--t-2);
+}
+
+.reply-who {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reply-head b {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+/* Reply all is a switch rather than a second box, and it prints the key that does the same thing
+   from the thread. */
+.reply-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px 3px 4px;
+  border-radius: var(--r-pill);
+  color: var(--ink-faint);
+  font-size: var(--t-2);
+  white-space: nowrap;
+}
+
+.reply-all:hover {
+  color: var(--ink);
+}
+
+.reply-all[data-on] {
+  background: var(--accent-wash);
+  color: var(--ink);
+}
+
+.reply-close {
+  display: grid;
+  place-items: center;
+  color: var(--ink-faint);
+}
+
+.reply-close:hover {
+  color: var(--ink);
+}
+
+.reply .compose-field {
+  padding-left: 14px;
+  padding-right: 12px;
+  background: var(--paper);
+}
+
+.reply .suggest {
+  left: 60px;
+  right: 12px;
+}
+
+.reply-body {
+  min-height: var(--reply-body-h);
+  padding: 12px 14px;
+  background: var(--paper);
+}
+
+.reply .compose-foot {
+  background: var(--raised);
+}
+
+/* Waiting to send: the one line a thread carries while its own message is still in the outbox. */
+.sending {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--raised);
+  color: var(--ink-soft);
+  font-size: var(--t-3);
+}
+
+.sending .icon {
+  flex: none;
+  color: var(--ink-faint);
+}
+
+.sending-now {
+  margin-left: auto;
+  color: var(--ink);
+  font-size: var(--t-2);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.sending-now:disabled {
+  color: var(--ink-faint);
+  text-decoration: none;
+  cursor: default;
+}
+
+/* On a phone the card is the window, because there is no room for it to be anything else. */
+:root[data-phone] .compose {
+  top: calc(var(--safe-top) + var(--phonebar-h));
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: auto;
+  max-height: none;
+  border-radius: 0;
+  border-width: 1px 0 0;
+}
+
+:root[data-phone] .chip-input,
+:root[data-phone] .compose-subject {
+  font-size: var(--t-5);
+}

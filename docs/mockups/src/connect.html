@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<title>Margin Mail: Connect</title>
+<link rel="stylesheet" href="mail.css">
+<style>
+/* The welcome screen is the only place in the app that is not a list, a pane or an overlay, so
+   these are its own pieces. Every value is a token. */
+.welcome {
+  margin: auto;
+  padding: 0 24px 56px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.welcome-mark {
+  margin-bottom: 24px;
+}
+
+.welcome-title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 32px;
+  letter-spacing: -0.02em;
+}
+
+.welcome-line {
+  margin: 9px 0 28px;
+  max-width: 30em;
+  color: var(--ink-soft);
+  font-size: var(--t-4);
+}
+
+/* One field and one button, which is the whole of the first step. The button is larger than a
+   button anywhere else in the app for the same reason it is the only one here. */
+.imap-address {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  max-width: 24em;
+  text-align: left;
+}
+
+.imap-address .field {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-label {
+  color: var(--ink-faint);
+  font-size: var(--t-1);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.field-input {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm);
+  background: var(--raised);
+  font: inherit;
+  font-size: var(--t-4);
+  color: var(--ink);
+}
+
+.imap-address .button {
+  min-height: 38px;
+  padding: 0 20px;
+  border-radius: var(--r-md);
+  font-size: var(--t-4);
+}
+
+.welcome-privacy {
+  margin: 22px 0 0;
+  max-width: 42em;
+  color: var(--ink-faint);
+  font-size: var(--t-2);
+  line-height: 1.6;
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header class="titlebar">
+    <div class="traffic"><i></i><i></i><i></i></div>
+    <div class="lead"></div>
+    <div></div>
+    <div class="trail"></div>
+  </header>
+
+  <div class="stage">
+    <div class="welcome">
+      <div class="welcome-mark">
+        <svg width="54" height="54" viewBox="0 0 54 54" fill="none">
+          <rect width="54" height="54" rx="13" style="fill: var(--accent)"/>
+          <rect x="14" y="18.5" width="26" height="17" rx="3.2" style="stroke: var(--accent-contrast)" stroke-width="2"/>
+          <path d="m14.8 20.5 10.5 7.6a3 3 0 0 0 3.4 0l10.5-7.6" style="stroke: var(--accent-contrast)" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+      <h1 class="welcome-title">Margin Mail</h1>
+      <p class="welcome-line">A quiet, keyboard-first client for your mail, where every decision you make stays on your own machine.</p>
+
+      <form class="imap-address">
+        <div class="field">
+          <label class="field-label" for="address">Email address</label>
+          <input class="field-input" id="address" type="email" value="maya@northgate.example">
+        </div>
+        <button class="button" data-variant="primary" type="button">Continue</button>
+      </form>
+
+      <p class="welcome-privacy">Any mailbox works here: Google, Fastmail, iCloud, Yahoo, Proton through Bridge, a mailbox where you work, or anything else that speaks IMAP. Margin works out the servers from the address, and nothing is stored until the account is added.</p>
+    </div>
+  </div>
+</div>
+</body>
+</html>

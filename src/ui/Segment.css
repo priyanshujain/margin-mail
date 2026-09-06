@@ -1,0 +1,63 @@
+/* A track of wash with the chosen option lifted onto the paper. No shadow under the lifted one:
+   the family has two shadows and neither belongs on a 22px control. */
+.segment {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  border-radius: var(--r-md);
+  background: var(--accent-wash);
+}
+
+.segment-option {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 22px;
+  padding: 0 11px;
+  border-radius: var(--r-sm);
+  color: var(--ink-soft);
+  font-size: var(--t-2);
+  white-space: nowrap;
+  transition: background 120ms var(--ease), color 120ms var(--ease);
+}
+
+.segment-option:hover {
+  color: var(--ink);
+}
+
+.segment-option[data-active] {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.segment-option .key {
+  color: var(--ink-faint);
+}
+
+/* The chosen box stays lifted, so what is being written is still readable; the rest go quiet. */
+.segment[data-disabled] .segment-option {
+  color: var(--ink-faint);
+  cursor: default;
+}
+
+.segment[data-disabled] .segment-option[data-active] {
+  color: var(--ink-soft);
+}
+
+/* On a phone this is the tab bar, so it takes the width and each option takes a finger. */
+:root[data-phone] .segment {
+  display: flex;
+  width: 100%;
+}
+
+:root[data-phone] .segment-option {
+  flex: 1;
+  min-width: 0;
+  justify-content: center;
+  min-height: var(--touch-h);
+  font-size: var(--t-3);
+}
+
+:root[data-touch] .segment-option {
+  min-height: var(--touch-h);
+}

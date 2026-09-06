@@ -1,0 +1,36 @@
+Return-Path: <specials@discounttire.example>
+MIME-Version: 1.0
+Date: Wed, 26 Aug 2026 08:00:00 -0600
+Message-ID: <camp-4471-8821@discounttire.example>
+Subject: Your air pressure reminder
+From: Discount Tire <specials@discounttire.example>
+To: pj@73ai.org
+List-Unsubscribe: <https://discounttire.example/u/4471>
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+<html>
+<head>
+<meta http-equiv="refresh" content="5;url=https://discounttire.example/go">
+<link rel="stylesheet" href="https://discounttire.example/css/mail.css">
+<style>body { font-family: Arial, sans-serif }</style>
+<script>window.location = "https://discounttire.example/track?o=1";</script>
+</head>
+<body onload="fetch('https://discounttire.example/beacon')">
+<div style="background-image: url('https://discounttire.example/bg.png')">
+<p onclick="alert('opened')">It has been 30 days since your last check.
+Stop by any store for a free air pressure check, no appointment needed.</p>
+</div>
+<form action="https://discounttire.example/book" method="post">
+<input type="text" name="postcode" placeholder="Postcode">
+<button type="submit">Find a store</button>
+</form>
+<iframe src="https://discounttire.example/offer" width="600" height="200"
+ frameborder="0"></iframe>
+<p><a href="javascript:void(document.location='https://evil.example')">Book
+now</a></p>
+<p><a href="https://discounttire.example/stores">Find a store near you</a></p>
+<object data="https://discounttire.example/flash.swf"></object>
+<embed src="https://discounttire.example/flash.swf">
+</body>
+</html>

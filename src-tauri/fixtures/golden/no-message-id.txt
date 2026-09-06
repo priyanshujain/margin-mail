@@ -1,0 +1,32 @@
+render-version: 2
+message-id: -
+in-reply-to: -
+references-first: -
+from: Sunny Day Music <enrolments@sunnydaymusic.example>
+to: <pj@73ai.org>
+cc: -
+bcc: -
+reply-to: -
+date-ms: 1786512739000
+subject: Enrolment received for Cooper
+is-html: false
+surface: theme
+snippet: Enrolment received for Cooper. Term starts the week of 8 September and your teacher will be in touch to fix a weekly slot. Nothing further is needed from you today. The term dates and the studio…
+list-id: -
+auto-submitted: -
+precedence: -
+unsubscribe: -
+blocked-images: 0
+
+--- html ---
+<p>Enrolment received for Cooper. Term starts the week of 8 September and your teacher will be in touch to fix a weekly slot.</p>
+<p>Nothing further is needed from you today. The term dates and the studio address are on the enrolment form you signed.</p>
+
+--- quoted: none ---
+
+--- text ---
+Enrolment received for Cooper. Term starts the week of 8 September and
+your teacher will be in touch to fix a weekly slot.
+
+Nothing further is needed from you today. The term dates and the studio
+address are on the enrolment form you signed.

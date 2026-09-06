@@ -1,0 +1,167 @@
+/* What mail adds to margin-shared's set, and nothing that is already in it.
+ *
+ * Everything here is a value that only a mail client has an opinion about: how wide a list of
+ * threads is, how tall a row is, what an unread dot is coloured, what surface a note sits on. A
+ * colour the calendar and the editor also use belongs upstream, not here.
+ *
+ * Both palettes declare an identical variable set, so a token can never be defined in light and
+ * missing in dark. */
+
+:root {
+  /* The fully round radius the family's three do not cover: pills, chips and the phone's write
+     button. */
+  --r-pill: 999px;
+
+  /* iOS Safari zooms the page when a field under 16px takes the focus, and the viewport is locked,
+     so there is no gesture back out. Phone fields take this one. */
+  --t-5: 16px;
+
+  /* The reading size for message bodies, in the text face. A setting rather than a constant: the
+     boot script in index.html writes it from `marginmail-text-size` before the first paint, so it
+     is declared here to give that override something to land on. */
+  --body-size: 15px;
+
+  /* Phone chrome. The bars are the only thing between the app and a notch or a home indicator, so
+     the insets are read once here and everything else pads with these. */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --phonebar-h: 48px;
+  --tabbar-h: 56px;
+  /* Apple's floor for anything a finger has to hit. Desktop keeps its 28px controls. */
+  --touch-h: 44px;
+  /* Enough of the page left showing that a bottom sheet reads as a layer over it rather than a
+     screen of its own. */
+  --sheet-max-h: 88dvh;
+  /* The lane the macOS traffic lights float in, opened only under `data-traffic`. */
+  --traffic-pad: 84px;
+
+  /* Mail geometry. The list column and the row height are the two numbers the whole layout is
+     built from, which is why the UI suite asserts them rather than trusting them. */
+  --list-w: 420px;
+  /* 46px, not the 58px the mockups were drawn at. A row is two lines and an avatar and it needed
+     nowhere near that much, and the twelve rows 58px fitted on a laptop was the single loudest
+     thing about this list beside a mail client somebody already uses. Fifteen fit now. 42px is
+     the floor: below it the 30px avatar has no clearance and the two lines start to touch. */
+  --row-h: 46px;
+  --avatar: 30px;
+  --pile-h: 92px;
+  /* The card on top of a pile. What is left of `--pile-h` above it is the room the edges of the
+     cards underneath show through, which is what makes a stack read as a stack. */
+  --pile-card-h: 72px;
+
+  /* Focus & Reply: a message and a reply box side by side, so it is wider than the pane's measure
+     and narrower than the window. */
+  --focus-w: 1080px;
+
+  /* All files is a grid rather than a list, and this is the narrowest a card can be and still
+     print a filename on one line. */
+  --file-card-w: 210px;
+
+  /* The Feed's column of cards. Its own measure rather than the pane's, because a Feed card is a
+     whole page of somebody else's design and the pane's is a thread of ours. */
+  --feed-w: 720px;
+
+  /* The compose card. 600 is the width the mockup pins and it is not arbitrary: it is a measure a
+     paragraph reads on with the list still legible beside it, which is the whole argument for a
+     card over the stage rather than a screen of its own. */
+  --compose-w: 600px;
+  /* Tall enough for a message and short enough that the card never reaches the header. */
+  --compose-max-h: 620px;
+  --compose-body-h: 220px;
+  /* The box in the thread is shorter: what it answers is on the screen above it. */
+  --reply-body-h: 84px;
+
+  /* The date block on an invite card, which is a calendar page and has to stay square. */
+  --invite-date-w: 52px;
+
+  /* How much of a Feed body shows before it fades into Read more. */
+  --feed-clip: 200px;
+}
+
+:root,
+:root[data-theme="light"] {
+  /* Darker than the shared value. The list is mostly faint ink (times, snippets, group labels) on
+     the paper, and the shared #9b9484 sat too close to 4.5:1 on the warmer tints the list has
+     carried. Same reasoning, same value, as the calendar's hour axis. */
+  --ink-faint: #6e675b;
+
+  --scrim: rgba(35, 32, 27, 0.28);
+
+  /* Row surfaces. Both washes are the ink at low alpha rather than a mixed colour, so a row over
+     the paper and the same row over the seen band read as the same state. */
+  --row-hover: rgba(35, 32, 27, 0.035);
+  --row-selected: rgba(35, 32, 27, 0.07);
+
+  /* The note surface, which is the one thing in the app that is not paper: a note is yours and
+     not the sender's, and it has to be obvious which is which at a glance down the list. */
+  --note-surface: #f4efdd;
+  --note-line: #e2d9b8;
+
+  /* A ticked box, and nothing else. The palette's accent is ink, and an ink-coloured box in a dark
+     sheet was the one control in the app you had to hunt for. These are the OS's own blue and the
+     white it draws the tick in, so the box reads as the checkbox the system draws. */
+  --check: #007aff;
+  --check-tick: #ffffff;
+
+
+  /* The ring on the card the keyboard is on, in the Screener and the Feed. A card is already the
+     widest thing on the page, so where a row takes a wash and an accent edge a card takes a lift
+     and a halo: a tinted card would read as a different kind of card rather than as this one. */
+  --card-ring: 0 1px 2px rgba(35, 32, 27, 0.06), 0 0 0 2px var(--accent-wash);
+
+  /* The eight muted hues, the calendar's --cal-1..8 under a name that says what they are for
+     here: avatar initials and the account edge on a row. */
+  --hue-1: #6f6194;
+  --hue-2: #47705f;
+  --hue-3: #a06044;
+  --hue-4: #4e6484;
+  --hue-5: #856434;
+  --hue-6: #955767;
+  --hue-7: #3a6b78;
+  --hue-8: #667141;
+}
+
+/* The surface HTML mail renders on, in both palettes.
+ *
+ * Deliberately outside the two theme blocks and deliberately the light palette's values written
+ * again. HTML mail is authored for a white page: a newsletter that sets a dark text colour and no
+ * background is unreadable on a dark surface, and inverting it breaks more than it fixes. Plain
+ * text is different, because this app renders that itself and it follows the theme like everything
+ * else. If the light palette moves, these move with it.
+ *
+ * Only src/screens/MessageBody.tsx reads them, and only for a message that arrived as HTML. */
+:root {
+  --message-paper: #fcfbf7;
+  --message-ink: #23201b;
+  --message-faint: #6e675b;
+  --message-line: #e3ddce;
+  --message-wash: rgba(35, 32, 27, 0.08);
+}
+
+:root[data-theme="dark"] {
+  --ink-faint: #8e8677;
+
+  /* A light scrim over a dark page dims nothing, so panels would float on shadow alone. */
+  --scrim: rgba(0, 0, 0, 0.58);
+
+  --row-hover: rgba(239, 233, 220, 0.05);
+  --row-selected: rgba(239, 233, 220, 0.1);
+
+  --note-surface: #2a271c;
+  --note-line: #3f3a28;
+
+  --check: #0a84ff;
+  --check-tick: #ffffff;
+
+
+  --card-ring: 0 1px 2px rgba(0, 0, 0, 0.4), 0 0 0 2px var(--accent-wash);
+
+  --hue-1: #a396c8;
+  --hue-2: #7fae98;
+  --hue-3: #d19a7c;
+  --hue-4: #8ba2c4;
+  --hue-5: #c4a267;
+  --hue-6: #cb909e;
+  --hue-7: #75a9b6;
+  --hue-8: #a2ae77;
+}

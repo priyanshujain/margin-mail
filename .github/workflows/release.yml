@@ -44,6 +44,12 @@ jobs:
           jq --arg v "$VERSION" '.version = $v' src-tauri/tauri.conf.json > "$tmp" && mv "$tmp" src-tauri/tauri.conf.json
           jq --arg v "$VERSION" '.version = $v' package.json > "$tmp" && mv "$tmp" package.json
           sed -i "0,/^version = \".*\"/s//version = \"$VERSION\"/" src-tauri/Cargo.toml
+          # Cargo.lock records margin-mail's own version, so bumping only Cargo.toml leaves the lock
+          # a release behind and the next build rewrites it under whoever checked it out.
+          awk -v v="$VERSION" '
+            /^name = "margin-mail"$/ { print; getline; sub(/^version = ".*"/, "version = \"" v "\""); print; next }
+            { print }
+          ' src-tauri/Cargo.lock > "$tmp" && mv "$tmp" src-tauri/Cargo.lock
 
       - name: Commit and tag
         env:
@@ -51,7 +57,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add src-tauri/tauri.conf.json package.json src-tauri/Cargo.toml
+          git add src-tauri/tauri.conf.json package.json src-tauri/Cargo.toml src-tauri/Cargo.lock
           git commit -m "chore(release): $TAG"
           for attempt in 1 2 3 4 5; do
             git fetch origin main
@@ -93,6 +99,9 @@ jobs:
           - os: ubuntu-22.04
             args: "--config src-tauri/tauri.release.conf.json"
             rust-targets: ""
+          - os: windows-latest
+            args: "--config src-tauri/tauri.release.conf.json"
+            rust-targets: ""
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -109,7 +118,7 @@ jobs:
           path: python/margin
 
       - name: Install Linux dependencies
-        if: startsWith(matrix.os, 'ubuntu')
+        if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y \
@@ -141,6 +150,7 @@ jobs:
       - uses: swatinem/rust-cache@v2
         with:
           workspaces: rust/margin-mail/src-tauri -> target
+          key: ${{ matrix.os }}
 
       - name: Install frontend dependencies
         run: pnpm install --frozen-lockfile
@@ -160,6 +170,42 @@ jobs:
             echo "::warning::GOOGLE_CREDENTIALS secret not set, embedding placeholder credentials; this build cannot connect to Gmail."
           fi
 
+      # macOS shows no notifications from a bundle that is not signed, so tauri.conf.json ad-hoc
+      # signs at minimum; a Developer ID from the secrets replaces that, and the App Store Connect
+      # key notarizes on top. Only what is present is exported, because Tauri takes an empty
+      # APPLE_SIGNING_IDENTITY for an identity and fails the signing step on it.
+      - name: Provision Apple signing
+        if: runner.os == 'macOS'
+        shell: bash
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+          APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
+          APPLE_API_KEY_P8: ${{ secrets.APPLE_API_KEY_P8 }}
+        run: |
+          if [ -z "$APPLE_CERTIFICATE" ] || [ -z "$APPLE_SIGNING_IDENTITY" ]; then
+            echo "::warning::APPLE_CERTIFICATE or APPLE_SIGNING_IDENTITY not set; the macOS bundle will be ad-hoc signed and not notarized."
+            exit 0
+          fi
+          for name in APPLE_CERTIFICATE APPLE_CERTIFICATE_PASSWORD APPLE_SIGNING_IDENTITY APPLE_TEAM_ID; do
+            { echo "$name<<MARGIN_EOF"; printf '%s\n' "${!name}"; echo "MARGIN_EOF"; } >> "$GITHUB_ENV"
+          done
+          echo "Signing as $APPLE_SIGNING_IDENTITY"
+          if [ -n "$APPLE_API_KEY_P8" ] && [ -n "$APPLE_API_KEY" ] && [ -n "$APPLE_API_ISSUER" ]; then
+            printf '%s' "$APPLE_API_KEY_P8" > "$RUNNER_TEMP/AuthKey.p8"
+            {
+              echo "APPLE_API_KEY=$APPLE_API_KEY"
+              echo "APPLE_API_ISSUER=$APPLE_API_ISSUER"
+              echo "APPLE_API_KEY_PATH=$RUNNER_TEMP/AuthKey.p8"
+            } >> "$GITHUB_ENV"
+            echo "Notarizing with App Store Connect key $APPLE_API_KEY"
+          else
+            echo "::warning::APPLE_API_KEY, APPLE_API_ISSUER or APPLE_API_KEY_P8 not set; the macOS bundle will be signed and not notarized."
+          fi
+
       - name: Build and upload
         uses: tauri-apps/tauri-action@v0
         with:
@@ -171,8 +217,45 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
 
-  publish:
+      - name: Verify the bundle is signed and notarized
+        if: runner.os == 'macOS' && env.APPLE_API_KEY_PATH != ''
+        run: |
+          app="src-tauri/target/universal-apple-darwin/release/bundle/macos/Margin Mail.app"
+          codesign --verify --deep --strict --verbose=2 "$app"
+          # Gatekeeper only says "accepted" once the notarization ticket is stapled to the bundle,
+          # so this is the check that somebody double-clicking the dmg will actually get past.
+          spctl --assess --type execute --verbose=4 "$app"
+          xcrun stapler validate "$app"
+
+  # The flatpak is not a Tauri bundle target, so it is built here from the deb the Linux job just
+  # published and uploaded to the same draft release. Before publish, so a release never goes out
+  # with the Linux artifacts half there.
+  flatpak:
     needs: [prepare, build]
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.prepare.outputs.tag }}
+
+      - run: |
+          sudo apt-get update
+          sudo apt-get install -y flatpak flatpak-builder
+
+      - name: Build the flatpak from the published deb
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          TAG: ${{ needs.prepare.outputs.tag }}
+          VERSION: ${{ needs.prepare.outputs.version }}
+        run: |
+          gh release download "$TAG" --repo "$REPO" \
+            --pattern "Margin.Mail_${VERSION}_amd64.deb" --output flatpak/margin-mail.deb
+          flatpak/build.sh "$PWD/Margin.Mail_${VERSION}_amd64.flatpak"
+          gh release upload "$TAG" --repo "$REPO" "Margin.Mail_${VERSION}_amd64.flatpak" --clobber
+
+  publish:
+    needs: [prepare, build, flatpak]
     runs-on: ubuntu-latest
     steps:
       - name: Verify manifest is complete, then publish
@@ -184,10 +267,71 @@ jobs:
           gh release download "$TAG" --repo "$REPO" --pattern latest.json --output latest.json --clobber
           echo "Platforms in latest.json:"
           jq '.platforms | keys' latest.json
-          for key in darwin-aarch64 darwin-x86_64 linux-x86_64; do
+          for key in darwin-aarch64 darwin-x86_64 linux-x86_64 windows-x86_64; do
             if ! jq -e ".platforms[\"$key\"].url" latest.json > /dev/null; then
               echo "::error::latest.json is missing platform '$key', refusing to publish a partial update manifest. Re-run the release."
               exit 1
             fi
           done
           gh release edit "$TAG" --repo "$REPO" --draft=false --latest
+
+  # Nix is the other Linux package. The AppImage carries Ubuntu's GTK stack, which cannot talk to a
+  # modern Wayland compositor and silently falls back to Xwayland; the Nix package relinks the
+  # published deb against nixpkgs' webkit2gtk and runs as a native Wayland client. Runs after
+  # publish so the flake can only ever point at a release that survived the manifest check.
+  nix:
+    needs: [prepare, publish]
+    runs-on: ubuntu-latest
+    steps:
+      # main rather than the tag: the pin lands on main, and the tag was cut before the artifact
+      # it needs the hash of existed.
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+
+      - name: Pin the flake to this release
+        env:
+          VERSION: ${{ needs.prepare.outputs.version }}
+          REPO: ${{ github.repository }}
+        run: |
+          URL="https://github.com/$REPO/releases/download/v$VERSION/Margin.Mail_${VERSION}_amd64.deb"
+          # From the published asset, so the hash is of the artifact users will actually fetch.
+          curl -fsSL --retry 3 -o package.deb "$URL"
+          HASH="sha256-$(openssl dgst -sha256 -binary package.deb | base64)"
+          jq -n --arg v "$VERSION" --arg h "$HASH" '{version: $v, hash: $h}' > nix/release.json
+          cat nix/release.json
+
+      - uses: cachix/install-nix-action@v31
+
+      # Building it is the check: a wrong hash, a library autoPatchelf cannot find or a broken flake
+      # stops here rather than on someone's machine. --impure and the variable because FSL is not a
+      # free licence, so nixpkgs refuses to build the package without being told.
+      - name: Build the package
+        run: NIXPKGS_ALLOW_UNFREE=1 nix build --impure .#margin-mail --print-build-logs
+
+      - name: Commit the pin
+        env:
+          VERSION: ${{ needs.prepare.outputs.version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add nix/release.json
+          # A rerun after the pin already landed has nothing to commit, and the release is done.
+          if git diff --cached --quiet; then
+            echo "The flake already points at v$VERSION, nothing to push."
+            exit 0
+          fi
+          git commit -m "point the nix package at v$VERSION"
+          for attempt in 1 2 3 4 5; do
+            git fetch origin main
+            git rebase origin/main
+            if git push origin HEAD:main; then
+              break
+            fi
+            if [ "$attempt" = "5" ]; then
+              echo "::error::main kept advancing; could not push the nix pin after 5 attempts. The release is published; rerun this job."
+              exit 1
+            fi
+            echo "main advanced; rebasing and retrying ($attempt)…"
+            sleep 3
+          done

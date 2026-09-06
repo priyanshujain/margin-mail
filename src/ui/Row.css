@@ -1,0 +1,236 @@
+/* Three columns: the gutter that holds the checkbox while selecting, the avatar, and everything
+   else. The gutter is always there, empty or not, so rows line up whether or not `x` is down.
+ *
+ * The margins are as narrow as the anatomy allows, because every pixel of them is a pixel the
+ * subject does not get, and a subject that had to be guessed at from its first four words was the
+ * thing that made this list hard to scan. */
+.row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 16px var(--avatar) 1fr;
+  gap: 0 10px;
+  align-items: center;
+  height: var(--row-h);
+  padding: 0 14px 0 8px;
+  cursor: default;
+  transition: background 100ms var(--ease);
+}
+
+.row:hover {
+  background: var(--row-hover);
+}
+
+.row[data-selected] {
+  background: var(--row-selected);
+}
+
+/* The selected edge stops short of the row's ends, so a run of selected rows still reads as rows
+   rather than as one bar. */
+.row[data-selected]::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  background: var(--accent);
+  border-radius: 0 2px 2px 0;
+}
+
+.row-gutter {
+  display: grid;
+  place-items: center;
+}
+
+.row-check {
+  display: grid;
+  place-items: center;
+  width: 14px;
+  height: 14px;
+  border: 1.5px solid var(--line-strong);
+  border-radius: 4px;
+  color: var(--accent-contrast);
+}
+
+.row[data-checked] .row-check {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+/* The account's colour in All accounts. Under the selection edge when both are present, which is
+   right: which account it landed in matters less than whether you are looking at it. */
+.row-account {
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  border-radius: 0 2px 2px 0;
+  background: var(--hue-1);
+}
+
+.row-account[data-hue="2"] { background: var(--hue-2); }
+.row-account[data-hue="3"] { background: var(--hue-3); }
+.row-account[data-hue="4"] { background: var(--hue-4); }
+.row-account[data-hue="5"] { background: var(--hue-5); }
+.row-account[data-hue="6"] { background: var(--hue-6); }
+.row-account[data-hue="7"] { background: var(--hue-7); }
+.row-account[data-hue="8"] { background: var(--hue-8); }
+
+.row-main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+/* The two lines are set tight to each other on purpose: they are one thing being read, not two
+   paragraphs, and the air that makes a row legible belongs around the pair rather than between
+   them. */
+.row-top,
+.row-bottom {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+  line-height: 1.35;
+}
+
+.row-sender {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink);
+  font-size: var(--t-3);
+}
+
+/* Unseen is a weight and only a weight: the sender and the subject go to 600 in the full ink. */
+.row[data-new] .row-sender {
+  font-weight: 600;
+}
+
+.row-count,
+.row-time {
+  flex: none;
+  color: var(--ink-faint);
+  font-size: var(--t-2);
+}
+
+.row-time {
+  font-variant-numeric: tabular-nums;
+}
+
+.row-mark {
+  flex: none;
+  display: inline-flex;
+  align-self: center;
+  color: var(--ink-faint);
+}
+
+/* The subject is served first and the snippet gets what is left, which is the one ordering that
+   makes the line readable. A fixed share gave each of them half of a 420px column and truncated
+   both, so a row said "Re: Lease renewal for th…" beside "Attached the revised dra…" and neither
+   half told you anything. The snippet's basis is zero, so it only ever grows into room the subject
+   did not want, and it is the one that gives way when there is none. */
+.row-subject {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink-soft);
+  font-size: var(--t-2);
+}
+
+.row[data-new] .row-subject {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.row-snippet {
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink-faint);
+  font-size: var(--t-2);
+}
+
+/* A note is yours and the rest of the row is the sender's, so it gets the one surface in the app
+   that is not paper. It sits under the text rather than beside it, and the row grows for it. */
+.row-note {
+  grid-column: 3;
+  margin-top: -1px;
+  padding: 2px 8px;
+  border: 1px solid var(--note-line);
+  border-radius: var(--r-sm);
+  background: var(--note-surface);
+  color: var(--ink-soft);
+  font-size: var(--t-1);
+  width: fit-content;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.row[data-noted] {
+  height: auto;
+  padding-top: 7px;
+  padding-bottom: 7px;
+  grid-template-rows: auto auto;
+  row-gap: 4px;
+}
+
+.row[data-noted] .row-gutter,
+.row[data-noted] .avatar,
+.row[data-noted] .row-main {
+  grid-row: 1;
+}
+
+/* Phone. The row is the screen, so it can afford a line each for the subject and the snippet, a
+   bigger face, and reading type rather than list type. */
+:root[data-phone] .row {
+  --avatar: 36px;
+  height: 68px;
+  padding: 0 16px 0 10px;
+  grid-template-columns: 14px var(--avatar) 1fr;
+}
+
+:root[data-phone] .row[data-noted] {
+  height: auto;
+}
+
+:root[data-phone] .row-sender {
+  font-size: var(--t-4);
+}
+
+:root[data-phone] .row-subject,
+:root[data-phone] .row-snippet,
+:root[data-phone] .row-time {
+  font-size: var(--t-3);
+}
+
+:root[data-phone] .row-bottom {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1px;
+}
+
+/* A line each, so there is no width for the subject to win off the snippet and the snippet's basis
+   is a height rather than a width. Back to auto, or it would be a line with nothing on it. */
+:root[data-phone] .row-snippet {
+  flex: 1 1 auto;
+}
+
+/* There is no hover on a finger, so the wash would only ever be the leftover of a tap. */
+:root[data-touch] .row:hover {
+  background: none;
+}
+
+:root[data-touch] .row[data-selected]:hover {
+  background: var(--row-selected);
+}

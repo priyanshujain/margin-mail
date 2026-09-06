@@ -1,0 +1,98 @@
+/* The snooze picker: six rows in a popover, each with the key that takes it and the moment it
+   means. The frame, the surface and the shadow are the Popover primitive's; this is only the list
+   inside it. */
+
+.snooze-picker {
+  padding: 6px;
+}
+
+.snooze-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* What the popover says before the four times are here, or why they are not coming. One faint
+   line on the option's own inset, so the frame is the same frame the list will fill. */
+.snooze-wait {
+  margin: 0;
+  padding: 6px 8px;
+  color: var(--ink-faint);
+  font-size: var(--t-2);
+}
+
+/* The key first, then what it does, then when. Reading left to right is reading the sentence, and
+   the times line up down the right edge because they are what the eye compares. */
+.snooze-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 6px 8px;
+  border-radius: var(--r-sm);
+  color: var(--ink);
+  font-size: var(--t-3);
+  text-align: left;
+  transition: background 120ms var(--ease);
+}
+
+.snooze-option:hover {
+  background: var(--accent-wash);
+}
+
+.snooze-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.snooze-when {
+  flex: none;
+  color: var(--ink-faint);
+  font-size: var(--t-2);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The two choices that ask for a date open in place. A second panel over this one for a single
+   field would be two overlays deep for the most ordinary thing on the picker. */
+.snooze-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 4px;
+}
+
+.snooze-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  color: var(--ink-faint);
+  font-size: var(--t-2);
+}
+
+.snooze-field input {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--paper);
+  color: var(--ink);
+  font-size: var(--t-3);
+  transition: border-color 120ms var(--ease);
+}
+
+.snooze-field input:focus {
+  border-color: var(--line-strong);
+}
+
+.snooze-form-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+:root[data-touch] .snooze-option {
+  min-height: var(--touch-h);
+}

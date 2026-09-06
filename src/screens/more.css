@@ -1,0 +1,52 @@
+/* The More menu: the rest of the thread's verbs in a popover under the bar's last button, each with
+   its key on the right the way the palette prints them. The frame, the surface and the shadow are
+   the Popover primitive's; this is only the list inside it. */
+
+.more-menu {
+  padding: 6px;
+}
+
+.more-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.more-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 6px 8px;
+  border-radius: var(--r-sm);
+  color: var(--ink);
+  font-size: var(--t-3);
+  text-align: left;
+  transition: background 120ms var(--ease);
+}
+
+/* The arrow keys walk the rows, so the row the keyboard is on reads the way the row the pointer is
+   over does. */
+.more-option:hover,
+.more-option:focus-visible {
+  background: var(--accent-wash);
+}
+
+.more-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.more-empty {
+  margin: 0;
+  padding: 6px 8px;
+  color: var(--ink-faint);
+  font-size: var(--t-2);
+}
+
+:root[data-touch] .more-option {
+  min-height: var(--touch-h);
+}

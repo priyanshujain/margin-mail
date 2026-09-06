@@ -1,0 +1,118 @@
+/* The selection's bar, which fills the footprint the two piles leave: same box, same border, same
+   surface, so the foot of the list does not jump when a selection appears. */
+
+.action-bar {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  /* The piles' box to the pixel: their card, the padding around it, and the rule above it. The
+     foot of the list must not move when a selection appears. */
+  height: calc(var(--pile-h) + 10px + 12px + 1px);
+  padding: 10px 14px 12px;
+  border-top: 1px solid var(--line);
+  background: var(--shell);
+}
+
+.action-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.action-count {
+  color: var(--ink-faint);
+  font-size: var(--t-1);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.action-clear {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  color: var(--ink-faint);
+  font-size: var(--t-1);
+  transition: color 120ms var(--ease);
+}
+
+.action-clear:hover {
+  color: var(--ink);
+}
+
+/* Three across and two down inside the piles' height. The verbs keep one order everywhere in the
+   app, so the hand that learned the bar has learned the keys. */
+.action-verbs {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.action-verbs .button {
+  justify-content: flex-start;
+  gap: 6px;
+}
+
+.action-verbs .button .key {
+  margin-left: auto;
+}
+
+/* The label picker
+   --------------------------------------------------------------------------------------------- */
+
+.label-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.label-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 7px 8px;
+  border-radius: var(--r-sm);
+  color: var(--ink);
+  font-size: var(--t-3);
+  text-align: left;
+  transition: background 120ms var(--ease);
+}
+
+.label-option:hover {
+  background: var(--accent-wash);
+}
+
+.label-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.label-option .icon {
+  flex: none;
+  color: var(--ink-faint);
+}
+
+.label-none {
+  padding: 7px 8px;
+  color: var(--ink-faint);
+  font-size: var(--t-3);
+}
+
+/* The same line when the read failed, with the way to ask again beside it. */
+.label-none[data-state="error"] {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+:root[data-touch] .label-option,
+:root[data-touch] .action-clear {
+  min-height: var(--touch-h);
+}

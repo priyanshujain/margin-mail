@@ -1,1 +1,5 @@
-/* Placeholder. The design system replaces this in F2. */
+/* The six faces, bound to the files vendored into public/fonts. Mail sets two of them, --font-ui
+   for the interface and --font-heading for the text face, and both are settings the boot script in
+   index.html restores before the first paint. */
+
+@import "margin-shared/css/fonts.css";

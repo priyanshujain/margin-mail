@@ -1,0 +1,155 @@
+/* The stage and the list column.
+ *
+ * The stage is here rather than in a file of its own because it is nothing but the two columns'
+ * shared box: a row, a paper background, and a list column of a fixed width beside a pane that
+ * takes what is left. */
+
+.stage {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  position: relative;
+  background: var(--paper);
+}
+
+.list-col {
+  flex: none;
+  width: var(--list-w);
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--line);
+  background: var(--paper);
+}
+
+/* With the reading pane hidden the list takes the window and a thread opens in place. */
+:root[data-no-pane] .list-col {
+  flex: 1;
+  width: auto;
+  border-right: 0;
+}
+
+/* As short as the pill in it allows. The head says where you are and is then read once a day,
+   so every pixel it does not need is a pixel of mail. */
+.list-head {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  height: 38px;
+  padding: 0 12px 0 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.list-title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+}
+
+.list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.list-blank {
+  display: grid;
+  place-items: start center;
+  padding-top: 40px;
+}
+
+/* An empty place whose mailbox is still arriving. The welcome screen's bar, at the list's own
+   size, under the engine's sentence in the text face the empty state uses. */
+.list-filling {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  padding: 40px 24px;
+  text-align: center;
+}
+
+.list-filling-line {
+  margin: 0;
+  color: var(--ink-faint);
+  font-family: var(--font-heading);
+  font-size: var(--t-4);
+}
+
+.list-filling-bar {
+  position: relative;
+  width: 200px;
+  max-width: 100%;
+  height: 3px;
+  border-radius: var(--r-pill);
+  background: var(--accent-wash);
+  overflow: hidden;
+}
+
+.list-filling-fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--r-pill);
+  background: var(--accent);
+  transform-origin: left center;
+  transition: transform 180ms var(--ease);
+}
+
+/* Before there is a total the bar has nothing to fill against, so a short run of it walks the
+   track instead: the same shape as the welcome screen's, and still a bar rather than a spinner. */
+.list-filling-bar[data-counting] .list-filling-fill {
+  width: 40%;
+  animation: list-filling-walk 1.4s var(--ease) infinite;
+}
+
+@keyframes list-filling-walk {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(250%);
+  }
+}
+
+.list-filling-count {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: var(--t-2);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .list-filling-bar[data-counting] .list-filling-fill {
+    width: 100%;
+    animation: none;
+    opacity: 0.5;
+  }
+}
+
+/* Where a headed group ends and the plain list begins: Back sits above the Inbox, and without a
+   line under it the Inbox reads as more of Back. */
+.list-item[data-rule] {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--line);
+}
+
+/* The one faint line a list closes with when it has run out of what is on the device. */
+.list-foot {
+  margin: 0;
+  padding: 14px 14px 20px;
+  color: var(--ink-faint);
+  font-size: var(--t-2);
+}
+
+/* The same line when the next page did not come, with the way to ask for it again beside it. */
+.list-foot[data-state="error"] {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}

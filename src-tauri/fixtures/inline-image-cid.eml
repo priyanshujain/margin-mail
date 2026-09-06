@@ -1,0 +1,75 @@
+Return-Path: <hannah.weiss@example.net>
+MIME-Version: 1.0
+Date: Sun, 30 Aug 2026 12:19:40 +0200
+Message-ID: <CADhw-hawaii-04@mail.example.net>
+Subject: Photos from the Hawaii trip
+From: Hannah Weiss <hannah.weiss@example.net>
+To: Priyanshu Jain <pj@73ai.org>
+Content-Type: multipart/related; type="multipart/alternative";
+ boundary="rel-hawaii-04"
+
+--rel-hawaii-04
+Content-Type: multipart/alternative; boundary="alt-hawaii-04"
+
+--alt-hawaii-04
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+Finally went through them all. The ones from the ridge walk are the best
+of the lot, two of them are below and the rest are in the folder.
+
+Hannah
+
+--alt-hawaii-04
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+<div>
+<p>Finally went through them all. The ones from the ridge walk are the
+best of the lot, two of them are below and the rest are in the folder.</p>
+<p><img src="cid:ridge-walk-1@example.net" alt="The ridge at seven"
+ width="16" height="16"></p>
+<p><img src="cid:ridge-walk-2@example.net" alt="Looking back down"
+ width="16" height="16"></p>
+<p>Hannah</p>
+</div>
+
+--alt-hawaii-04--
+
+--rel-hawaii-04
+Content-Type: image/png; name="ridge-walk-1.png"
+Content-Transfer-Encoding: base64
+Content-ID: <ridge-walk-1@example.net>
+Content-Disposition: inline; filename="ridge-walk-1.png"
+
+iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAACJ0lEQVR42g3Loc6GIBQA0P9xvmg0
+EAgEAoFgYMxwA2MEAmOGm5jBwEwkRjA4EsnkA/6efv5+mkyazppRzbkWUkulF9DK6TVoQG127bL2
+RYemt1vj3w/IBHQGRoFzEBKkggVAOVgDAILZwWXwBUKD7YYvWDJZOltGLedWSCuVXcAqZ9dgAa3Z
+rcvWFxua3W77BU8mT2fPqOfcC+ml8gt45fwaPKA3u3fZ++JD89vtvxDJFOkcGY2cRyGjVHGBqFxc
+QwSMZo8uR19iaHG74xeQTEhnZBQ5RyFRKlwAlcM1ICCaHV1GXzA03G78QiJTonNiNHGehExSpQWS
+cmkNCTCZPbmcfEmhpe1OXzjIdND5YPTg/BDykOpY4FDuWMMBeJj9cPnw5Qjt2O7jCyeZTjqfjJ6c
+n0KeUp0LnMqdazgBT7OfLp++nKGd231+oZCp0LkwWjgvQhapygJFubKGAljMXlwuvpTQynaXL1Qy
+VTpXRivnVcgqVV2gKlfXUAGr2avL1ZcaWt3u+oWLTBedL0Yvzi8hL6muBS7lrjVcgJfZL5cvX67Q
+ru2+vtDJ1OncGe2cdyG7VH2BrlxfQwfsZu8ud196aH27+xcGmQadB6OD8yHkkGosMJQbaxiAw+zD
+5eHLCG1s9/jCQ6aHzg+jD+ePkI9UzwKPcs8aHsDH7I/Ljy9PaM92P194yfTS+WX05fwV8pXqXeBV
+7l3DC/ia/XX59eUN7d3uF/8BbBpFEE55jaYAAAAASUVORK5CYII=
+
+--rel-hawaii-04
+Content-Type: image/png; name="ridge-walk-2.png"
+Content-Transfer-Encoding: base64
+Content-ID: <ridge-walk-2@example.net>
+Content-Disposition: inline; filename="ridge-walk-2.png"
+
+iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAACJ0lEQVR42g3Loc6GIBQA0P9xvmg0
+EAgEAoFgYMxwA2MEAmOGm5jBwEwkRjA4EsnkA/6efv5+mkyazppRzbkWUkulF9DK6TVoQG127bL2
+RYemt1vj3w/IBHQGRoFzEBKkggVAOVgDAILZwWXwBUKD7YYvWDJZOltGLedWSCuVXcAqZ9dgAa3Z
+rcvWFxua3W77BU8mT2fPqOfcC+ml8gt45fwaPKA3u3fZ++JD89vtvxDJFOkcGY2cRyGjVHGBqFxc
+QwSMZo8uR19iaHG74xeQTEhnZBQ5RyFRKlwAlcM1ICCaHV1GXzA03G78QiJTonNiNHGehExSpQWS
+cmkNCTCZPbmcfEmhpe1OXzjIdND5YPTg/BDykOpY4FDuWMMBeJj9cPnw5Qjt2O7jCyeZTjqfjJ6c
+n0KeUp0LnMqdazgBT7OfLp++nKGd231+oZCp0LkwWjgvQhapygJFubKGAljMXlwuvpTQynaXL1Qy
+VTpXRivnVcgqVV2gKlfXUAGr2avL1ZcaWt3u+oWLTBedL0Yvzi8hL6muBS7lrjVcgJfZL5cvX67Q
+ru2+vtDJ1OncGe2cdyG7VH2BrlxfQwfsZu8ud196aH27+xcGmQadB6OD8yHkkGosMJQbaxiAw+zD
+5eHLCG1s9/jCQ6aHzg+jD+ePkI9UzwKPcs8aHsDH7I/Ljy9PaM92P194yfTS+WX05fwV8pXqXeBV
+7l3DC/ia/XX59eUN7d3uF/8BbBpFEE55jaYAAAAASUVORK5CYII=
+
+--rel-hawaii-04--

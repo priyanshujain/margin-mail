@@ -1,0 +1,30 @@
+render-version: 2
+message-id: AM6PR03MB4419D1E@fieldnotes.example
+in-reply-to: -
+references-first: -
+from: Clare Dunn <clare.dunn@fieldnotes.example>
+to: Priyanshu Jain <pj@73ai.org>
+cc: -
+bcc: -
+reply-to: -
+date-ms: 1788182527000
+subject: The signature block, and one photo
+is-html: true
+surface: theme
+snippet: The photo you asked for is below. Clare
+list-id: -
+auto-submitted: -
+precedence: -
+unsubscribe: -
+blocked-images: 0
+
+--- html ---
+
+<p>The photo you asked for is below.</p>
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==" width="600" height="400" alt="The site"></p>
+<p>Clare</p>
+
+--- quoted: none ---
+
+--- text ---
+The photo you asked for is below. Clare

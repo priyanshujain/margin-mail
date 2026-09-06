@@ -1,0 +1,99 @@
+/* Wider than a sheet and capped in height, because it is a list you read down rather than a form
+   you fill in. The shell is .overlay[data-align="top"] and .panel in app.css. */
+.palette {
+  width: min(620px, calc(100vw - 32px));
+  max-height: min(560px, 76vh);
+}
+
+.palette-input {
+  flex: none;
+  width: 100%;
+  padding: 18px 22px;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: none;
+  font-size: var(--t-4);
+  outline: none;
+}
+
+.palette-input::placeholder {
+  color: var(--ink-faint);
+}
+
+.palette-list,
+.palette-items {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.palette-list {
+  flex: 1;
+  min-height: 0;
+  padding: 6px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.palette-group {
+  padding: 10px 16px 4px;
+  color: var(--ink-faint);
+  font-size: var(--t-1);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.palette-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 16px;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+}
+
+.palette-row[data-active] {
+  background: var(--accent-wash);
+}
+
+.palette-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.palette-label .hint {
+  margin-left: 8px;
+  color: var(--ink-faint);
+}
+
+.palette-keys {
+  flex: none;
+  display: flex;
+  gap: 4px;
+}
+
+.palette-empty {
+  margin: 0;
+  padding: 32px 22px 40px;
+  text-align: center;
+  color: var(--ink-faint);
+  font-family: var(--font-heading);
+  font-size: var(--t-4);
+}
+
+/* The palette is where a phone reaches everything, so its rows are the most tapped list there is
+   on a device with no keys to jump with. */
+:root[data-touch] .palette-row {
+  min-height: var(--touch-h);
+}
+
+/* Docked to the bottom edge like every other panel, and the field is at the top of it where the
+   keyboard will push it anyway. */
+:root[data-phone] .overlay[data-align="top"] {
+  align-items: end;
+  padding-top: 0;
+}

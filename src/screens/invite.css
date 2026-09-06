@@ -1,0 +1,110 @@
+/* The invitation, as a card under the message that carried it.
+ *
+ * A calendar page on the left and the event on the right. The date is a block rather than a line of
+ * the sentence because it is the one thing you look for: whether it is a day you can do. */
+
+.invite {
+  display: grid;
+  grid-template-columns: var(--invite-date-w) 1fr;
+  gap: 14px;
+  margin: 14px 0;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--raised);
+  transition: border-color 120ms var(--ease), box-shadow 120ms var(--ease);
+}
+
+.invite:focus {
+  outline: none;
+}
+
+/* The card the keys are pointed at. A ring rather than a wash, the same way a Screener card takes
+   one: the card is already the widest thing in the thread and tinting it would read as a quote. */
+.invite[data-focus] {
+  border-color: var(--line-strong);
+  box-shadow: var(--card-ring);
+}
+
+.invite-date {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 0;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md);
+  background: var(--paper);
+}
+
+.invite-date .mon {
+  color: var(--ink-faint);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.invite-date .day {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.invite-main {
+  min-width: 0;
+}
+
+.invite-title {
+  margin-bottom: 2px;
+  font-size: var(--t-4);
+  font-weight: 600;
+}
+
+.invite-when {
+  color: var(--ink-soft);
+  font-size: var(--t-2);
+}
+
+.invite-organizer {
+  margin-top: 2px;
+  color: var(--ink-faint);
+  font-size: var(--t-2);
+}
+
+/* One sentence, and then the button that fixes it. Not a banner and not a warning colour: the app
+   is short a permission, which is a thing to grant rather than a thing that went wrong. */
+.invite-scope {
+  margin: 10px 0 0;
+  color: var(--ink-soft);
+  font-size: var(--t-2);
+  line-height: 1.5;
+}
+
+.invite-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.invite-answered {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--ink-faint);
+  font-size: var(--t-2);
+}
+
+.invite-open {
+  margin-left: auto;
+  color: var(--ink-faint);
+  font-size: var(--t-2);
+}
+
+.invite-open:hover {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

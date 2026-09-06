@@ -1,0 +1,105 @@
+/* Two stacks of cards on the shell surface at the foot of the list. A thread leaves the list and
+   lands here, which is why they are cards and not two more rows. */
+
+.piles {
+  flex: none;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 10px 14px 12px;
+  border-top: 1px solid var(--line);
+  background: var(--shell);
+}
+
+.pile {
+  position: relative;
+  height: var(--pile-h);
+  text-align: left;
+}
+
+.pile-card {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  height: var(--pile-card-h);
+  padding: 9px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md);
+  background: var(--raised);
+  overflow: hidden;
+}
+
+/* The cards underneath, drawn as the edge each of them would leave showing. Two at most: a third
+   line says nothing a second one has not, and the stack has to stay inside the footprint the
+   action bar takes over. */
+.pile-edge {
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  height: 10px;
+  border: 1px solid var(--line-strong);
+  border-bottom: 0;
+  border-radius: var(--r-md) var(--r-md) 0 0;
+  background: var(--raised);
+}
+
+.pile-edge[data-depth="1"] {
+  bottom: calc(var(--pile-card-h) - 4px);
+}
+
+.pile-edge[data-depth="2"] {
+  left: 12px;
+  right: 12px;
+  bottom: calc(var(--pile-card-h) + 2px);
+}
+
+/* An empty pile is an outline: there is no card in it to draw, and a filled box with nothing in it
+   reads as something that failed to load. */
+.pile[data-empty] .pile-card {
+  border-style: dashed;
+  background: none;
+}
+
+.pile-top {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink-faint);
+  font-size: var(--t-1);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.pile-top .key {
+  margin-left: auto;
+}
+
+.pile-top .icon {
+  flex: none;
+}
+
+.pile-subject {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink);
+  font-size: var(--t-3);
+}
+
+.pile-who {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink-faint);
+  font-size: var(--t-2);
+}
+
+.pile:hover .pile-card,
+.pile:hover .pile-edge {
+  border-color: var(--ink-faint);
+}

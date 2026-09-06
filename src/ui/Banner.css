@@ -1,0 +1,68 @@
+.banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--raised);
+  color: var(--ink-soft);
+  font-size: var(--t-2);
+}
+
+.banner[data-tone="muted"] {
+  border-color: var(--note-line);
+  background: var(--note-surface);
+}
+
+.banner-text {
+  min-width: 0;
+}
+
+.banner-text b {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.banner .icon {
+  color: var(--ink-faint);
+}
+
+.banner-action {
+  margin-left: auto;
+  color: var(--ink-faint);
+  white-space: nowrap;
+  transition: color 120ms var(--ease);
+}
+
+.banner-action:hover {
+  color: var(--ink);
+}
+
+:root[data-touch] .banner-action {
+  min-height: var(--touch-h);
+}
+
+/* Pressed and waiting. The label has already changed to say so; the pulse is what keeps it from
+   reading as a dead control while a slow host answers. */
+.banner-action[data-busy] {
+  color: var(--ink-faint);
+  cursor: default;
+  animation: banner-busy 1.2s var(--ease) infinite;
+}
+
+.banner-action[data-busy]:hover {
+  color: var(--ink-faint);
+}
+
+@keyframes banner-busy {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .banner-action[data-busy] {
+    animation: none;
+  }
+}
