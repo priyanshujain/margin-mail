@@ -11,6 +11,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: release
+  cancel-in-progress: false
+
 jobs:
   prepare:
     runs-on: ubuntu-latest
@@ -20,17 +24,30 @@ jobs:
       release_id: ${{ steps.release.outputs.release_id }}
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: main
 
       - name: Determine version
         id: version
+        env:
+          REQUESTED_VERSION: ${{ inputs.version }}
         run: |
-          if [ -n "${{ inputs.version }}" ]; then
-            VERSION="${{ inputs.version }}"
+          if [ -n "$REQUESTED_VERSION" ]; then
+            VERSION="$REQUESTED_VERSION"
             VERSION="${VERSION#v}"
           else
             CURRENT=$(jq -r .version src-tauri/tauri.conf.json)
             IFS=. read -r MAJOR MINOR PATCH <<< "$CURRENT"
             VERSION="$MAJOR.$MINOR.$((PATCH + 1))"
+          fi
+          if ! [[ "$VERSION" =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
+            echo "::error::Expected a release version such as 0.2.0."
+            exit 1
+          fi
+          EXISTING=$(git ls-remote --tags origin "refs/tags/v$VERSION")
+          if [ -n "$EXISTING" ]; then
+            echo "::error::v$VERSION already exists; choose a new version."
+            exit 1
           fi
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
@@ -73,7 +90,12 @@ jobs:
             sleep 3
           done
           git tag "$TAG"
-          git push origin "$TAG"
+          if ! git push origin "$TAG"; then
+            # A push can land remotely even when Git reports a ref-lock failure.
+            # Accept only this exact commit; never move an existing release tag.
+            REMOTE=$(git ls-remote --tags origin "refs/tags/$TAG" | cut -f1)
+            [ "$REMOTE" = "$(git rev-parse HEAD)" ] || exit 1
+          fi
 
       - name: Create draft release
         id: release
