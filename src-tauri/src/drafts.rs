@@ -40,6 +40,35 @@ pub const MAX_ENCODED_BYTES: u64 = 35 * 1024 * 1024;
 /// arrives; this decides how often one of them leaves the machine.
 pub const UPLOAD_EVERY_MS: i64 = 5_000;
 
+#[tauri::command(async)]
+pub fn draft_attachment_store(
+    app: tauri::AppHandle,
+    account_id: String,
+    filename: String,
+    mime_type: String,
+    data_base64: String,
+) -> Result<DraftAttachment, String> {
+    use base64::Engine;
+    if data_base64.len() as u64 > MAX_ENCODED_BYTES {
+        return Err(format!("{filename} is too large to attach"));
+    }
+    let bytes = base64::engine::general_purpose::STANDARD
+        .decode(data_base64).map_err(|e| e.to_string())?;
+    let db = db_of(&app)?;
+    db.with(&account_id, |_| Ok(()))?;
+    let directory = db.account_dir(&account_id).join("draft-files");
+    std::fs::create_dir_all(&directory).map_err(|e| e.to_string())?;
+    let path = directory.join(write::fresh_id("file"));
+    std::fs::write(&path, &bytes).map_err(|e| format!("{filename} could not be stored: {e}"))?;
+    Ok(DraftAttachment {
+        path: Some(path.to_string_lossy().into_owned()),
+        attachment_id: None,
+        filename,
+        mime_type,
+        size: bytes.len() as u64,
+    })
+}
+
 /// What sits in the `drafts` row's payload.
 ///
 /// The version is bumped on every save and is what says whether the provider is behind. A

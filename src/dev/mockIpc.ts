@@ -287,15 +287,16 @@ interface UndoEntry {
   token: string;
   label: string;
   revert: () => void;
+  outgoingId?: string;
 }
 
 const undoStack: UndoEntry[] = [];
 let undoCount = 0;
 
-function undoable(label: string, revert: () => void, undoMs = 0): Undo {
+function undoable(label: string, revert: () => void, undoMs = 0, outgoingId?: string): Undo {
   undoCount += 1;
   const token = `undo-${undoCount}`;
-  undoStack.push({ token, label, revert });
+  undoStack.push({ token, label, revert, outgoingId });
   // Bounded in Rust for the same reason: a stack that grows for a session is a leak.
   if (undoStack.length > 25) undoStack.shift();
   return { token, label, undoMs };
@@ -1451,6 +1452,15 @@ export async function mockCall<T>(command: string, args?: Record<string, unknown
     // ---------------------------------------------------------------------------------------
     // Writing
     // ---------------------------------------------------------------------------------------
+    case "draft_list": {
+      const accountId = arg<string | null>("accountId");
+      return done(
+        empty ? [] : drafts
+          .filter((draft) => !accountId || draft.accountId === accountId)
+          .map((draft) => structuredClone(draft)),
+      );
+    }
+
     case "draft_save": {
       const draft = arg<Draft>("draft");
       const id = draft.id ?? `draft-${drafts.length + 1}`;
@@ -1462,7 +1472,7 @@ export async function mockCall<T>(command: string, args?: Record<string, unknown
         const thread = byKey(draft.threadKey);
         if (thread) thread.hasDraft = true;
       }
-      changed("threads");
+      changed("drafts threads");
       const encodedSize = Math.round(draft.bodyHtml.length * 1.37) + 2_048;
       return done({
         id,
@@ -1486,7 +1496,7 @@ export async function mockCall<T>(command: string, args?: Record<string, unknown
         const thread = gone?.threadKey ? byKey(gone.threadKey) : undefined;
         if (thread) thread.hasDraft = false;
       }
-      changed("threads");
+      changed("drafts threads");
       return done(undefined);
     }
 
@@ -1510,7 +1520,9 @@ export async function mockCall<T>(command: string, args?: Record<string, unknown
         thread.hasDraft = false;
         thread.pile = null;
       }
-      changed("outbox threads");
+      const savedIndex = drafts.findIndex((saved) => saved.id === draft.id);
+      const saved = savedIndex >= 0 ? drafts.splice(savedIndex, 1)[0] : undefined;
+      changed("outbox drafts threads");
       const to = draft.to[0]?.name ?? draft.to[0]?.address ?? "nobody";
       return done(
         undoable(
@@ -1518,18 +1530,21 @@ export async function mockCall<T>(command: string, args?: Record<string, unknown
           () => {
             const index = outbox.findIndex((item) => item.id === id);
             if (index >= 0) outbox.splice(index, 1);
+            if (saved) drafts.push(saved);
             if (thread) {
               thread.sending = false;
               thread.hasDraft = true;
             }
           },
           settings.undoDelaySecs * 1_000,
+          id,
         ),
       );
     }
 
     case "send_now": {
-      const id = arg<string>("outgoingId");
+      const outgoingId = arg<string>("outgoingId");
+      const id = undoStack.find((entry) => entry.token === outgoingId)?.outgoingId ?? outgoingId;
       // Rust pushes the message to the provider before it answers, and the line has a busy state
       // for that wait: the same beat as the bodies, so it can be looked at.
       if (flagged("marginmail-dev-pending")) await beat(900);

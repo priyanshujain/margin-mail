@@ -15,9 +15,11 @@ import { useEscapeLayer } from "../escape";
 import { registerCommands } from "../keys/commands";
 import { useKeyContext } from "../keys/keymap";
 import { contactsSuggest } from "../api/contacts";
+import { draftAttachmentStore } from "../api/write";
+import { notify } from "../store/useToast";
 import { isTauri, type Draft, type DraftAttachment, type Person } from "../ipc";
 import { useAccounts } from "../store/useAccounts";
-import { useCompose, type Composer, type ComposerAt } from "../store/useCompose";
+import { storeAttachments, useCompose, type Composer, type ComposerAt } from "../store/useCompose";
 import { useMail } from "../store/useMail";
 import { useSettings } from "../store/useSettings";
 import { Editor } from "./Editor";
@@ -139,34 +141,62 @@ function defaultReminder(): number {
 // Files
 // -------------------------------------------------------------------------------------------
 
-/**
- * The webview's own picker, which is the only one this app has: there is no dialog plugin in
- * `src-tauri`, and adding one is a decision for whoever owns that crate.
- *
- * A `File` from a webview has a name, a size and a type and no path, and `DraftAttachment` carries
- * a path or a mirror attachment id and nothing else. So the name goes in the path field, which is
- * enough for the fixture and for the composer's own arithmetic and is not enough for Rust to read
- * the bytes. Dragging a file onto a Tauri window is the route that carries a real path.
- */
 export function pickFiles(at: ComposerAt): void {
   const input = document.createElement("input");
   input.type = "file";
   input.multiple = true;
   input.style.display = "none";
   input.addEventListener("change", () => {
-    useCompose.getState().attach(at, [...(input.files ?? [])].map(asAttachment));
+    void attachFiles(at, [...(input.files ?? [])]);
     input.remove();
   });
+  input.addEventListener("cancel", () => input.remove());
   document.body.append(input);
   input.click();
 }
 
 export const asAttachment = (file: File): DraftAttachment => ({
-  path: file.name,
   filename: file.name,
   mimeType: file.type || "application/octet-stream",
   size: file.size,
 });
+
+function attachFiles(at: ComposerAt, files: File[]): Promise<void> {
+  return storeAttachments(at, persistFiles(at, files)).catch((error) => {
+    notify(`Could not attach files: ${error}`);
+  });
+}
+
+async function persistFiles(at: ComposerAt, files: File[]): Promise<void> {
+  const composer = at === "card" ? useCompose.getState().card : useCompose.getState().reply;
+  if (!composer || files.length === 0) return;
+  const existingSize = Math.max(composer.encodedSize,
+    (composer.draft.attachments ?? []).reduce((size, file) => size + file.size * 4 / 3, 0));
+  if (existingSize + files.reduce((size, file) => size + file.size * 4 / 3, 0) > 35 * 1024 * 1024) {
+    throw new Error("These files would put this message over the 35 MB the provider takes");
+  }
+  const draftId = composer.draft.id || crypto.randomUUID();
+  if (!composer.draft.id) useCompose.getState().edit(at, { id: draftId });
+  const attachments: DraftAttachment[] = [];
+  for (const file of files) {
+    const descriptor = asAttachment(file);
+    if (!isTauri) {
+      attachments.push(descriptor);
+      continue;
+    }
+    const data = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result).split(",")[1]);
+      reader.onerror = () => reject(reader.error ?? new Error(`${file.name} could not be read`));
+      reader.readAsDataURL(file);
+    });
+    attachments.push(await draftAttachmentStore(composer.draft.accountId, descriptor, data));
+  }
+  const current = at === "card" ? useCompose.getState().card : useCompose.getState().reply;
+  if (current?.draft.id === draftId) {
+    useCompose.getState().attach(at, attachments);
+  }
+}
 
 // -------------------------------------------------------------------------------------------
 // The card
@@ -232,6 +262,7 @@ function ComposeCard({ composer, expanded, onClose, onExpand }: ComposeCardProps
   const draft = composer.draft;
   const edit = useCompose((s) => s.edit);
   const setShowCc = useCompose((s) => s.setShowCc);
+  const signature = useSettings((s) => s.settings?.accounts.find((account) => account.accountId === draft.accountId)?.signature);
 
   return (
     <div
@@ -314,6 +345,7 @@ function ComposeCard({ composer, expanded, onClose, onExpand }: ComposeCardProps
           html={draft.bodyHtml}
           label="Message"
           placeholder="Write your message"
+          signature={signature}
           onChange={(bodyHtml) => edit("card", { bodyHtml })}
         />
         <Attachments at="card" files={draft.attachments ?? []} />
@@ -336,19 +368,14 @@ export function dropped(e: DragEvent<HTMLElement>, at: ComposerAt): void {
   const files = [...(e.dataTransfer.files ?? [])];
   if (files.length === 0) return;
   e.preventDefault();
-  useCompose.getState().attach(at, files.map(asAttachment));
+  void attachFiles(at, files);
 }
 
-/**
- * A pasted image becomes an attachment rather than an inline part, because `DraftAttachment` has a
- * path or a mirror attachment id and no content id and no inline flag. That is the contract rather
- * than an oversight to route around here: an inline image needs a `cid:` on both sides.
- */
 export function pasted(e: ClipboardEvent<HTMLElement>, at: ComposerAt): void {
   const files = [...(e.clipboardData?.files ?? [])];
   if (files.length === 0) return;
   e.preventDefault();
-  useCompose.getState().attach(at, files.map(asAttachment));
+  void attachFiles(at, files);
 }
 
 interface FromFieldProps {
@@ -727,6 +754,7 @@ export function ReplyBox({ to, composer }: ReplyBoxProps) {
   const [closing, setClosing] = useState(false);
   const editor = useRef<TiptapEditor | null>(null);
   const draft = composer.draft;
+  const signature = useSettings((s) => s.settings?.accounts.find((account) => account.accountId === draft.accountId)?.signature);
 
   // Escape leaves the editor and keeps the draft, which is docs/keyboard.md's own wording. The
   // second Escape is not this box's: it belongs to whatever is under it.
@@ -810,6 +838,7 @@ export function ReplyBox({ to, composer }: ReplyBoxProps) {
           html={draft.bodyHtml}
           label="Reply"
           placeholder="Write a reply"
+          signature={signature}
           autoFocus={!forwarding}
           onChange={(bodyHtml) => edit("reply", { bodyHtml })}
           onReady={(instance) => {

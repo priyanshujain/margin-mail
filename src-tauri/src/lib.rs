@@ -2,6 +2,7 @@
 // front of it, the modules are the parts, and a contract type that nothing has consumed yet is a
 // contract type rather than dead code.
 pub mod accounts;
+pub mod app_lock;
 pub mod attachments;
 pub mod imap;
 pub mod backup;
@@ -24,6 +25,8 @@ pub mod mirror;
 pub mod notify;
 pub mod piles;
 pub mod provider;
+pub mod proofing;
+pub mod otp_autofill;
 pub mod routing;
 pub mod sanitize;
 pub mod screener;
@@ -34,6 +37,7 @@ pub mod state;
 pub mod sync;
 pub mod undo;
 pub mod unsubscribe;
+pub mod writingtools;
 
 #[cfg(desktop)]
 use tauri::menu::{Menu, MenuItemBuilder, MenuItemKind, PredefinedMenuItem, SubmenuBuilder};
@@ -298,7 +302,9 @@ pub fn run() {
     }
 
     builder = builder.manage(google::AuthState::default()).setup(|app| {
+        app.manage(app_lock::AppLock::new(settings::load(app.handle())?.app_lock_enabled));
         let handle = app.handle();
+        tauri::async_runtime::spawn_blocking(|| { let _ = otp_autofill::clear(); });
 
         // The mirror and the state database, one connection per account, opened lazily by the
         // first read. Managed here because every command that touches SQLite reaches for it.
@@ -384,7 +390,15 @@ pub fn run() {
     }
 
     let app = builder
-        .invoke_handler(tauri::generate_handler![
+        .invoke_handler({
+            let handler: Box<dyn Fn(tauri::ipc::Invoke<tauri::Wry>) -> bool + Send + Sync> = Box::new(tauri::generate_handler![
+            app_lock::app_lock_status,
+            app_lock::app_unlock,
+            proofing::proof_text,
+            otp_autofill::otp_autofill_status,
+            otp_autofill::otp_autofill_enable,
+            writingtools::writing_tools_available,
+            writingtools::run_writing_tool,
             // Accounts and consent
             accounts::accounts_list,
             account_start,
@@ -451,6 +465,7 @@ pub fn run() {
             contacts::contacts_suggest,
             // Writing
             drafts::draft_save,
+            drafts::draft_attachment_store,
             drafts::draft_get,
             drafts::draft_list,
             drafts::draft_import,
@@ -489,7 +504,15 @@ pub fn run() {
             exports::keymap_path,
             exports::keymap_reset,
             packaged_by
-        ])
+            ]);
+            move |invoke| {
+                if !app_lock::permits(&invoke) {
+                    invoke.resolver.reject("Unlock your mailbox first.");
+                    return true;
+                }
+                handler(invoke)
+            }
+        })
         .build(context)
         .expect("error while building Margin Mail");
 

@@ -22,6 +22,8 @@
     "@tauri-apps/plugin-os": "^2",
     "@tauri-apps/plugin-process": "^2",
     "@tauri-apps/plugin-updater": "^2",
+    "@tiptap/core": "^3.31.2",
+    "@tiptap/pm": "^3.31.2",
     "@tiptap/react": "^3.31.2",
     "@tiptap/starter-kit": "^3.31.2",
     "margin-shared": "file:../../python/margin/shared",

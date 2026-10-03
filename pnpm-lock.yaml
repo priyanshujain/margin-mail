@@ -26,6 +26,12 @@ importers:
       '@tauri-apps/plugin-updater':
         specifier: ^2
         version: 2.11.0
+      '@tiptap/core':
+        specifier: ^3.31.2
+        version: 3.31.2(@tiptap/pm@3.31.2)
+      '@tiptap/pm':
+        specifier: ^3.31.2
+        version: 3.31.2
       '@tiptap/react':
         specifier: ^3.31.2
         version: 3.31.2(@floating-ui/dom@1.8.0)(@tiptap/core@3.31.2(@tiptap/pm@3.31.2))(@tiptap/pm@3.31.2)(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)

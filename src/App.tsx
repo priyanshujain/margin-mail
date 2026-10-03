@@ -9,6 +9,7 @@ import { Header } from "./screens/Header";
 import { ListColumn } from "./screens/ListColumn";
 import { Clips } from "./screens/Clips";
 import { Compose } from "./screens/Compose";
+import { AppLockGate } from "./screens/AppLock";
 import { ContactCards } from "./screens/ContactCards";
 import { Contacts } from "./screens/Contacts";
 import { Feed } from "./screens/Feed";
@@ -447,7 +448,7 @@ function App() {
     );
   }
 
-  return <Shell />;
+  return <AppLockGate><Shell /></AppLockGate>;
 }
 
 export default App;

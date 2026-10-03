@@ -47,6 +47,7 @@ pub struct Outcome {
 
 pub const POLL_FOREGROUND_SECS: u64 = 12;
 pub const POLL_BACKGROUND_SECS: u64 = 60;
+const RECEIVE_POLL_SECS: u64 = 5;
 /// A cold start should show fresh mail rather than wait out a poll interval.
 const FIRST_PASS_SECS: u64 = 2;
 
@@ -373,15 +374,23 @@ fn db_of(app: &tauri::AppHandle) -> Result<tauri::State<'_, Db>, String> {
 /// Starts the poll loop. The integrator calls this from `setup` once the database is managed.
 pub fn setup(app: tauri::AppHandle) {
     tauri::async_runtime::spawn(async move {
-        let mut delay = Duration::from_secs(FIRST_PASS_SECS);
+        let start = tokio::time::Instant::now() + Duration::from_secs(FIRST_PASS_SECS);
+        let mut polls = tokio::time::interval_at(start, Duration::from_secs(RECEIVE_POLL_SECS));
+        polls.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
+        let mut maintained: Option<tokio::time::Instant> = None;
         loop {
-            tokio::time::sleep(delay).await;
-            tick(&app).await;
-            delay = Duration::from_secs(if focused(&app) {
+            polls.tick().await;
+            let foreground = focused(&app);
+            let cadence = Duration::from_secs(if foreground {
                 POLL_FOREGROUND_SECS
             } else {
                 POLL_BACKGROUND_SECS
             });
+            let maintenance = maintained.map(|last| last.elapsed() >= cadence).unwrap_or(true);
+            if maintenance {
+                maintained = Some(tokio::time::Instant::now());
+            }
+            tick(&app, foreground, maintenance).await;
         }
     });
 }
@@ -392,26 +401,34 @@ fn focused(app: &tauri::AppHandle) -> bool {
         .any(|window| window.is_focused().unwrap_or(false))
 }
 
-async fn tick(app: &tauri::AppHandle) {
+async fn tick(app: &tauri::AppHandle, foreground: bool, maintenance: bool) {
     let Ok(db) = db_of(app) else { return };
     let sink = AppSink { app: app.clone() };
-    for account_id in attached() {
+    let db = db.inner();
+    let sink = &sink;
+    let passes = attached().into_iter().map(|account_id| async move {
         let Some(remote) = remote_for(&account_id) else {
-            continue;
+            return;
         };
         let engine = engine_for(&account_id);
         let store = Scoped {
-            db: db.inner(),
+            db,
             account_id: &account_id,
         };
         engine
-            .run_pass(&store, remote.as_ref(), &sink, focused(app))
+            .run_scheduled_pass(&store, remote.as_ref(), sink, foreground, maintenance)
             .await;
 
         // A draft written just before a quit has a local row and no provider copy yet. The pass is
         // where it catches up, so a draft roams the way Gmail drafts always have rather than
         // waiting for the composer to be opened again.
-        let _ = crate::drafts::upload_pending(app, &account_id).await;
+        if maintenance {
+            let _ = crate::drafts::upload_pending(app, &account_id).await;
+        }
+    });
+    futures::future::join_all(passes).await;
+    if let Err(error) = crate::otp_autofill::refresh(app).await {
+        crate::log::note("autofill", &error);
     }
 }
 

@@ -295,6 +295,17 @@ impl Engine {
         sink: &dyn Sink,
         foreground: bool,
     ) -> SyncStatus {
+        self.run_scheduled_pass(store, remote, sink, foreground, true).await
+    }
+
+    pub async fn run_scheduled_pass<S: Store>(
+        &self,
+        store: &S,
+        remote: &dyn Remote,
+        sink: &dyn Sink,
+        foreground: bool,
+        maintenance: bool,
+    ) -> SyncStatus {
         if self.running.swap(true, Ordering::AcqRel) {
             return self.status();
         }
@@ -337,8 +348,10 @@ impl Engine {
             // the seed is waiting on and asking beforehand would answer "not yet" on the very pass
             // that made it ready.
             self.seed_when_ready(store, sink);
-            self.housekeeping(store, remote, sink, &mut status, foreground)
-                .await;
+            if maintenance {
+                self.housekeeping(store, remote, sink, &mut status, foreground)
+                    .await;
+            }
         }
 
         status.pending_writes = store.with(write::pending_writes).unwrap_or(0);

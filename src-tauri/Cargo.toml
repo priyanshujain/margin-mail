@@ -29,6 +29,7 @@ base64 = "0.22"
 sha2 = "0.10"
 rand = "0.8"
 url = "2"
+regex = "1"
 chrono = { version = "0.4", features = ["serde"] }
 tokio = { version = "1", features = ["sync", "time", "net", "io-util", "rt"] }
 
@@ -109,13 +110,25 @@ roxmltree = "0.21"
 # build keeps a single copy of objc2.
 [target.'cfg(target_os = "macos")'.dependencies]
 objc2 = "0.6"
+objc2-app-kit = { version = "0.3", default-features = false, features = ["std", "NSSpellChecker", "NSApplication", "NSMenu", "NSMenuItem"] }
 objc2-foundation = { version = "0.3", default-features = false, features = [
   "std",
+  "NSArray",
+  "NSRange",
+  "NSFileManager",
+  "NSURL",
+  "NSTextCheckingResult",
+  "NSValue",
   "NSDictionary",
   "NSError",
 
   "NSObject",
   "NSString",
+] }
+objc2-local-authentication = { version = "0.3", default-features = false, features = [
+  "std",
+  "block2",
+  "LAContext",
 ] }
 objc2-user-notifications = { version = "0.3", default-features = false, features = [
   "std",

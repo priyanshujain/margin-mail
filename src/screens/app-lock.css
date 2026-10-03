@@ -1,0 +1,27 @@
+.app-lock {
+  align-items: center;
+  justify-content: center;
+}
+
+.app-lock-content {
+  padding: 24px;
+  max-width: 30em;
+  text-align: center;
+}
+
+.app-lock-title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--t-5);
+  font-weight: 500;
+}
+
+.app-lock-description {
+  margin: 12px 0 24px;
+  color: var(--ink-soft);
+}
+
+.app-lock-error {
+  margin: 0 0 20px;
+  color: var(--ink-soft);
+}

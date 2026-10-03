@@ -622,6 +622,11 @@ export interface Settings {
   /** The per sender allowances are not here: they live on the contact and roam with it. */
   remoteImages: "never" | "ask" | "always";
   linkCleaning: boolean;
+  otpAutofillEnabled: boolean;
+  appLockEnabled: boolean;
+  spellingEnabled: boolean;
+  grammarEnabled: boolean;
+  writingToolsEnabled: boolean;
 
   screenerEnabled: boolean;
   holdReplies: boolean;

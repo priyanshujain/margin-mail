@@ -1,11 +1,15 @@
 import {
   call,
   type Draft,
+  type DraftAttachment,
   type DraftSaved,
   type InviteResponse,
   type Outgoing,
   type Undo,
 } from "../ipc";
+
+export const draftAttachmentStore = (accountId: string, file: DraftAttachment, dataBase64: string) =>
+  call<DraftAttachment>("draft_attachment_store", { accountId, filename: file.filename, mimeType: file.mimeType, dataBase64 });
 
 /** Saves locally on every keystroke's debounce and to the provider every few seconds. */
 export const draftSave = (draft: Draft) => call<DraftSaved>("draft_save", { draft });

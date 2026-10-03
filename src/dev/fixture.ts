@@ -1268,6 +1268,11 @@ export const devSettings: Settings = {
 
   remoteImages: "ask",
   linkCleaning: true,
+  otpAutofillEnabled: false,
+  appLockEnabled: false,
+  spellingEnabled: true,
+  grammarEnabled: false,
+  writingToolsEnabled: false,
 
   screenerEnabled: true,
   holdReplies: false,

@@ -785,6 +785,16 @@ pub struct Settings {
     /// because they are a decision about a person and they roam with the rest of those.
     pub remote_images: String,
     pub link_cleaning: bool,
+    #[serde(default)]
+    pub otp_autofill_enabled: bool,
+    #[serde(default)]
+    pub app_lock_enabled: bool,
+    #[serde(default = "on")]
+    pub spelling_enabled: bool,
+    #[serde(default)]
+    pub grammar_enabled: bool,
+    #[serde(default)]
+    pub writing_tools_enabled: bool,
 
     pub screener_enabled: bool,
     /// A reply to a thread you are in is never held. Turning this off holds it anyway.

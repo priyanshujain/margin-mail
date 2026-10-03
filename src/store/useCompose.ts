@@ -14,6 +14,7 @@ import { useAccounts } from "./useAccounts";
 import { useMail } from "./useMail";
 import { useSettings } from "./useSettings";
 import { notify, useToast } from "./useToast";
+import { signatureHtml } from "../signature";
 
 /**
  * Everything being written, and the one send that has not gone yet.
@@ -195,7 +196,7 @@ function sendingAccount(): string | null {
 function signatureFor(accountId: string): string {
   const settings = useSettings.getState().settings;
   const signature = settings?.accounts.find((a) => a.accountId === accountId)?.signature ?? "";
-  return signature ? `<p></p><p>${signature}</p>` : "<p></p>";
+  return signature ? `<p></p>${signatureHtml(signature)}` : "<p></p>";
 }
 
 /** The people a reply goes to, with you and the sender taken out of the extra ones. */
@@ -224,6 +225,14 @@ const escapeHtml = (text: string): string =>
 
 const saveTimers: Record<ComposerAt, number> = { card: 0, reply: 0 };
 const saveRequests: Partial<Record<ComposerAt, Promise<void>>> = {};
+const attachmentRequests: Record<ComposerAt, Set<Promise<void>>> = { card: new Set(), reply: new Set() };
+
+export function storeAttachments(at: ComposerAt, work: Promise<void>): Promise<void> {
+  attachmentRequests[at].add(work);
+  const clear = () => attachmentRequests[at].delete(work);
+  void work.then(clear, clear);
+  return work;
+}
 
 function scheduleSave(at: ComposerAt): void {
   if (typeof window === "undefined") return;
@@ -275,19 +284,6 @@ function startBeat(): void {
   stopBeat();
   tick();
   beat = window.setInterval(tick, 1000);
-}
-
-/**
- * The row this send just went out on, found in the outbox.
- *
- * `send` answers with an `Undo` and not with the `Outgoing` it queued, so the only handle on the
- * queued message is the outbox itself. The one that is holding the longest is the one that was
- * queued last, because every hold is the same length from the moment it was made.
- */
-async function newestOutgoing(): Promise<string | null> {
-  const outbox = await outboxList();
-  if (outbox.length === 0) return null;
-  return outbox.reduce((latest, item) => (item.holdUntilMs > latest.holdUntilMs ? item : latest)).id;
 }
 
 export const useCompose = create<ComposeState>((set, get) => ({
@@ -366,6 +362,7 @@ export const useCompose = create<ComposeState>((set, get) => ({
   },
 
   closeCard: async () => {
+    try { await Promise.all(attachmentRequests.card); } catch { return; }
     await get().save("card");
     const card = get().card;
     if (!card || card.phase === "error") return;
@@ -466,6 +463,7 @@ export const useCompose = create<ComposeState>((set, get) => ({
     }),
 
   closeReply: async () => {
+    try { await Promise.all(attachmentRequests.reply); } catch { return; }
     await get().save("reply");
     const reply = get().reply;
     if (!reply || reply.phase === "error") return;
@@ -601,6 +599,7 @@ export const useCompose = create<ComposeState>((set, get) => ({
   },
 
   post: async (at, now) => {
+    try { await Promise.all(attachmentRequests[at]); } catch { return; }
     cancelSave(at);
     await saveRequests[at];
     const composer = composerAt(get(), at);
@@ -647,8 +646,7 @@ export const useCompose = create<ComposeState>((set, get) => ({
       // from here until the provider answers, and that can be twenty seconds.
       notify(`Sending to ${named(draft.to[0])}`);
       try {
-        const id = await newestOutgoing();
-        if (id) await sendNow(id);
+        await sendNow(undo.token);
       } catch (e) {
         notify(`Could not skip the wait: ${e}`);
         void useMail.getState().load();

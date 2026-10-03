@@ -48,6 +48,11 @@ pub fn defaults() -> Settings {
 
         remote_images: "ask".to_string(),
         link_cleaning: true,
+        otp_autofill_enabled: false,
+        app_lock_enabled: false,
+        spelling_enabled: true,
+        grammar_enabled: false,
+        writing_tools_enabled: false,
 
         screener_enabled: true,
         hold_replies: false,
@@ -152,7 +157,15 @@ pub fn settings_set(app: tauri::AppHandle, patch: Value) -> Result<Settings, Str
     let path = path(&app)?;
     let before = load(&app)?;
     let after = merge(&before, patch)?;
+    crate::app_lock::validate_setting_change(before.app_lock_enabled, after.app_lock_enabled)?;
+    if !before.otp_autofill_enabled && after.otp_autofill_enabled {
+        crate::otp_autofill::validate_enabled()?;
+    }
     write(&path, &after)?;
+    if before.otp_autofill_enabled && !after.otp_autofill_enabled {
+        crate::otp_autofill::clear()?;
+    }
+    app.state::<crate::app_lock::AppLock>().configure(after.app_lock_enabled);
 
     for (account_id, days) in window_changes(&before, &after) {
         crate::sync::window_set(&app, &account_id, days)?;

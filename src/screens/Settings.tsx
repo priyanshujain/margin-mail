@@ -16,6 +16,7 @@ import { accountRemove, accountSetColor, accountSetName } from "../api/accounts"
 import { backupConfigure, backupNow, backupPhrase, backupRestore } from "../api/backup";
 import { contactUpdate, contactsList } from "../api/contacts";
 import { imapServers } from "../api/imap";
+import { otpAutofillEnable, otpAutofillStatus, type OtpAutofillStatus } from "../api/otpAutofill";
 import {
   askForNotifications,
   notifyPermission,
@@ -41,6 +42,7 @@ import {
   REQUIRED_SCOPE,
   SCOPES,
   isDesktop,
+  isMacDesktop,
   isTauri,
   type Account,
   type BackupSettings,
@@ -1401,6 +1403,20 @@ function PrivacySection() {
   const save = useSettings((s) => s.save);
   const [allowed, setAllowed] = useState<ContactCard[]>([]);
   const [phase, setPhase] = useState<"loading" | "idle" | "error">("loading");
+  const [otpStatus, setOtpStatus] = useState<OtpAutofillStatus | null>(null);
+  const [otpBusy, setOtpBusy] = useState(false);
+
+  useEffect(() => {
+    let alive = true;
+    void otpAutofillStatus().then((status) => {
+      if (alive) setOtpStatus(status);
+    }).catch((error) => {
+      if (!alive) return;
+      setOtpStatus({ available: false, enabled: false });
+      notify(`Could not check Email OTP AutoFill: ${error}`);
+    });
+    return () => { alive = false; };
+  }, []);
 
   useEffect(() => {
     let alive = true;
@@ -1420,6 +1436,25 @@ function PrivacySection() {
 
   if (!settings) return <h2 className="settings-title">Privacy</h2>;
 
+  const changeOtpAutofill = async (enabled: boolean) => {
+    setOtpBusy(true);
+    try {
+      if (enabled && !otpStatus?.enabled) {
+        const activated = await otpAutofillEnable();
+        if (!activated) {
+          notify("Email OTP AutoFill was not enabled in macOS.");
+          return;
+        }
+        setOtpStatus({ available: true, enabled: true });
+      }
+      await save({ otpAutofillEnabled: enabled });
+    } catch (error) {
+      notify(`Could not enable Email OTP AutoFill: ${error}`);
+    } finally {
+      setOtpBusy(false);
+    }
+  };
+
   const forget = (card: ContactCard) => {
     setAllowed((were) => were.filter((one) => one !== card));
     void contactUpdate(card.accountId, card.person.address, { allowRemoteImages: false }).catch(
@@ -1437,6 +1472,26 @@ function PrivacySection() {
         What a message is allowed to do when you open it. Nothing here leaves the machine to be
         decided somewhere else.
       </p>
+
+      <div className="set-field">
+        <Toggle checked={settings.otpAutofillEnabled && (otpStatus?.enabled ?? false)}
+          label="Email OTP AutoFill"
+          disabled={!otpStatus?.available || otpBusy}
+          note="Suggest recent email verification codes in compatible website and app fields through macOS AutoFill. Codes expire after three minutes. Detection stays on this device."
+          onChange={(enabled) => void changeOtpAutofill(enabled)} />
+        <p className="settings-note">
+          {otpStatus?.available
+            ? "Enable Margin Mail under macOS System Settings → General → AutoFill & Passwords when prompted. Keep Margin Mail running and unlocked to receive codes."
+            : "Requires macOS 15 or later and the installed Margin Mail AutoFill extension."}
+        </p>
+      </div>
+
+      <div className="set-field">
+        <Toggle checked={settings.appLockEnabled} label="Require authentication when opening"
+          disabled={!isMacDesktop}
+          note="On macOS, unlock with Touch ID or your Mac login password when starting the app."
+          onChange={(appLockEnabled) => void save({ appLockEnabled })} />
+      </div>
 
       <SettingRow
         label="Remote images"
@@ -1708,6 +1763,24 @@ function WritingSection() {
       <p className="settings-note">
         What happens when you send, and what goes out under your name.
       </p>
+
+      <div className="set-field">
+        <Toggle checked={settings.spellingEnabled} label="Check spelling"
+          note="Use local spelling suggestions while writing."
+          onChange={(spellingEnabled) => void save({ spellingEnabled })} />
+      </div>
+      <div className="set-field">
+        <Toggle checked={settings.grammarEnabled} label="Check grammar"
+          disabled={!isMacDesktop}
+          note="Use macOS grammar suggestions while writing."
+          onChange={(grammarEnabled) => void save({ grammarEnabled })} />
+      </div>
+      <div className="set-field">
+        <Toggle checked={settings.writingToolsEnabled} label="Apple Writing Tools"
+          disabled={!isMacDesktop}
+          note="Show Proofread and Rewrite actions. Requires Apple Intelligence enabled on a supported Mac."
+          onChange={(writingToolsEnabled) => void save({ writingToolsEnabled })} />
+      </div>
 
       <SettingRow
         label="Undo delay"

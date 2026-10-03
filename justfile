@@ -53,7 +53,14 @@ build:
       fi
     fi
     case "$(uname -s)" in
-      Darwin) pnpm tauri build --bundles app ;;
+      Darwin)
+        autofill_config=$(node scripts/prepare-autofill.mjs)
+        if [ -n "$autofill_config" ]; then
+          pnpm tauri build --bundles app --config "$autofill_config"
+        else
+          pnpm tauri build --bundles app
+        fi
+        ;;
       Linux)  pnpm tauri build --bundles deb,appimage ;;
       *)      echo "just: no local build for $(uname -s); macOS and Linux are the desktop targets." >&2; exit 1 ;;
     esac

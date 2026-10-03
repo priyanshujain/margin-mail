@@ -92,7 +92,7 @@ export function FocusReply() {
     setAt((was) => Math.min(Math.max(was + delta, 0), Math.max(items.length - 1, 0)));
 
   /** One item's reply, down the pipeline the other two composers use. */
-  const post = (thread: ThreadSummary, now: boolean) => {
+  const post = async (thread: ThreadSummary, now: boolean) => {
     const view = views[thread.key];
     const last = view?.messages.at(-1);
     const body = (drafts[thread.key] ?? "").trim();
@@ -108,7 +108,8 @@ export function FocusReply() {
         .join(""),
     });
     const to = useCompose.getState().reply?.draft.to[0];
-    void compose.post("reply", now);
+    await compose.post("reply", now);
+    if (useCompose.getState().reply) return;
     setSent((was) => ({ ...was, [thread.key]: to ? displayName(to) : displayName(thread.from) }));
     step(1);
   };

@@ -450,6 +450,9 @@ pub fn announce(app: &tauri::AppHandle, account_id: &str, arrivals: &[Arrival]) 
 
 /// Posts one notification, and writes down why when it could not.
 fn post(app: &tauri::AppHandle, text: &Text) -> Result<(), String> {
+    if crate::app_lock::is_locked(app) {
+        return Ok(());
+    }
     let result = platform::post(app, text);
     if let Err(e) = &result {
         crate::log::note("notify", &format!("could not post \"{}\": {e}", text.body));
@@ -582,4 +585,3 @@ pub fn opened(app: &tauri::AppHandle, target: Option<NotifyTarget>) {
 pub fn notify_take() -> Option<NotifyTarget> {
     OPENED.lock().ok().and_then(|mut slot| slot.take())
 }
-
