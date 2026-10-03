@@ -20,7 +20,7 @@ use std::collections::HashMap;
 
 use crate::dto::{Invite, Person, Surface, Tracker, Unsubscribe};
 
-pub const RENDER_VERSION: i32 = 2;
+pub const RENDER_VERSION: i32 = 5;
 
 #[derive(Debug, Clone, Default)]
 pub struct RenderedAttachment {

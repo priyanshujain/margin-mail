@@ -125,3 +125,17 @@ hr {
   border: 0;
   background: var(--m-line);
 }
+
+body[data-paper] {
+  max-width: none;
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+}
+
+body[data-paper] p {
+  margin: 1em 0;
+}
+
+body[data-paper] table {
+  border-collapse: separate;
+}

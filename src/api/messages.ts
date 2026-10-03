@@ -5,8 +5,11 @@ import { call, type MessageView } from "../ipc";
  * a referrer, and inlines the results as `data:` URIs, so the webview never makes a request of its
  * own and the sender learns nothing but that somebody asked once.
  */
-export const messageShowImages = (messageId: string) =>
-  call<MessageView>("message_show_images", { messageId });
+export const messageShowImages = (accountId: string, messageId: string) =>
+  call<MessageView>("message_show_images", { accountId, messageId });
+
+export const messageImagesSet = (accountId: string, messageId: string, allowed: boolean) =>
+  call<MessageView>("message_images_set", { accountId, messageId, allowed });
 
 /** The bytes of an attachment as a `data:` URI, for the inline preview. Fetched on demand. */
 export const attachmentDataUrl = (attachmentId: string) =>

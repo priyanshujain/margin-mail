@@ -392,28 +392,22 @@ fn free_path(dir: &Path, filename: &str) -> PathBuf {
 // Commands
 // ---------------------------------------------------------------------------------------------
 
-/// The reader has asked to see the pictures.
-///
-/// The answer is a view and not a stored row on purpose: the `bodies` table has no column saying
-/// whether images were loaded, so this is per view rather than remembered, and closing the thread
-/// puts the block back. Inventing a column for it would also be inventing a policy, and the policy
-/// that roams with a person is the per sender allowance on the contact card, not a flag on a body.
 #[tauri::command]
 pub async fn message_show_images(
     app: tauri::AppHandle,
+    account_id: String,
     message_id: String,
 ) -> Result<MessageView, String> {
     let db = db_of(&app)?;
-    let account_id = account_holding(
-        db.inner(),
-        "SELECT COUNT(*) FROM messages WHERE id = ?1",
-        &message_id,
-    )?;
-
     let (raw, options) = db.with(&account_id, |conn| {
+        let options = sync::hydrate::render_options(conn)?;
+        let view = read::message_view(conn, &account_id, &message_id, &options.own_addresses)?;
+        if !view.images_allowed {
+            return Err("images are hidden for this email".into());
+        }
         let raw = read::raw_body(conn, &message_id)?
             .ok_or("that message has not been fetched yet")?;
-        Ok((raw, sync::hydrate::render_options(conn)?))
+        Ok((raw, options))
     })?;
 
     let urls = wanted(&raw, &options)?;
@@ -422,12 +416,38 @@ pub async fn message_show_images(
     let mut view = db.with(&account_id, |conn| {
         read::message_view(conn, &account_id, &message_id, &options.own_addresses)
     })?;
+    if !view.images_allowed {
+        return Ok(view);
+    }
     view.html = rendered.html;
     view.quoted_html = rendered.quoted_html;
     view.trackers = rendered.trackers;
     view.blocked_images = rendered.blocked_images;
     view.images_loaded = true;
     Ok(view)
+}
+
+#[tauri::command]
+pub fn message_images_set(
+    app: tauri::AppHandle,
+    account_id: String,
+    message_id: String,
+    allowed: bool,
+) -> Result<MessageView, String> {
+    let db = db_of(&app)?;
+    db.with(&account_id, |conn| {
+        let options = sync::hydrate::render_options(conn)?;
+        let mut view = read::message_view(conn, &account_id, &message_id, &options.own_addresses)?;
+        if view.images_allowed != allowed {
+            crate::state::write::set_pref(
+                conn,
+                &read::message_images_key(&view.message_id, &view.id),
+                if allowed { "true" } else { "false" },
+            )?;
+        }
+        view.images_allowed = allowed;
+        Ok(view)
+    })
 }
 
 /// The inline preview. Refuses anything too big to be a data URI before it fetches a byte, so the

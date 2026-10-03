@@ -10,12 +10,12 @@ import {
 } from "react";
 import { listen } from "@tauri-apps/api/event";
 import type { Editor as TiptapEditor } from "@tiptap/react";
-import { Avatar, Button, Icon, icons, Key, NO_AUTOFILL, Popover } from "../ui";
+import { Avatar, Button, Icon, icons, Key, NO_AUTOFILL, Popover, Sheet } from "../ui";
 import { useEscapeLayer } from "../escape";
 import { registerCommands } from "../keys/commands";
 import { useKeyContext } from "../keys/keymap";
 import { contactsSuggest } from "../api/contacts";
-import { isTauri, type DraftAttachment, type Person } from "../ipc";
+import { isTauri, type Draft, type DraftAttachment, type Person } from "../ipc";
 import { useAccounts } from "../store/useAccounts";
 import { useCompose, type Composer, type ComposerAt } from "../store/useCompose";
 import { useMail } from "../store/useMail";
@@ -179,11 +179,14 @@ export function Compose() {
   const compose = useCompose((s) => s.compose);
   const closeCard = useCompose((s) => s.closeCard);
   const toggleExpanded = useCompose((s) => s.toggleExpanded);
+  const [closing, setClosing] = useState(false);
+  const requestClose = () => card && !card.pristine ? setClosing(true) : closeCard();
 
   // `c` and the Write button, for as long as this is mounted, which is the whole life of the app:
   // this is mounted once at the top of the tree, so writing a message is something you can do from
   // the Feed and the Screener and not only from a list.
   useEffect(() => registerCommands({ compose }), [compose]);
+  useEffect(() => { void useCompose.getState().loadDrafts(); }, []);
 
   // The signature, the undo delay, the reply-all default and the instant intro line are all
   // settings, and settings are only read when the settings screen asks for them. Writing is the
@@ -199,17 +202,20 @@ export function Compose() {
     return registerCommands({ undo: () => void useCompose.getState().undoSend() });
   }, [holding]);
 
-  useEscapeLayer(card !== null, closeCard);
+  useEscapeLayer(card !== null && !closing, requestClose);
 
   if (!card) return null;
 
   return (
+    <>
+    <CloseDraft at="card" open={closing} onClose={() => setClosing(false)} />
     <ComposeCard
       composer={card}
       expanded={expanded}
-      onClose={closeCard}
+      onClose={requestClose}
       onExpand={toggleExpanded}
     />
+    </>
   );
 }
 
@@ -232,14 +238,14 @@ function ComposeCard({ composer, expanded, onClose, onExpand }: ComposeCardProps
       className="compose"
       data-expanded={expanded ? "" : undefined}
       role="dialog"
-      aria-label={CARD_TITLE}
+      aria-label={draft.id ? "Draft" : CARD_TITLE}
       ref={frame.ref}
       onDragOver={allowDrop}
       onDrop={(e) => dropped(e, "card")}
       onPaste={(e) => pasted(e, "card")}
     >
       <div className="compose-head">
-        <h2>{CARD_TITLE}</h2>
+        <h2>{draft.id ? "Draft" : CARD_TITLE}</h2>
         <Button
           variant="ghost"
           iconOnly
@@ -695,6 +701,7 @@ export function ComposeFoot({ at, composer, onSend, extra }: ComposeFootProps) {
         label="Attach a file"
         onClick={() => pickFiles(at)}
       />
+      <Button variant="ghost" icon={icons.TRASH} onClick={() => void useCompose.getState().discard(at)}>Discard draft</Button>
       <span className="compose-delay">{`Undo send: ${delay} s`}</span>
     </div>
   );
@@ -717,6 +724,7 @@ export function ReplyBox({ to, composer }: ReplyBoxProps) {
   const setAll = useCompose((s) => s.setAll);
   const setShowCc = useCompose((s) => s.setShowCc);
   const closeReply = useCompose((s) => s.closeReply);
+  const [closing, setClosing] = useState(false);
   const editor = useRef<TiptapEditor | null>(null);
   const draft = composer.draft;
 
@@ -737,6 +745,7 @@ export function ReplyBox({ to, composer }: ReplyBoxProps) {
       onDrop={(e) => dropped(e, "reply")}
       onPaste={(e) => pasted(e, "reply")}
     >
+      <CloseDraft at="reply" open={closing} onClose={() => setClosing(false)} />
       <div className="reply-head">
         <span className="reply-who">
           {forwarding ? "Forward" : "Reply to "}
@@ -758,7 +767,7 @@ export function ReplyBox({ to, composer }: ReplyBoxProps) {
           className="reply-close"
           title="Close, keeping the draft"
           aria-label="Close, keeping the draft"
-          onClick={closeReply}
+          onClick={() => composer.pristine ? closeReply() : setClosing(true)}
         >
           <Icon d={icons.CLOSE} size={12} />
         </button>
@@ -839,3 +848,29 @@ export function SendingLine({ threadKey }: { threadKey: string }) {
 }
 
 export default Compose;
+
+function CloseDraft({ at, open, onClose }: { at: ComposerAt; open: boolean; onClose: () => void }) {
+  const [busy, setBusy] = useState(false);
+  const save = async () => {
+    setBusy(true);
+    const compose = useCompose.getState();
+    if (at === "card") await compose.closeCard(); else await compose.closeReply();
+    const current = at === "card" ? useCompose.getState().card : useCompose.getState().reply;
+    setBusy(false);
+    if (current?.phase === "error") return;
+    onClose();
+  };
+  return <Sheet open={open} size="mini" title="Keep your draft?" busy={busy} onClose={onClose} foot={<>
+    <Button disabled={busy} onClick={onClose}>Keep editing</Button>
+    <Button variant="danger" disabled={busy} onClick={() => { onClose(); void useCompose.getState().discard(at); }}>Discard</Button>
+    <Button variant="primary" disabled={busy} onClick={() => void save()}>{busy ? "Saving…" : "Save draft and close"}</Button>
+  </>}><p>Save what you wrote before closing, or discard this draft.</p></Sheet>;
+}
+
+export function DraftCard({ draft }: { draft: Draft }) {
+  return <div className="draft-card">
+    <span><b>Draft</b> · {draft.subject || "(no subject)"} · {draft.to.map(displayName).join(", ")}</span>
+    <Button size="sm" onClick={() => useCompose.getState().resumeDraft(draft)}>Resume draft</Button>
+    <Button size="sm" variant="ghost" onClick={() => { if (draft.id) void useCompose.getState().deleteDraft(draft.id); }}>Discard draft</Button>
+  </div>;
+}

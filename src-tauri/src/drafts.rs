@@ -20,10 +20,11 @@
 // the queue is the `drafts` table, which already has the two columns it needs.
 
 use std::collections::HashSet;
-use std::sync::{Mutex, OnceLock};
+use std::sync::OnceLock;
 
 use rusqlite::{Connection, OptionalExtension};
 use serde::{Deserialize, Serialize};
+use tauri::Manager;
 
 use crate::decisions::db_of;
 use crate::dto::{Draft, DraftAttachment, DraftSaved, Person};
@@ -341,7 +342,10 @@ pub async fn upload<S: Store, P: sync::Remote + ?Sized>(
     for (id, provider_draft_id, held) in store.with(|conn| due(conn, now))? {
         let subject = held.draft.subject.clone();
         let from = crate::send::sender(&held.draft, from);
-        let raw = store.with(|conn| built(conn, &held.draft, &from, None, None, &[], &subject))?;
+        let raw = store.with(|conn| {
+            let threading = crate::send::threading(conn, &held.draft)?;
+            built(conn, &held.draft, &from, None, threading.in_reply_to.as_deref(), &threading.references, &subject)
+        })?;
         let thread_hint = store.with(|conn| thread_hint(conn, held.draft.thread_key.as_deref()))?;
 
         let put = provider
@@ -370,9 +374,9 @@ pub fn thread_hint(conn: &Connection, thread_key: Option<&str>) -> Result<Option
 }
 
 /// One account at a time, so two saves in the same second cannot both upload the same draft.
-fn uploading() -> &'static Mutex<HashSet<String>> {
-    static UPLOADING: OnceLock<Mutex<HashSet<String>>> = OnceLock::new();
-    UPLOADING.get_or_init(|| Mutex::new(HashSet::new()))
+fn uploading() -> &'static tokio::sync::Mutex<()> {
+    static UPLOADING: OnceLock<tokio::sync::Mutex<()>> = OnceLock::new();
+    UPLOADING.get_or_init(|| tokio::sync::Mutex::new(()))
 }
 
 /// Puts every draft of one account that is due in front of the provider.
@@ -381,18 +385,8 @@ fn uploading() -> &'static Mutex<HashSet<String>> {
 /// before the app was quit is uploaded when the app comes back, rather than waiting for somebody to
 /// open the composer again.
 pub async fn upload_pending(app: &tauri::AppHandle, account_id: &str) -> Result<u32, String> {
-    if !uploading()
-        .lock()
-        .map(|mut held| held.insert(account_id.to_string()))
-        .unwrap_or(false)
-    {
-        return Ok(0);
-    }
-    let done = upload_now(app, account_id).await;
-    if let Ok(mut held) = uploading().lock() {
-        held.remove(account_id);
-    }
-    done
+    let _guard = uploading().lock().await;
+    upload_now(app, account_id).await
 }
 
 async fn upload_now(app: &tauri::AppHandle, account_id: &str) -> Result<u32, String> {
@@ -427,7 +421,143 @@ pub fn draft_save(app: tauri::AppHandle, draft: Draft) -> Result<DraftSaved, Str
         tokio::time::sleep(std::time::Duration::from_millis(UPLOAD_EVERY_MS as u64)).await;
         let _ = upload_pending(&handle, &account_id).await;
     });
+    crate::emit_store_changed(&app, "drafts");
     Ok(saved)
+}
+
+#[tauri::command(async)]
+pub fn draft_list(app: tauri::AppHandle, account_id: Option<String>) -> Result<Vec<Draft>, String> {
+    let db = db_of(&app)?;
+    let mut drafts = Vec::new();
+    for (account_id, _) in sync::accounts(db.inner(), account_id.as_deref()) {
+        drafts.extend(db.with(&account_id, |conn| {
+            let mut stmt = conn
+                .prepare("SELECT payload FROM drafts ORDER BY updated_at DESC")
+                .map_err(|e| e.to_string())?;
+            let rows = stmt
+                .query_map([], |row| row.get::<_, String>(0))
+                .map_err(|e| e.to_string())?;
+            rows.map(|row| {
+                let payload = row.map_err(|e| e.to_string())?;
+                serde_json::from_str::<Stored>(&payload)
+                    .map(|held| held.draft)
+                    .map_err(|e| e.to_string())
+            })
+            .collect::<Result<Vec<_>, String>>()
+        })?);
+    }
+    Ok(drafts)
+}
+
+#[tauri::command]
+pub async fn draft_import(
+    app: tauri::AppHandle,
+    account_id: String,
+    message_id: String,
+) -> Result<Draft, String> {
+    let db = db_of(&app)?;
+    let auth = app
+        .try_state::<crate::google::AuthState>()
+        .ok_or("no Google session store")?;
+    let token = crate::google::auth::valid_access_token(&app, auth.inner(), &account_id).await?;
+    let mut page = None;
+    let provider_id = loop {
+        let found = crate::google::api::with_retry(|| {
+            crate::google::api::drafts_list(&token, page.as_deref())
+        })
+        .await
+        .map_err(|e| e.to_string())?;
+        if let Some(draft) = found
+            .drafts
+            .into_iter()
+            .find(|draft| draft.message.as_ref().is_some_and(|m| m.id == message_id))
+        {
+            break draft.id;
+        }
+        page = found.next_page_token;
+        if page.is_none() {
+            return Err(
+                "that Gmail draft is no longer available; sync the mailbox again".to_string(),
+            );
+        }
+    };
+    db.with(&account_id, |conn| {
+        let existing: Option<String> = conn
+            .query_row(
+                "SELECT id FROM drafts WHERE provider_draft_id = ?1",
+                [&provider_id],
+                |row| row.get(0),
+            )
+            .optional()
+            .map_err(|e| e.to_string())?;
+        let existing = existing.map(|id| stored(conn, &id)).transpose()?.flatten();
+        if let Some((held, _, _)) = &existing {
+            if held.version > held.uploaded_version {
+                return Ok(held.draft.clone());
+            }
+        }
+        let raw = read::raw_body(conn, &message_id)?.ok_or("the draft body is still loading")?;
+        let rendered = crate::mime::render(&raw, &crate::sync::hydrate::render_options(conn)?)?;
+        let key: String = conn
+            .query_row(
+                "SELECT thread_key FROM messages WHERE id = ?1 AND draft = 1",
+                [&message_id],
+                |row| row.get(0),
+            )
+            .map_err(|e| e.to_string())?;
+        let id = existing
+            .as_ref()
+            .and_then(|(held, _, _)| held.draft.id.clone())
+            .unwrap_or_else(|| write::fresh_id("draft"));
+        let files = db.account_dir(&account_id).join("draft-files").join(&id);
+        let mut attachments = Vec::new();
+        for (index, file) in read::attachments(conn, &message_id)?
+            .into_iter()
+            .enumerate()
+        {
+            let mut attachment = DraftAttachment {
+                path: None,
+                attachment_id: Some(file.id),
+                filename: file.filename,
+                mime_type: file.mime_type,
+                size: file.size,
+            };
+            let bytes = attachment_bytes(conn, &attachment)?;
+            std::fs::create_dir_all(&files).map_err(|e| e.to_string())?;
+            let path = files.join(index.to_string());
+            std::fs::write(&path, bytes).map_err(|e| e.to_string())?;
+            attachment.path = Some(path.to_string_lossy().into_owned());
+            attachment.attachment_id = None;
+            attachments.push(attachment);
+        }
+        let draft = Draft {
+            id: Some(id),
+            account_id: account_id.clone(),
+            thread_key: Some(key),
+            in_reply_to: rendered.in_reply_to,
+            from_alias: Some(rendered.from.address),
+            to: rendered.to,
+            cc: rendered.cc,
+            bcc: rendered.bcc,
+            subject: rendered.subject,
+            body_html: format!(
+                "{}{}",
+                rendered.html,
+                rendered.quoted_html.unwrap_or_default()
+            ),
+            attachments,
+            remind_at_ms: None,
+        };
+        let saved = save(conn, &draft)?;
+        uploaded(
+            conn,
+            &saved.id,
+            &provider_id,
+            existing.map(|(held, _, _)| held.version).unwrap_or(0) + 1,
+            write::now_ms(),
+        )?;
+        get(conn, &saved.id)
+    })
 }
 
 #[tauri::command(async)]
@@ -443,23 +573,56 @@ pub fn draft_get(app: tauri::AppHandle, id: String) -> Result<Draft, String> {
 
 #[tauri::command]
 pub async fn draft_delete(app: tauri::AppHandle, id: String) -> Result<(), String> {
+    let _guard = uploading().lock().await;
     let db = db_of(&app)?;
     for (account_id, _) in sync::accounts(db.inner(), None) {
-        let held = db.with(&account_id, |conn| stored(conn, &id))?;
-        if held.is_none() {
+        let Some((_, provider_id, _)) = db.with(&account_id, |conn| stored(conn, &id))? else {
             continue;
-        }
-        let provider_draft_id = db.with(&account_id, |conn| delete(conn, &id))?;
-        if let Some(provider_draft_id) = provider_draft_id {
-            // The local row has gone either way. A provider that will not take the delete leaves a
-            // draft in the mailbox's own Drafts, which is visible and fixable, and refusing the
-            // command over it would leave the one on this machine that the person asked to be rid
-            // of.
-            if let Some(provider) = sync::remote_for(&account_id) {
-                let _ = provider.draft_delete(&provider_draft_id).await;
+        };
+        let mut message_id = None;
+        if let Some(provider_id) = provider_id {
+            if crate::accounts::list(&app)?
+                .iter()
+                .any(|a| a.id == account_id && a.kind == crate::dto::AccountKind::Google)
+            {
+                let auth = app
+                    .try_state::<crate::google::AuthState>()
+                    .ok_or("no Google session store")?;
+                let token =
+                    crate::google::auth::valid_access_token(&app, auth.inner(), &account_id)
+                        .await?;
+                let mut page = None;
+                loop {
+                    let found = crate::google::api::with_retry(|| {
+                        crate::google::api::drafts_list(&token, page.as_deref())
+                    })
+                    .await
+                    .map_err(|e| e.to_string())?;
+                    if let Some(draft) = found.drafts.into_iter().find(|d| d.id == provider_id) {
+                        message_id = draft.message.map(|m| m.id);
+                        break;
+                    }
+                    page = found.next_page_token;
+                    if page.is_none() {
+                        break;
+                    }
+                }
             }
+            let provider = sync::remote_for(&account_id)
+                .ok_or("connect this account before discarding its remote draft")?;
+            provider
+                .draft_delete(&provider_id)
+                .await
+                .map_err(|e| e.to_string())?;
         }
-        crate::emit_store_changed(&app, "threads");
+        db.with(&account_id, |conn| {
+            delete(conn, &id)?;
+            if let Some(message_id) = message_id {
+                write::delete_message(conn, &message_id)?;
+            }
+            Ok(())
+        })?;
+        crate::emit_store_changed(&app, "drafts threads thread");
         return Ok(());
     }
     Err("that draft is not on this device".to_string())

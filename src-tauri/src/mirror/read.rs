@@ -153,7 +153,7 @@ fn place_clause(
         Place::Sent => "t.trashed = 0 AND EXISTS (SELECT 1 FROM messages m \
                         WHERE m.provider_thread_id = t.provider_thread_id AND m.sent = 1)"
             .to_string(),
-        Place::Drafts => "t.has_draft = 1 AND t.trashed = 0".to_string(),
+        Place::Drafts => "(t.has_draft = 1 OR EXISTS (SELECT 1 FROM drafts d WHERE d.thread_key = t.thread_key)) AND t.trashed = 0".to_string(),
         Place::Starred => "t.starred = 1 AND t.trashed = 0".to_string(),
         Place::Spam => "t.spam = 1".to_string(),
         Place::Trash => "t.trashed = 1".to_string(),
@@ -305,7 +305,7 @@ const COLUMNS: &str = "\
     t.trashed AS trashed,
     t.spam AS spam,
     t.has_attachment AS has_attachment,
-    t.has_draft AS has_draft,
+    (t.has_draft OR EXISTS (SELECT 1 FROM drafts d WHERE d.thread_key = t.thread_key)) AS has_draft,
     pl.pile AS pile,
     COALESCE(sn.return_at, rt.due_ms) AS snoozed_until,
     COALESCE(tf.ignored, 0) AS ignored,
@@ -557,8 +557,8 @@ const VIEW_SQL: &str = "\
         COALESCE(b.blocked_images, 0) AS blocked_images,
         (SELECT json_group_array(json_object(
              'id', a.id, 'messageId', a.message_id, 'filename', a.filename,
-             'mimeType', a.mime_type, 'size', a.size, 'inline', a.inline = 1,
-             'contentId', a.content_id, 'cached', a.cached_path IS NOT NULL))
+             'mimeType', a.mime_type, 'size', a.size, 'inline', json(CASE WHEN a.inline = 1 THEN 'true' ELSE 'false' END),
+             'contentId', a.content_id, 'cached', json(CASE WHEN a.cached_path IS NOT NULL THEN 'true' ELSE 'false' END)))
          FROM attachments a WHERE a.message_id = m.id) AS attachments_json,
         (SELECT name FROM state.renames WHERE thread_key = ?) AS rename,
         (SELECT subject FROM threads WHERE thread_key = ? ORDER BY latest_ms DESC LIMIT 1)
@@ -632,6 +632,7 @@ pub fn thread_view(
                     trackers: serde_json::from_str(&row.get::<_, String>("trackers")?)
                         .unwrap_or_default(),
                     blocked_images: row.get::<_, i64>("blocked_images")? as u32,
+                    images_allowed: false,
                     // The sanitiser fetches nothing, so a body is only ever served with its remote
                     // images already inlined by the caller that asked for them.
                     images_loaded: false,
@@ -677,7 +678,11 @@ pub fn thread_view(
     let mut participants: Vec<Person> = Vec::new();
     let mut labels: Vec<String> = Vec::new();
     let mut messages = Vec::new();
-    for (message, message_labels, _) in rows {
+    for (mut message, message_labels, _) in rows {
+        message.images_allowed =
+            state::read::pref(conn, &message_images_key(&message.message_id, &message.id))?
+                .as_deref()
+            == Some("true");
         for label in serde_json::from_str::<Vec<String>>(&message_labels).unwrap_or_default() {
             if !labels.contains(&label) {
                 labels.push(label);
@@ -1050,6 +1055,15 @@ pub fn thread_key_of(conn: &Connection, provider_thread_id: &str) -> Result<Opti
     )
     .optional()
     .map_err(|e| e.to_string())
+}
+
+pub fn message_images_key(message_id: &str, provider_id: &str) -> String {
+    let id = if message_id.trim().is_empty() {
+        provider_id
+    } else {
+        message_id
+    };
+    format!("message-images:{id}")
 }
 
 /// One message's view, taken out of its thread's rather than assembled a second time. Sharing the

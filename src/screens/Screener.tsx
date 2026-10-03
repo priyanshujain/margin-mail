@@ -1,3 +1,4 @@
+import { MessageContent, MessageImageBanner } from "./MessageContent";
 import { useEffect, useMemo, useState } from "react";
 import { Avatar, Button, Confirm, EmptyState, Pill, Sheet, Toggle } from "../ui";
 import { registerCommands, runCommand } from "../keys/commands";
@@ -12,7 +13,7 @@ import {
   useScreener,
 } from "../store/useScreener";
 import { cap, displayName, isBrand } from "./format";
-import { BodyMissing, BodySkeleton, MessageBody } from "./MessageBody";
+import { BodyMissing, BodySkeleton } from "./MessageBody";
 import "./screener.css";
 
 /**
@@ -140,6 +141,7 @@ export function Screener() {
                 onFocus={() => focus(card.threadKey)}
                 onDecide={(destination) => void decide(card.threadKey, destination, false)}
                 onElsewhere={() => setPicking(card.threadKey)}
+                onExpand={() => toggleExpanded(card.threadKey)}
               />
             ))}
 
@@ -195,15 +197,16 @@ interface CardProps {
   onFocus: () => void;
   onDecide: (destination: Destination) => void;
   onElsewhere: () => void;
+  onExpand: () => void;
 }
 
-function Card({ card, focused, open, deciding, onFocus, onDecide, onElsewhere }: CardProps) {
+function Card({ card, focused, open, deciding, onFocus, onDecide, onElsewhere, onExpand }: CardProps) {
   const view = useScreener((s) => s.views[card.threadKey]);
   const viewPhase = useScreener((s) => s.viewPhase[card.threadKey]);
   const retryView = useScreener((s) => s.retryView);
   const name = displayName(card.sender);
   const suggested = destinationName(card.suggestion);
-  const message = view?.messages.at(-1);
+  const message = view?.messages.filter((m) => !m.draft).at(-1);
 
   return (
     <article
@@ -226,6 +229,7 @@ function Card({ card, focused, open, deciding, onFocus, onDecide, onElsewhere }:
       </div>
 
       <div className="screen-actions">
+        <Button variant="ghost" onClick={onExpand}>{open ? "Collapse email" : "View entire email"}</Button>
         <Button
           variant="primary"
           keycap={cap("screen-yes")}
@@ -247,10 +251,13 @@ function Card({ card, focused, open, deciding, onFocus, onDecide, onElsewhere }:
         </Button>
       </div>
 
+      {open && message ? <MessageImageBanner accountId={card.accountId} message={message} /> : null}
       {open ? (
         <div className="screen-message">
           {message ? (
-            <MessageBody html={message.html} surface={message.surface} />
+            <>
+              <MessageContent accountId={card.accountId} message={message} quoted />
+            </>
           ) : viewPhase === "error" ? (
             <BodyMissing onRetry={() => retryView(card.threadKey)} />
           ) : (

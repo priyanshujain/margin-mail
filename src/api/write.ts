@@ -36,3 +36,6 @@ export const unsubscribe = (
   alsoTrash: boolean,
   alsoScreenOut: boolean,
 ) => call<Undo>("unsubscribe", { accountId, address, alsoTrash, alsoScreenOut });
+
+export const draftList = (accountId: string | null = null) => call<Draft[]>("draft_list", { accountId });
+export const draftImport = (accountId: string, messageId: string) => call<Draft>("draft_import", { accountId, messageId });

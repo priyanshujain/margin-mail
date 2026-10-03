@@ -123,7 +123,7 @@ pub fn threading(conn: &Connection, draft: &Draft) -> Result<Threading, String> 
             "SELECT m.id, m.message_id, m.provider_thread_id, m.subject
                FROM messages m
                JOIN threads t ON t.provider_thread_id = m.provider_thread_id
-              WHERE t.thread_key = ?1
+              WHERE t.thread_key = ?1 AND m.draft = 0
               ORDER BY m.date_ms ASC, m.id ASC",
         )
         .map_err(|e| e.to_string())?;

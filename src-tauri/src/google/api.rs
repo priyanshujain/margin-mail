@@ -126,6 +126,7 @@ pub enum Call {
     BatchModify,
     MessagesModify,
     MessagesSend,
+    DraftsList,
     DraftsCreate,
     DraftsUpdate,
     DraftsDelete,
@@ -143,7 +144,7 @@ impl Call {
             Call::MessagesGet | Call::AttachmentsGet => 20,
             Call::DraftsUpdate => 15,
             Call::DraftsCreate | Call::DraftsDelete => 10,
-            Call::MessagesList | Call::MessagesModify => 5,
+            Call::MessagesList | Call::MessagesModify | Call::DraftsList => 5,
             Call::HistoryList => 2,
             Call::LabelsList | Call::SendAsList | Call::GetProfile => 1,
         }
@@ -166,6 +167,7 @@ impl Call {
             Call::BatchModify => "Gmail label change",
             Call::MessagesModify => "Gmail label change",
             Call::MessagesSend => "Gmail send",
+            Call::DraftsList => "Gmail draft list",
             Call::DraftsCreate => "Gmail draft create",
             Call::DraftsUpdate => "Gmail draft update",
             Call::DraftsDelete => "Gmail draft delete",
@@ -1181,6 +1183,30 @@ pub async fn messages_send(
         .send()
         .await?;
     read_json(resp, call.name(), call.scope()).await
+}
+
+#[derive(Debug, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DraftsPage {
+    #[serde(default)]
+    pub drafts: Vec<Draft>,
+    pub next_page_token: Option<String>,
+}
+
+pub async fn drafts_list(
+    access_token: &str,
+    page_token: Option<&str>,
+) -> Result<DraftsPage, ApiError> {
+    let mut params = vec![("maxResults", MAX_LIST_RESULTS)];
+    if let Some(token) = page_token {
+        params.push(("pageToken", token));
+    }
+    let resp = HTTP
+        .get(url_with(&format!("{BASE}/users/me/drafts"), &params))
+        .bearer_auth(access_token)
+        .send()
+        .await?;
+    read_json(resp, Call::DraftsList.name(), Call::DraftsList.scope()).await
 }
 
 pub async fn drafts_create(

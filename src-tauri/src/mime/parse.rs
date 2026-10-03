@@ -43,6 +43,15 @@ pub fn render(raw: &[u8], options: &RenderOptions) -> Result<Rendered, String> {
     let inline_parts = inline_parts(&message);
 
     let (source, is_html, text) = body(&message);
+    let source = if is_html {
+        css_inline::CSSInliner::options()
+            .load_remote_stylesheets(false)
+            .build()
+            .inline(&source)
+            .unwrap_or(source)
+    } else {
+        source
+    };
     let (visible_source, quoted_source) = if is_html {
         quoted::split_html(&source)
     } else {

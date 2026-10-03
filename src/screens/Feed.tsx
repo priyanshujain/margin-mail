@@ -1,3 +1,4 @@
+import { MessageContent, MessageImageBanner } from "./MessageContent";
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Avatar, Banner, Button, EmptyState, icons } from "../ui";
 import { registerCommands, runCommand } from "../keys/commands";
@@ -8,7 +9,7 @@ import { useContacts } from "../store/useContacts";
 import { useFeed } from "../store/useFeed";
 import { useMail } from "../store/useMail";
 import { displayName, isBrand, messageTime } from "./format";
-import { BodyMissing, BodySkeleton, MessageBody } from "./MessageBody";
+import { BodyMissing, BodySkeleton } from "./MessageBody";
 import * as triage from "./triage";
 import "./feed.css";
 
@@ -261,6 +262,7 @@ function Card({ thread, view, focused, onFocus, onToggle, hold }: CardProps) {
       data-selected={focused ? "" : undefined}
       onClick={onFocus}
     >
+      {message ? <MessageImageBanner accountId={thread.accountId} message={message} /> : null}
       <div className="feed-head">
         <Avatar
           name={displayName(thread.from)}
@@ -285,7 +287,7 @@ function Card({ thread, view, focused, onFocus, onToggle, hold }: CardProps) {
           data-open={expanded ? "" : undefined}
           data-paper={message.surface === "paper" ? "" : undefined}
         >
-          <MessageBody html={message.html} surface={message.surface} />
+          <MessageContent accountId={thread.accountId} message={message} />
           {clipped && !expanded ? <div className="feed-fade" /> : null}
         </div>
       ) : (

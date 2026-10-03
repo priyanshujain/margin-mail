@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { undoToken } from "../api/undo";
-import { draftDelete, draftSave, outboxList, send, sendNow } from "../api/write";
+import { draftDelete, draftGet, draftImport, draftList, draftSave, outboxList, send, sendNow } from "../api/write";
 import {
   live,
   type Draft,
@@ -84,6 +84,11 @@ interface Holding {
 }
 
 interface ComposeState {
+  drafts: Draft[];
+  loadDrafts: () => Promise<void>;
+  resumeDraft: (draft: Draft) => void;
+  openDraft: (accountId: string, messageId: string) => Promise<void>;
+  deleteDraft: (id: string) => Promise<boolean>;
   card: Composer | null;
   /** The card, closed but not thrown away. */
   parked: Composer | null;
@@ -101,14 +106,14 @@ interface ComposeState {
 
   /** `c`. The parked draft when there is one, a blank message when there is not. */
   compose: () => void;
-  closeCard: () => void;
+  closeCard: () => Promise<void>;
   toggleExpanded: () => void;
 
   /** `r`, `a` and `f`, from the pane. */
   answer: (thread: ThreadView, message: MessageView, kind: ComposerKind, all: boolean) => void;
   /** `a` again, on a box that is already open. */
   setAll: (all: boolean) => void;
-  closeReply: () => void;
+  closeReply: () => Promise<void>;
 
   edit: (at: ComposerAt, changes: Partial<Draft>) => void;
   setShowCc: (at: ComposerAt, show: boolean) => void;
@@ -218,6 +223,7 @@ const escapeHtml = (text: string): string =>
 // -------------------------------------------------------------------------------------------
 
 const saveTimers: Record<ComposerAt, number> = { card: 0, reply: 0 };
+const saveRequests: Partial<Record<ComposerAt, Promise<void>>> = {};
 
 function scheduleSave(at: ComposerAt): void {
   if (typeof window === "undefined") return;
@@ -285,6 +291,44 @@ async function newestOutgoing(): Promise<string | null> {
 }
 
 export const useCompose = create<ComposeState>((set, get) => ({
+  drafts: [],
+  loadDrafts: async () => {
+    if (!live()) return;
+    try { set({ drafts: await draftList() }); } catch (e) { notify(`Could not load drafts: ${e}`); }
+  },
+  resumeDraft: (draft) => {
+    const current = get().card;
+    if (current?.draft.id === draft.id) return;
+    if (current) {
+      notify("Close the current composer before opening another draft");
+      return;
+    }
+    if (get().reply?.draft.id === draft.id) return;
+    set({ card: blank("card", "new", "Draft", draft), parked: null, expanded: false });
+    if (get().parkedReply?.draft.id === draft.id) set({ parkedReply: null, parkedReplyKey: null });
+  },
+  openDraft: async (accountId, messageId) => {
+    try {
+      const draft = await draftImport(accountId, messageId);
+      await get().loadDrafts();
+      get().resumeDraft(await draftGet(draft.id!));
+    } catch (e) { notify(`Could not open the draft: ${e}`); }
+  },
+  deleteDraft: async (id) => {
+    await Promise.all(Object.values(saveRequests));
+    try {
+      await draftDelete(id);
+      const state = get();
+      if (state.card?.draft.id === id) set({ card: null, expanded: false });
+      if (state.reply?.draft.id === id) set({ reply: null, replyKey: null });
+      if (state.parked?.draft.id === id) set({ parked: null });
+      if (state.parkedReply?.draft.id === id) set({ parkedReply: null, parkedReplyKey: null });
+      await get().loadDrafts();
+      void useMail.getState().load();
+      void useMail.getState().refreshThread();
+      return true;
+    } catch (e) { notify(`Could not discard that draft: ${e}`); return false; }
+  },
   card: null,
   parked: null,
   expanded: false,
@@ -321,17 +365,24 @@ export const useCompose = create<ComposeState>((set, get) => ({
     });
   },
 
-  closeCard: () => {
+  closeCard: async () => {
+    await get().save("card");
     const card = get().card;
-    if (!card) return;
+    if (!card || card.phase === "error") return;
     cancelSave("card");
     set({ card: null, parked: card, expanded: false });
-    void get().save("card").catch(() => {});
+
   },
 
   toggleExpanded: () => set((s) => (s.card ? { expanded: !s.expanded } : {})),
 
   answer: (thread, message, kind, all) => {
+    const active = get().reply;
+    if (active) {
+      if (get().replyKey === thread.key && active.kind === kind) { get().setAll(all); return; }
+      notify("Close the current reply before starting another reply or forward");
+      return;
+    }
     if (!useSettings.getState().settings) void useSettings.getState().load();
 
     // A box that was closed rather than sent comes back with what was in it, the same way the card
@@ -414,12 +465,13 @@ export const useCompose = create<ComposeState>((set, get) => ({
       };
     }),
 
-  closeReply: () => {
+  closeReply: async () => {
+    await get().save("reply");
     const reply = get().reply;
-    if (!reply) return;
+    if (!reply || reply.phase === "error") return;
     cancelSave("reply");
     set({ reply: null, replyKey: null, parkedReply: reply, parkedReplyKey: get().replyKey });
-    void get().save("reply").catch(() => {});
+
   },
 
   edit: (at, changes) => {
@@ -505,58 +557,52 @@ export const useCompose = create<ComposeState>((set, get) => ({
   remind: (at, atMs) => get().edit(at, { remindAtMs: atMs }),
 
   save: async (at) => {
-    const start = held(get(), at);
-    if (!start || !live()) return;
-    cancelSave(at);
-    const draft = start.composer.draft;
-    // Nothing has been written yet, so there is nothing to keep. A draft saved on open is a draft
-    // that shows up in the list the moment you press `c` and stays there when you change your mind.
-    if (!draft.id && start.composer.pristine) return;
-    set(start.write({ ...start.composer, phase: "saving" }));
-    try {
-      const saved = await draftSave(draft);
-      const after = held(get(), at);
-      if (!after) return;
-      // Something may have been typed while the save was in the air, and what came back is about
-      // the draft that went out. Only the id belongs to both.
-      const same = after.composer.draft === draft;
-      set(
-        after.write({
-          ...after.composer,
-          phase: "idle",
-          draft: { ...after.composer.draft, id: saved.id },
-          ...(same ? { encodedSize: saved.encodedSize, overLimit: saved.overLimit } : {}),
-        }),
-      );
-    } catch (e) {
-      const after = held(get(), at);
-      if (after) set(after.write({ ...after.composer, phase: "error" }));
-      notify(`Could not save the draft: ${e}`);
-    }
+    const work = async () => {
+      const start = held(get(), at);
+      if (!start || !live()) return;
+      cancelSave(at);
+      const draft = start.composer.draft;
+      if (start.composer.pristine) return;
+      set(start.write({ ...start.composer, phase: "saving" }));
+      try {
+        const saved = await draftSave(draft);
+        void get().loadDrafts();
+        const after = held(get(), at);
+        if (!after || after.composer.draft.id !== draft.id || after.composer.draft.accountId !== draft.accountId || after.composer.draft.threadKey !== draft.threadKey) return;
+        const same = after.composer.draft === draft;
+        set(
+          after.write({
+            ...after.composer,
+            phase: "idle",
+            draft: { ...after.composer.draft, id: saved.id },
+            ...(same ? { encodedSize: saved.encodedSize, overLimit: saved.overLimit } : {}),
+          }),
+        );
+      } catch (e) {
+        const after = held(get(), at);
+        if (after) set(after.write({ ...after.composer, phase: "error" }));
+        notify(`Could not save the draft: ${e}`);
+      }
+    };
+    const pending = (saveRequests[at] ?? Promise.resolve()).then(work);
+    saveRequests[at] = pending;
+    await pending;
+    if (saveRequests[at] === pending) delete saveRequests[at];
   },
 
   discard: async (at) => {
+    cancelSave(at);
+    await saveRequests[at];
     const composer = composerAt(get(), at);
     if (!composer) return;
-    cancelSave(at);
+    if (composer.draft.id) { await get().deleteDraft(composer.draft.id); return; }
     if (at === "card") set({ card: null, parked: null, expanded: false });
     else set({ reply: null, replyKey: null, parkedReply: null, parkedReplyKey: null });
-    const id = composer.draft.id;
-    if (!id) return;
-    // Rust asks the provider to forget the draft too before it answers, and the list's marker
-    // should not wait on Gmail for something that has already gone from this machine.
-    const threadKey = composer.draft.threadKey ?? null;
-    if (threadKey) useMail.getState().patch([threadKey], { hasDraft: false });
-    try {
-      await draftDelete(id);
-      void useMail.getState().load();
-    } catch (e) {
-      if (threadKey) useMail.getState().patch([threadKey], { hasDraft: true });
-      notify(`Could not discard that draft: ${e}`);
-    }
   },
 
   post: async (at, now) => {
+    cancelSave(at);
+    await saveRequests[at];
     const composer = composerAt(get(), at);
     if (!composer) return;
     if (composer.draft.to.length === 0) {
@@ -585,6 +631,7 @@ export const useCompose = create<ComposeState>((set, get) => ({
     let undo: Undo;
     try {
       undo = await send(draft);
+      void get().loadDrafts();
     } catch (e) {
       if (threadKey) useMail.getState().patch([threadKey], { sending: false, hasDraft: true });
       // Back on screen, not parked: after "That did not go through" the message should be right

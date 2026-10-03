@@ -289,7 +289,7 @@ fn rewrite(tag: &Tag, drop_background: bool, drop_foreground: bool) -> String {
             "style" => {
                 let style = declarations(value)
                     .filter(|(property, _)| match *property {
-                        "background-color" => !drop_background,
+                        "background-color" | "background" => !drop_background,
                         "color" => !drop_foreground,
                         _ => true,
                     })
@@ -323,6 +323,11 @@ fn rewrite(tag: &Tag, drop_background: bool, drop_foreground: bool) -> String {
 
 fn background_of(tag: &Tag) -> Option<Rgba> {
     declaration(tag, "background-color")
+        .or_else(|| {
+            declarations(tag.attr("style")?)
+                .rfind(|(name, _)| *name == "background")
+                .and_then(|(_, value)| parse_colour(value).or_else(|| shorthand_colour(value)))
+        })
         .or_else(|| tag.attr("bgcolor").and_then(parse_colour))
 }
 
@@ -441,7 +446,10 @@ const NAMED: &[(&str, u32)] = &[
 ];
 
 fn parse_colour(value: &str) -> Option<Rgba> {
-    let value = value.trim();
+    let value = value.rsplit_once('!')
+        .filter(|(_, priority)| priority.trim().eq_ignore_ascii_case("important"))
+        .map_or(value, |(colour, _)| colour)
+        .trim();
     if value.is_empty() {
         return None;
     }

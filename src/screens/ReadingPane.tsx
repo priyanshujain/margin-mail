@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Avatar, AvatarStack, Banner, Button, EmptyState, Field, icons, Pill, Sheet } from "../ui";
+import { Avatar, AvatarStack, Banner, Button, Confirm, EmptyState, Field, icons, Pill, Sheet } from "../ui";
 import { registerCommands, runCommand } from "../keys/commands";
-import { attachmentOpen, messageShowImages } from "../api/messages";
+import { attachmentOpen } from "../api/messages";
+import { draftImport } from "../api/write";
 import { noteAdd } from "../api/notes";
 import { threadMerge, threadRename, threadUnmerge } from "../api/threads";
 import { undoToken } from "../api/undo";
@@ -12,14 +13,14 @@ import { useCompose, type ComposerKind } from "../store/useCompose";
 import { useMail } from "../store/useMail";
 import { usePiles } from "../store/usePiles";
 import { useSelection } from "../store/useSelection";
-import { useSettings } from "../store/useSettings";
 import { useSnooze } from "../store/useSnooze";
 import { useTheme } from "../store/useTheme";
 import { notify } from "../store/useToast";
 import { LabelPicker, type PickerMode } from "./ActionBar";
-import { ReplyBox, SendingLine } from "./Compose";
+import { DraftCard, ReplyBox, SendingLine } from "./Compose";
 import { InviteCard } from "./InviteCard";
-import { BodyMissing, BodySkeleton, MessageBody } from "./MessageBody";
+import { BodyMissing, BodySkeleton } from "./MessageBody";
+import { MessageContent, MessageImageBanner } from "./MessageContent";
 import { MoreMenu } from "./MoreMenu";
 import { SnoozePicker, snoozeAnchor } from "./SnoozePicker";
 import * as triage from "./triage";
@@ -135,17 +136,9 @@ interface VerbSpec {
   icon: string;
 }
 
-/**
- * The bar of verbs, in the order the hand reaches for them: the four that move a thread on the
- * left, and Archive on the right where it cannot be hit by accident.
- *
- * Every one of them goes through the command registry rather than calling anything directly, which
- * is what keeps the button and the key one code path. Reply all and Forward are not in the bar and
- * are not missing: `a` and `f` open the same box this button does with different recipients in it,
- * and three buttons for one verb is a bar you have to read.
- */
 const LEAD: VerbSpec[] = [
   { command: "reply", label: "Reply", icon: icons.REPLY },
+  { command: "reply-all", label: "Reply all", icon: icons.REPLY },
   { command: "reply-later", label: "Reply later", icon: icons.CLOCK },
   { command: "set-aside", label: "Set aside", icon: icons.SET_ASIDE },
   { command: "snooze", label: "Snooze", icon: icons.SNOOZE },
@@ -158,6 +151,8 @@ function PaneBar({ notify }: { notify: boolean }) {
   const place = useMail((s) => s.place);
   const lead = place === "paper-trail" ? TRAIL_LEAD : LEAD;
   const [more, setMore] = useState(false);
+  const [trashing, setTrashing] = useState(false);
+  const openKey = useMail((s) => s.openKey);
   const moreButton = useRef<HTMLButtonElement | null>(null);
 
   // `.` and the button are one verb, so the key is registered by the bar that draws the button and
@@ -169,6 +164,10 @@ function PaneBar({ notify }: { notify: boolean }) {
       {lead.map((verb) => (
         <Verb key={verb.command} {...verb} />
       ))}
+      <Button variant="ghost" icon={icons.TRASH} onClick={() => setTrashing(true)}>Trash</Button>
+      <Sheet open={trashing} size="mini" title="Move to trash" onClose={() => setTrashing(false)}>
+        <Confirm title="Trash this email?" body={<p>This conversation will move to Trash.</p>} confirmLabel="Trash" onCancel={() => setTrashing(false)} onConfirm={() => { setTrashing(false); if (openKey) triage.trash([openKey]); }} />
+      </Sheet>
       <span className="pane-gap" />
       {place === "paper-trail" ? (
         <Verb command="move" label="Move to Inbox" icon={icons.INBOX} />
@@ -266,15 +265,6 @@ export function ReadingPane() {
   const [expanded, setExpanded] = useState<string[]>([]);
   const [quoted, setQuoted] = useState<string[]>([]);
   const [focus, setFocus] = useState<number | null>(null);
-  /** Messages re-rendered with their images fetched, which replaces the one the thread came with. */
-  const [shown, setShown] = useState<Record<string, MessageView>>({});
-  /**
-   * Where the request for the pictures is. Rust fetches them and that is a network round trip per
-   * host, so the button has to say it is working: pressed and unchanged for three seconds is the
-   * one thing this pane must never look like.
-   */
-  const [images, setImages] = useState<"idle" | "fetching">("idle");
-  const imagesRequest = useRef(0);
   /** Same for the merge banner's verb, which is three round trips with nothing else on screen. */
   const [unmerging, setUnmerging] = useState<"idle" | "working">("idle");
   const [picker, setPicker] = useState<PickerMode | null>(null);
@@ -285,12 +275,13 @@ export function ReadingPane() {
   const openKey = useMail((s) => s.openKey);
   const reply = useCompose((s) => s.reply);
   const replyKey = useCompose((s) => s.replyKey);
+  const drafts = useCompose((s) => s.drafts);
 
   const isMe = useIsMe();
 
   const messages = useMemo(
-    () => (thread?.messages ?? []).map((m) => shown[m.id] ?? m),
-    [thread, shown],
+    () => thread?.messages ?? [],
+    [thread],
   );
 
   // A thread opens on its latest message with everything before it collapsed to a line, which is
@@ -300,9 +291,6 @@ export function ReadingPane() {
     setExpanded(last ? [last.id] : []);
     setQuoted([]);
     setFocus(null);
-    setShown({});
-    setImages("idle");
-    imagesRequest.current += 1;
     setUnmerging("idle");
     // The failed slots were the last thread's, and nothing in `open` knows about them.
     useMail.getState().clearBodyPhase();
@@ -331,16 +319,16 @@ export function ReadingPane() {
     if (!thread) return;
     const answer = (kind: ComposerKind, all: boolean) => {
       const view = useMail.getState().thread;
-      const last = view?.messages.at(-1);
+      const last = view?.messages.filter((m) => !m.draft).at(-1);
       if (!view || !last) return;
       useCompose.getState().answer(view, last, kind, all);
     };
     return registerCommands({
-      reply: () => answer("reply", useSettings.getState().settings?.replyAllDefault ?? false),
+      reply: () => answer("reply", false),
       "reply-all": () => {
         const compose = useCompose.getState();
         const open = compose.replyKey === thread.key ? compose.reply : null;
-        if (open && open.kind !== "forward") compose.setAll(!open.all);
+        if (open && open.kind !== "forward") compose.setAll(true);
         else answer("reply", true);
       },
       forward: () => answer("forward", false),
@@ -419,32 +407,6 @@ export function ReadingPane() {
       </section>
     );
   }
-
-  const trackers = messages.flatMap((m) => m.trackers);
-  const blocked = messages.filter((m) => m.blockedImages > 0);
-  // Asked for and still not there: a host that would not answer. The banner says so rather than
-  // offering the same button again as if nothing had happened.
-  const missing = blocked.reduce((n, m) => (m.imagesLoaded ? n + m.blockedImages : n), 0);
-  const vendors = [...new Set(trackers.map((t) => t.vendor))];
-
-  const showImages = async () => {
-    if (images === "fetching") return;
-    const mine = ++imagesRequest.current;
-    setImages("fetching");
-    const results = await Promise.allSettled(blocked.map((m) => messageShowImages(m.id)));
-    const next: Record<string, MessageView> = {};
-    let failure: unknown = null;
-    results.forEach((result, index) => {
-      if (result.status === "fulfilled") next[blocked[index].id] = result.value;
-      else failure ??= result.reason;
-    });
-    setShown((was) => ({ ...was, ...next }));
-    // Another thread has been opened since, and its banner is not this request's to settle.
-    if (imagesRequest.current !== mine) return;
-    setImages("idle");
-    // A press that came to nothing has to say so, or the button is the one that looked stuck.
-    if (failure !== null) notify(`Could not load the images: ${String(failure)}`);
-  };
 
   const unmerge = async () => {
     if (unmerging === "working") return;
@@ -544,42 +506,6 @@ export function ReadingPane() {
             </div>
           ) : null}
 
-          {trackers.length > 0 || blocked.length > 0 ? (
-            <div className="thread-banner">
-              <Banner
-                icon={icons.SHIELD}
-                action={
-                  blocked.length > 0
-                    ? {
-                        label: missing > 0 ? "Try again" : "Show images",
-                        busy: images === "fetching",
-                        busyLabel: "Loading images…",
-                        onClick: () => void showImages(),
-                      }
-                    : undefined
-                }
-              >
-                {/* The count is only spoken when there is one. A message with no trackers and a
-                    remote image says the thing that is true about it, because a banner reading
-                    "Blocked 0 trackers" is the app taking credit for doing nothing. */}
-                <>
-                  {trackers.length > 0 ? (
-                    <>
-                      {"Blocked "}
-                      <b>{`${trackers.length} tracker${trackers.length === 1 ? "" : "s"}`}</b>
-                      {vendors.length > 0 ? ` from ${vendors.join(", ")}. ` : ". "}
-                    </>
-                  ) : null}
-                  {blocked.length > 0
-                    ? missing > 0
-                      ? `${missing} image${missing === 1 ? "" : "s"} did not load.`
-                      : "Remote images are off for this sender."
-                    : null}
-                </>
-              </Banner>
-            </div>
-          ) : null}
-
           {messages.map((message, index) => (
             <Message
               key={message.id}
@@ -595,6 +521,7 @@ export function ReadingPane() {
                 setFocus(index);
                 toggle(message.id);
               }}
+              onReply={() => useCompose.getState().answer(thread, message, "reply", false)}
               onQuoted={() =>
                 setQuoted((was) =>
                   was.includes(message.id)
@@ -612,6 +539,7 @@ export function ReadingPane() {
               <Note key={note.id} body={note.body} />
             ))}
 
+          {drafts.filter((d) => d.accountId === thread.accountId && d.threadKey === thread.key && !messages.some((m) => m.draft)).map((draft) => <DraftCard key={draft.id} draft={draft} />)}
           <SendingLine threadKey={thread.key} />
 
           {/* The box a reply is written in, under what it answers. `r`, `a` and `f` open it and
@@ -812,6 +740,7 @@ interface MessageProps {
   toYou: boolean;
   onToggle: () => void;
   onQuoted: () => void;
+  onReply: () => void;
   notes: { id: string; body: string }[];
 }
 
@@ -826,6 +755,7 @@ function Message({
   toYou,
   onToggle,
   onQuoted,
+  onReply,
   notes,
 }: MessageProps) {
   const who = me ? "You" : displayName(message.from);
@@ -857,89 +787,98 @@ function Message({
     setOverride(next);
   };
   return (
-    <article
-      className="msg"
-      data-message={message.id}
-      data-collapsed={open ? undefined : ""}
-      data-focus={focused ? "" : undefined}
-    >
-      <div className="msg-head" onClick={open ? undefined : onToggle}>
-        {/* The face is the sender's, whatever the line beside it calls them: a thread of your own
-            replies is a column of your initials, not a column of the word You. */}
-        <Avatar
-          name={displayName(message.from)}
-          address={message.from.address}
-          brand={isBrand(message.from)}
-        />
-        <div className="msg-who">
-          <div className="msg-name">
-            {who}
-            {open && !me ? <span className="addr">{message.from.address}</span> : null}
-          </div>
-          {open ? (
-            <div className="msg-to">{toYou ? "to you" : `to ${message.to.map(displayName).join(", ")}`}</div>
-          ) : (
-            <div className="msg-preview">{previewOf(message.html)}</div>
-          )}
-        </div>
-        <div className="msg-aside">
-          <span className="msg-time">{messageTime(message.dateMs)}</span>
-          {open && theme === "dark" && message.isHtml ? (
-            <SurfaceToggle surface={surface} onFlip={flip} />
-          ) : null}
-        </div>
-      </div>
-
-      {open ? (
-        <div className="msg-body">
-          {message.bodyPending ? (
-            pending === "error" ? (
-              <BodyMissing onRetry={() => void useMail.getState().hydrateThread()} />
+    <>
+      {open && !message.draft && !message.bodyPending ? <MessageImageBanner accountId={accountId} message={message} /> : null}
+      <article
+        className="msg"
+        data-message={message.id}
+        data-collapsed={open ? undefined : ""}
+        data-focus={focused ? "" : undefined}
+      >
+        <div className="msg-head" onClick={open ? undefined : onToggle}>
+          {/* The face is the sender's, whatever the line beside it calls them: a thread of your own
+              replies is a column of your initials, not a column of the word You. */}
+          <Avatar
+            name={displayName(message.from)}
+            address={message.from.address}
+            brand={isBrand(message.from)}
+          />
+          <div className="msg-who">
+            <div className="msg-name">
+              {message.draft ? "Draft" : who}
+              {open && !me ? <span className="addr">{message.from.address}</span> : null}
+            </div>
+            {open ? (
+              <div className="msg-to">{toYou ? "to you" : `to ${message.to.map(displayName).join(", ")}`}</div>
             ) : (
-              <BodySkeleton />
-            )
-          ) : (
-            <MessageBody html={message.html} plain={plain} surface={surface} />
-          )}
-
-          {message.quotedHtml ? (
-            <div className="msg-quoted">
-              <Pill tone="quiet" onClick={onQuoted}>
-                {quoted ? "Hide quoted text" : "··· Show quoted text"}
-              </Pill>
-              {quoted ? <MessageBody html={message.quotedHtml} plain={plain} surface={surface} /> : null}
-            </div>
-          ) : null}
-
-          {message.invite ? (
-            <InviteCard invite={message.invite} messageId={message.id} accountId={accountId} />
-          ) : null}
-
-          {message.attachments.length > 0 ? (
-            <div className="attachments">
-              {message.attachments.map((file) => (
-                <button
-                  type="button"
-                  className="attachment"
-                  key={file.id}
-                  data-phase={files[file.id] ?? "idle"}
-                  disabled={files[file.id] === "opening"}
-                  onClick={() => void openFile(file.id)}
-                >
-                  <span className="ext">{fileKind(file.filename, file.mimeType)}</span>
-                  {file.filename}
-                  <span className="size">{fileSize(file.size)}</span>
-                </button>
-              ))}
-            </div>
-          ) : null}
+              <div className="msg-preview">{previewOf(message.html)}</div>
+            )}
+          </div>
+          <div className="msg-aside">
+            <span className="msg-time">{messageTime(message.dateMs)}</span>
+            {open && theme === "dark" && message.isHtml ? (
+              <SurfaceToggle surface={surface} onFlip={flip} />
+            ) : null}
+          </div>
         </div>
-      ) : null}
 
-      {notes.map((note) => (
-        <Note key={note.id} body={note.body} />
-      ))}
-    </article>
+        {open ? (
+          <div className="msg-body">
+            {message.draft ? (
+              <div className="draft-card">
+                <b>Draft</b>
+                <Button disabled={message.bodyPending} onClick={() => void useCompose.getState().openDraft(accountId, message.id)}>Resume draft</Button>
+                <Button variant="ghost" disabled={message.bodyPending} onClick={() => void draftImport(accountId, message.id).then(async (draft) => { if (draft.id) await useCompose.getState().deleteDraft(draft.id); }).catch((e) => notify(`Could not discard that draft: ${e}`))}>Discard draft</Button>
+              </div>
+            ) : message.bodyPending ? (
+              pending === "error" ? (
+                <BodyMissing onRetry={() => void useMail.getState().hydrateThread()} />
+              ) : (
+                <BodySkeleton />
+              )
+            ) : (
+              <MessageContent accountId={accountId} message={message} plain={plain} surface={surface} quoted={quoted} />
+            )}
+
+            {message.quotedHtml ? (
+              <div className="msg-quoted">
+                <Pill tone="quiet" onClick={onQuoted}>
+                  {quoted ? "Hide quoted text" : "··· Show quoted text"}
+                </Pill>
+                <Pill tone="quiet" onClick={onReply}>Quick reply</Pill>
+              </div>
+            ) : null}
+
+            {message.invite ? (
+              <InviteCard invite={message.invite} messageId={message.id} accountId={accountId} />
+            ) : null}
+
+            {message.attachments.length > 0 ? (
+              <div className="attachments">
+                {message.attachments.map((file) => (
+                  <button
+                    type="button"
+                    className="attachment"
+                    key={file.id}
+                    data-phase={files[file.id] ?? "idle"}
+                    disabled={files[file.id] === "opening"}
+                    onClick={() => void openFile(file.id)}
+                  >
+                    <span className="ext">{fileKind(file.filename, file.mimeType)}</span>
+                    {file.filename}
+                    <span className="size">{fileSize(file.size)}</span>
+                  </button>
+                ))}
+              </div>
+            ) : null}
+          </div>
+        ) : null}
+
+        {notes.map((note) => (
+          <Note key={note.id} body={note.body} />
+        ))}
+      </article>
+    </>
   );
 }
 

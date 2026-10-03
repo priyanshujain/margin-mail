@@ -4,6 +4,8 @@ import { Button, EmptyState, GroupHead, icons, Pill, Row } from "../ui";
 import { registerCommands, runCommand } from "../keys/commands";
 import { useEscapeLayer } from "../escape";
 import { GROUPS, type Place, type ThreadSummary } from "../ipc";
+import { useCompose } from "../store/useCompose";
+import { DraftCard } from "./Compose";
 import { useAccounts } from "../store/useAccounts";
 import { useMail } from "../store/useMail";
 import { usePiles } from "../store/usePiles";
@@ -187,6 +189,8 @@ export function ListColumn() {
   const waiting = useScreener((s) => s.cards.length);
   const loadScreener = useScreener((s) => s.load);
 
+  const drafts = useCompose((s) => s.drafts).filter((d) => !accountId || d.accountId === accountId);
+  useEffect(() => { if (place === "drafts") void useCompose.getState().loadDrafts(); }, [place, accountId]);
   const entries = useMemo(() => entriesOf(threads), [threads]);
   const searching = place === "search";
   const searchOpen = searchPhase !== "off";
@@ -390,7 +394,7 @@ export function ListColumn() {
             address={entry.thread.from.address}
             brand={isBrand(entry.thread.from)}
             time={timeOf(entry.thread, place)}
-            subject={entry.thread.subject}
+            subject={entry.thread.hasDraft ? `Draft · ${entry.thread.subject}` : entry.thread.subject}
             snippet={entry.thread.snippet}
             count={entry.thread.messageCount}
             note={entry.thread.note ?? undefined}
@@ -438,12 +442,13 @@ export function ListColumn() {
         ) : null}
       </div>
 
+      {place === "drafts" ? drafts.filter((d) => !threads.some((t) => t.key === d.threadKey)).map((draft) => <DraftCard key={draft.id} draft={draft} />) : null}
       {entries.length === 0 ? (
         <div className="list list-blank">
           {phase === "loading" ? null : fill && !searching ? (
             <Filling fill={fill} />
           ) : (
-            <EmptyState>{EMPTY[place] ?? "Nothing here"}</EmptyState>
+            <EmptyState>{place === "drafts" && drafts.length > 0 ? "" : EMPTY[place] ?? "Nothing here"}</EmptyState>
           )}
           {searching ? searchFoot() : null}
         </div>

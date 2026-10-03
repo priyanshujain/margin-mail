@@ -42,7 +42,8 @@
   display: flex;
   align-items: center;
   gap: 2px;
-  height: 42px;
+  min-height: 42px;
+  flex-wrap: wrap;
   padding: 0 12px 0 14px;
   border-bottom: 1px solid var(--line);
 }
@@ -400,3 +401,5 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
+
+.msg-quoted > .pill + .pill { margin-left: 8px; }

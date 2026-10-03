@@ -31,6 +31,7 @@ import { useEscapeLayer } from "./escape";
 import { registerCommands } from "./keys/commands";
 import { setAccountSwitch, useKeyContext, useKeymap } from "./keys/keymap";
 import { handleMenuAction } from "./keys/menu";
+import { useCompose } from "./store/useCompose";
 import { useAccounts } from "./store/useAccounts";
 import { useMail } from "./store/useMail";
 import { useStage } from "./store/useStage";
@@ -322,6 +323,7 @@ function Shell() {
       // rename, a merge. Those show on the row as well as in the pane, so this one does reach the
       // list, and joins whatever query is already pending.
       if (scopes.some((scope) => scope.startsWith("thread:"))) reloadList();
+      if (scopes.includes("drafts")) void useCompose.getState().loadDrafts();
       if (scopes.includes("accounts")) void useAccounts.getState().refresh();
       // The Screener's pill counts senders waiting rather than rows, so it is not part of the page
       // the list loaded and it has to be asked for by name.

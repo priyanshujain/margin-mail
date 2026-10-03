@@ -403,6 +403,7 @@ pub fn run() {
             imap::imap_trust_cert,
             imap::imap_forget_cert,
             attachments::message_show_images,
+            attachments::message_images_set,
             attachments::attachment_data_url,
             attachments::attachment_save,
             attachments::attachment_open,
@@ -451,6 +452,8 @@ pub fn run() {
             // Writing
             drafts::draft_save,
             drafts::draft_get,
+            drafts::draft_list,
+            drafts::draft_import,
             drafts::draft_delete,
             send::send,
             send::send_now,

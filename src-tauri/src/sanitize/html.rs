@@ -43,6 +43,7 @@ use crate::dto::Tracker;
 const STYLE_PROPERTIES: &[&str] = &[
     "color",
     "background-color",
+    "background",
     "font",
     "font-family",
     "font-size",
@@ -126,16 +127,14 @@ const EXTRA_TAGS: &[&str] = &["tfoot", "font", "address"];
 /// `style` because of `STYLE_PROPERTIES` above, `dir` because right to left mail is mail.
 const EXTRA_GENERIC_ATTRIBUTES: &[&str] = &["style", "dir"];
 
-/// The presentational attributes a table based newsletter is built out of. `background` is not
-/// here: it is a URL in an attribute, which is the same fetch by another name.
 const EXTRA_TAG_ATTRIBUTES: &[(&str, &[&str])] = &[
-    ("table", &["bgcolor", "border", "cellpadding", "cellspacing", "width", "height"]),
+    ("table", &["background", "bgcolor", "border", "cellpadding", "cellspacing", "width", "height"]),
     ("thead", &["bgcolor", "valign"]),
     ("tbody", &["bgcolor", "valign"]),
     ("tfoot", &["align", "bgcolor", "valign"]),
     ("tr", &["bgcolor", "height", "valign"]),
-    ("td", &["bgcolor", "height", "nowrap", "valign", "width"]),
-    ("th", &["bgcolor", "height", "nowrap", "valign", "width"]),
+    ("td", &["background", "bgcolor", "height", "nowrap", "valign", "width"]),
+    ("th", &["background", "bgcolor", "height", "nowrap", "valign", "width"]),
     ("font", &["color", "face", "size"]),
     ("img", &["border", "hspace", "vspace"]),
     ("a", &["name"]),
@@ -174,7 +173,8 @@ pub fn clean(
     remote_images: &HashMap<String, Vec<u8>>,
     policy: Policy,
 ) -> Result<Sanitized, String> {
-    let plans = plan_images(source, inline_parts, remote_images, policy);
+    let source = background_images(source);
+    let plans = plan_images(&source, inline_parts, remote_images, policy);
     let log: Arc<Mutex<Vec<ImageEvent>>> = Arc::new(Mutex::new(Vec::new()));
 
     let filter_log = Arc::clone(&log);
@@ -194,7 +194,7 @@ pub fn clean(
         builder.add_tag_attributes(tag, attributes.iter().copied());
     }
 
-    let html = builder.clean(source).to_string();
+    let html = builder.clean(&source).to_string();
 
     let events = log
         .lock()
@@ -234,7 +234,7 @@ fn filter<'u>(
     };
 
     match (element, attribute) {
-        ("img", "src") => match plans.get(value.trim()) {
+        ("img", "src") | (_, "background") => match plans.get(value.trim()) {
             Some(ImagePlan::Inline {
                 data_url,
                 content_id,
@@ -282,10 +282,19 @@ fn plan_images(
 ) -> HashMap<String, ImagePlan> {
     let mut plans = HashMap::new();
     for tag in scan(source) {
-        if tag.closing || tag.name != "img" {
+        if tag.closing {
             continue;
         }
-        let Some(src) = tag.attr("src").map(str::trim).filter(|src| !src.is_empty()) else {
+        let attribute = match tag.name.as_str() {
+            "img" => "src",
+            "table" | "td" | "th" => "background",
+            _ => continue,
+        };
+        let Some(src) = tag
+            .attr(attribute)
+            .map(str::trim)
+            .filter(|src| !src.is_empty())
+        else {
             continue;
         };
         if let Some(plan) = plan_one(src, &tag, inline_parts, remote_images, policy) {
@@ -293,6 +302,54 @@ fn plan_images(
         }
     }
     plans
+}
+
+fn background_images(source: &str) -> Cow<'_, str> {
+    let mut out = String::new();
+    let mut cursor = 0;
+    for tag in scan(source) {
+        if tag.closing || !matches!(tag.name.as_str(), "table" | "td" | "th") {
+            continue;
+        }
+        if tag.attr("background").is_some() {
+            continue;
+        }
+        let Some(url) = tag.attr("style").and_then(|style| {
+            style
+                .split(';')
+                .filter_map(|declaration| {
+                    let (name, value) = declaration.split_once(':')?;
+                    matches!(
+                        name.trim().to_ascii_lowercase().as_str(),
+                        "background" | "background-image"
+                    )
+                    .then_some(value)
+                })
+                .find_map(|value| {
+                    let start = value.to_ascii_lowercase().find("url(")? + 4;
+                    let url = value[start..]
+                        .split_once(')')?
+                        .0
+                        .trim()
+                        .trim_matches(['\'', '"']);
+                    (!url.is_empty()).then_some(url)
+                })
+        }) else {
+            continue;
+        };
+        let insertion = tag.start + 1 + tag.name.len();
+        out.push_str(&source[cursor..insertion]);
+        out.push_str(" background=\"");
+        out.push_str(&escape_html(url));
+        out.push('"');
+        cursor = insertion;
+    }
+    if cursor == 0 {
+        Cow::Borrowed(source)
+    } else {
+        out.push_str(&source[cursor..]);
+        Cow::Owned(out)
+    }
 }
 
 fn plan_one(
@@ -304,8 +361,8 @@ fn plan_one(
 ) -> Option<ImagePlan> {
     let lowercase = src.to_ascii_lowercase();
 
-    if let Some(reference) = lowercase.strip_prefix("cid:") {
-        let key = decode_entities(reference)
+    if lowercase.starts_with("cid:") {
+        let key = decode_entities(&src[4..])
             .trim_matches(|character| character == '<' || character == '>')
             .to_string();
         let part = inline_parts.get(&key)?;

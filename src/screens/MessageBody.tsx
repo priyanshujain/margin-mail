@@ -3,7 +3,7 @@ import { openUrl } from "@tauri-apps/plugin-opener";
 import { isTauri, type Surface } from "../ipc";
 import { useTheme } from "../store/useTheme";
 import { notify } from "../store/useToast";
-import { Pill } from "../ui";
+import { Button, Pill, Sheet } from "../ui";
 
 /**
  * One message's body, in a sandboxed iframe.
@@ -50,6 +50,7 @@ export interface MessageBodyProps {
    * unreadable on our own paper off a `theme` body, so what is left inherits ours.
    */
   surface?: Surface;
+  imagesAllowed?: boolean;
 }
 
 /**
@@ -153,8 +154,10 @@ function rootRule(surface: Surface, theme: string): string {
   return `:root{${values};--m-color-scheme:${pinned ? "only light" : theme}}`;
 }
 
-export function MessageBody({ html, plain, surface = "theme" }: MessageBodyProps) {
+export function MessageBody({ html, plain, surface = "theme", imagesAllowed }: MessageBodyProps) {
   const frame = useRef<HTMLIFrameElement | null>(null);
+  const [link, setLink] = useState<string | null>(null);
+  const allowImages = imagesAllowed ?? false;
   const theme = useTheme((s) => s.theme);
   const [css, setCss] = useState<string | null>(sheetText);
 
@@ -177,8 +180,8 @@ export function MessageBody({ html, plain, surface = "theme" }: MessageBodyProps
     () =>
       css === null
         ? ""
-        : `<!doctype html><html><head><meta charset="utf-8"><style>${tokens}\n${css}</style></head><body${plain ? " data-plain" : ""}>${html}</body></html>`,
-    [css, html, plain, tokens],
+        : `<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="img-src ${allowImages ? "data: blob:" : "'none'"}"><style>${tokens}\n${css}</style></head><body${plain ? " data-plain" : ""}${surface === "paper" ? " data-paper" : ""}>${html}</body></html>`,
+    [css, html, plain, tokens, surface, allowImages],
   );
 
   useEffect(() => {
@@ -196,8 +199,7 @@ export function MessageBody({ html, plain, surface = "theme" }: MessageBodyProps
       event.preventDefault();
       const href = anchor.getAttribute("href");
       if (!href || href.startsWith("#")) return;
-      if (isTauri) void openUrl(href).catch((e) => notify(`Could not open that link: ${String(e)}`));
-      else window.open(href, "_blank", "noopener,noreferrer");
+      setLink(href);
     };
 
     /** Whether there was a document there to take. */
@@ -256,6 +258,17 @@ export function MessageBody({ html, plain, surface = "theme" }: MessageBodyProps
   }, [srcdoc]);
 
   return (
+    <>
+    <Sheet open={link !== null} size="mini" title="Link" onClose={() => setLink(null)} foot={<>
+      <Button onClick={() => { if (link) void navigator.clipboard.writeText(link).then(() => { notify("Link copied"); setLink(null); }).catch((e) => notify(`Could not copy the link: ${String(e)}`)); }}>Copy link</Button>
+      <Button variant="primary" onClick={() => {
+        if (!link) return;
+        if (isTauri) void openUrl(link).then(() => setLink(null)).catch((e) => notify(`Could not open that link: ${String(e)}`));
+        else { window.open(link, "_blank", "noopener,noreferrer"); setLink(null); }
+      }}>Open in browser</Button>
+    </>}>
+      <p style={{ overflowWrap: "anywhere" }}>{link}</p>
+    </Sheet>
     <iframe
       className="msg-frame"
       ref={frame}
@@ -266,6 +279,7 @@ export function MessageBody({ html, plain, surface = "theme" }: MessageBodyProps
       sandbox="allow-same-origin"
       srcDoc={srcdoc}
     />
+    </>
   );
 }
 

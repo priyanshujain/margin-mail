@@ -441,6 +441,8 @@ pub struct MessageView {
     pub trackers: Vec<Tracker>,
     /// Ordinary remote images that were blocked, which is a different count from the trackers.
     pub blocked_images: u32,
+    #[serde(default)]
+    pub images_allowed: bool,
     /// Whether the body currently rendered has remote images loaded.
     pub images_loaded: bool,
     pub seen: bool,

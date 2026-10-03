@@ -291,6 +291,7 @@ export interface MessageView {
   trackers: Tracker[];
   blockedImages: number;
   imagesLoaded: boolean;
+  imagesAllowed?: boolean;
   seen: boolean;
   draft: boolean;
   sentByMe: boolean;

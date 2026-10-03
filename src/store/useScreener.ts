@@ -4,6 +4,7 @@ import { threadHydrate, threadView } from "../api/threads";
 import { undoLast } from "../api/undo";
 import { live, type Destination, type ScreenerCard, type ThreadView } from "../ipc";
 import { acknowledge } from "../screens/triage";
+import { useMail } from "./useMail";
 import { notify } from "./useToast";
 
 /**
@@ -202,6 +203,7 @@ export const useScreener = create<ScreenerState>((set, get) => ({
           expanded: s.expanded === key ? null : s.expanded,
         };
       });
+      if (get().cards.length === 0 && useMail.getState().place === "screener") useMail.getState().goTo("inbox");
       acknowledge(undo, () => void get().load(card.accountId));
     } catch (e) {
       set((s) => ({ deciding: s.deciding.filter((k) => k !== key) }));
@@ -215,6 +217,7 @@ export const useScreener = create<ScreenerState>((set, get) => ({
     set({ cards: [], focused: null, expanded: null });
     try {
       acknowledge(await screenerClearAll(accountId), () => void get().load(accountId));
+      if (useMail.getState().place === "screener") useMail.getState().goTo("inbox");
     } catch (e) {
       set({ cards });
       notify(`That did not go through: ${e}`);

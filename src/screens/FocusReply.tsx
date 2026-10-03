@@ -8,9 +8,10 @@ import { useCompose } from "../store/useCompose";
 import { useMail } from "../store/useMail";
 import { usePiles } from "../store/usePiles";
 import { useSettings } from "../store/useSettings";
+import { notify } from "../store/useToast";
 import { useStage } from "../store/useStage";
 import { cap, displayName, isBrand, messageTime } from "./format";
-import { MessageBody } from "./MessageBody";
+import { MessageContent, MessageImageBanner } from "./MessageContent";
 import "./focus.css";
 
 /**
@@ -98,6 +99,7 @@ export function FocusReply() {
     if (!view || !last || !body) return;
 
     const compose = useCompose.getState();
+    if (compose.reply) { notify("Close the current reply before sending from Focus & Reply"); return; }
     compose.answer(view, last, "reply", useSettings.getState().settings?.replyAllDefault ?? false);
     compose.edit("reply", {
       bodyHtml: body
@@ -105,7 +107,7 @@ export function FocusReply() {
         .map((para) => `<p>${para.replace(/\n/g, "<br>")}</p>`)
         .join(""),
     });
-    const to = compose.reply?.draft.to[0];
+    const to = useCompose.getState().reply?.draft.to[0];
     void compose.post("reply", now);
     setSent((was) => ({ ...was, [thread.key]: to ? displayName(to) : displayName(thread.from) }));
     step(1);
@@ -159,6 +161,15 @@ export function FocusReply() {
     const key = items[at]?.key;
     if (key) boxes.current.get(key)?.focus();
   }, [at, items]);
+
+  const hadItems = useRef(false);
+  useEffect(() => {
+    if (items.length > 0) hadItems.current = true;
+    else if (hadItems.current) {
+      useStage.getState().close();
+      useMail.getState().goTo("inbox");
+    }
+  }, [items.length]);
 
   if (items.length === 0) {
     return (
@@ -279,6 +290,7 @@ function Item({
     <article className="focus-item" data-active={active ? "" : undefined} onClick={onFocus}>
       <div className="focus-message">
         <h2 className="focus-subject">{thread.subject}</h2>
+        {message ? <MessageImageBanner accountId={thread.accountId} message={message} /> : null}
         <div className="focus-from">
           <Avatar name={name} address={from.address} brand={isBrand(from)} />
           <div className="focus-who">
@@ -292,7 +304,7 @@ function Item({
         </div>
         <div className="focus-body">
           {message ? (
-            <MessageBody html={message.html} surface={message.surface} />
+            <MessageContent accountId={thread.accountId} message={message} />
           ) : (
             <p className="focus-snippet">{thread.snippet}</p>
           )}
