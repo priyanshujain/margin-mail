@@ -1477,13 +1477,10 @@ function PrivacySection() {
         <Toggle checked={settings.otpAutofillEnabled && (otpStatus?.enabled ?? false)}
           label="Email OTP AutoFill"
           disabled={!otpStatus?.available || otpBusy}
-          note="Suggest recent email verification codes in compatible website and app fields through macOS AutoFill. Codes expire after three minutes. Detection stays on this device."
+          note={otpStatus?.available
+            ? "Suggest recent email verification codes in website and app fields through AutoFill. Turn on Margin Mail in AutoFill & Passwords when asked, and keep it running and unlocked. Codes expire after three minutes and never leave this device."
+            : "Needs the Margin Mail AutoFill extension installed."}
           onChange={(enabled) => void changeOtpAutofill(enabled)} />
-        <p className="settings-note">
-          {otpStatus?.available
-            ? "Enable Margin Mail under macOS System Settings → General → AutoFill & Passwords when prompted. Keep Margin Mail running and unlocked to receive codes."
-            : "Requires macOS 15 or later and the installed Margin Mail AutoFill extension."}
-        </p>
       </div>
 
       <div className="set-field">
