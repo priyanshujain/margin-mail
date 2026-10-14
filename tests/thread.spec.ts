@@ -77,7 +77,8 @@ test("a message body renders inside its own frame", async ({ page }) => {
   await openLease(page);
 
   await expect(page.locator(".msg-frame")).toHaveCount(1);
-  await expect(page.locator(".msg-frame")).toHaveAttribute("sandbox", "allow-same-origin");
+  await expect(page.locator(".msg-frame")).toHaveAttribute("sandbox", "allow-same-origin allow-scripts");
+  await expect(page.locator(".msg-frame")).toHaveAttribute("srcdoc", /content="script-src 'none'/);
 
   const bodies = await bodyText(page);
   expect(bodies.join(" ")).toContain("Attached the revised draft");
