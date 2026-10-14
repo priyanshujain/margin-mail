@@ -112,6 +112,9 @@ fn code_in(subject: &str, body: &str) -> Option<String> {
 
 pub async fn refresh(app: &tauri::AppHandle) -> Result<(), String> {
     use tauri::Manager;
+    if !native::available() {
+        return Ok(());
+    }
     if !crate::settings::load(app)?.otp_autofill_enabled || crate::app_lock::is_locked(app) {
         return Ok(());
     }

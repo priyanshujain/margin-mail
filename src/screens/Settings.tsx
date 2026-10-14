@@ -1473,7 +1473,7 @@ function PrivacySection() {
         decided somewhere else.
       </p>
 
-      <div className="set-field">
+      {isMacDesktop && <div className="set-field">
         <Toggle checked={settings.otpAutofillEnabled && (otpStatus?.enabled ?? false)}
           label="Email OTP AutoFill"
           disabled={!otpStatus?.available || otpBusy}
