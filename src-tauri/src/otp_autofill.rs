@@ -47,7 +47,7 @@ pub fn clear() -> Result<(), String> {
     native::publish(&[], None)
 }
 
-fn code_in(subject: &str, body: &str) -> Option<String> {
+pub fn code_in(subject: &str, body: &str) -> Option<String> {
     use std::sync::LazyLock;
     static CUE: LazyLock<regex::Regex> = LazyLock::new(|| {
         regex::Regex::new(

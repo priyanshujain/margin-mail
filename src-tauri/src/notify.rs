@@ -71,6 +71,7 @@ pub struct Text {
     pub title: String,
     pub subtitle: String,
     pub body: String,
+    pub code: Option<String>,
     /// None for the sample from the settings screen, which has nothing to open.
     pub target: Option<NotifyTarget>,
 }
@@ -336,6 +337,7 @@ pub fn text(arrivals: &[Arrival]) -> Option<Text> {
             title: APP_NAME.to_string(),
             subtitle: one.sender.clone(),
             body: body_of(one),
+            code: None,
             target: Some(NotifyTarget {
                 account_id: one.account_id.clone(),
                 // A thread announced by its own switch from a pile or a snooze shows in none of the
@@ -355,6 +357,7 @@ pub fn text(arrivals: &[Arrival]) -> Option<Text> {
                 title: APP_NAME.to_string(),
                 subtitle: format!("{} new messages", many.len()),
                 body: named(&senders),
+                code: None,
                 target: Some(NotifyTarget {
                     account_id: many[0].account_id.clone(),
                     place: Place::Inbox,
@@ -433,19 +436,69 @@ pub fn announce(app: &tauri::AppHandle, account_id: &str, arrivals: &[Arrival]) 
     if let Ok(Some(entry)) = crate::accounts::find(app, account_id) {
         own.push(entry.email);
     }
-    let mine: Vec<Arrival> = wanted(arrivals, &settings.notify_places)
+    let not_own = |arrival: &Arrival| {
+        !own.iter()
+            .any(|address| address.eq_ignore_ascii_case(&arrival.sender_address))
+    };
+    let chosen = wanted(arrivals, &settings.notify_places);
+    let mut codes = Vec::new();
+    for arrival in arrivals.iter().filter(|arrival| not_own(arrival)) {
+        let told = chosen.iter().any(|one| one.message_id == arrival.message_id);
+        if !told && arrival.place != Some(Place::PaperTrail) {
+            continue;
+        }
+        if let Some(code) = code_of(app, arrival) {
+            codes.push(Text {
+                title: APP_NAME.to_string(),
+                subtitle: arrival.sender.clone(),
+                body: format!("{code} · {}", body_of(arrival)),
+                code: Some(code),
+                target: Some(NotifyTarget {
+                    account_id: arrival.account_id.clone(),
+                    place: arrival.place.unwrap_or(Place::Everything),
+                    thread_key: Some(arrival.thread_key.clone()),
+                }),
+            });
+        }
+    }
+    let rest: Vec<Arrival> = chosen
         .into_iter()
+        .filter(|arrival| not_own(arrival))
         .filter(|arrival| {
-            !own.iter()
-                .any(|address| address.eq_ignore_ascii_case(&arrival.sender_address))
+            !codes.iter().any(|text| {
+                text.target.as_ref().and_then(|target| target.thread_key.as_deref())
+                    == Some(arrival.thread_key.as_str())
+            })
         })
         .collect();
-    if let Some(text) = text(&mine) {
+    let texts: Vec<Text> = codes.into_iter().chain(text(&rest)).collect();
+    if !texts.is_empty() {
         let app = app.clone();
         std::thread::spawn(move || {
-            let _ = post(&app, &text);
+            for text in texts {
+                let _ = post(&app, &text);
+            }
         });
     }
+}
+
+fn code_of(app: &tauri::AppHandle, arrival: &Arrival) -> Option<String> {
+    use tauri::Manager;
+    let body = app
+        .state::<crate::db::Db>()
+        .with(&arrival.account_id, |conn| {
+            conn.query_row(
+                "SELECT text FROM bodies WHERE message_id = ?1",
+                [&arrival.message_id],
+                |row| row.get::<_, String>(0),
+            )
+            .optional()
+            .map_err(|e| e.to_string())
+        })
+        .ok()
+        .flatten()
+        .unwrap_or_else(|| arrival.snippet.clone());
+    crate::otp_autofill::code_in(&arrival.subject, &body)
 }
 
 /// Posts one notification, and writes down why when it could not.
@@ -555,6 +608,7 @@ pub fn notify_test(app: tauri::AppHandle) -> Result<(), String> {
             title: APP_NAME.to_string(),
             subtitle: String::new(),
             body: "This is what new mail will look like.".to_string(),
+            code: None,
             target: None,
         },
     )

@@ -21,9 +21,11 @@ use block2::{DynBlock, RcBlock};
 use objc2::rc::Retained;
 use objc2::runtime::{Bool, NSObject, NSObjectProtocol, ProtocolObject};
 use objc2::{define_class, msg_send, AllocAnyThread};
-use objc2_foundation::{NSDictionary, NSError, NSString};
+use objc2_foundation::{NSArray, NSDictionary, NSError, NSSet, NSString};
 use objc2_user_notifications::{
     UNAuthorizationOptions, UNAuthorizationStatus, UNMutableNotificationContent, UNNotification,
+    UNNotificationAction, UNNotificationActionOptions, UNNotificationCategory,
+    UNNotificationCategoryOptions,
     UNNotificationDefaultActionIdentifier, UNNotificationPresentationOptions,
     UNNotificationRequest, UNNotificationResponse, UNNotificationSetting, UNNotificationSettings,
     UNNotificationSound, UNShowPreviewsSetting, UNUserNotificationCenter,
@@ -39,6 +41,9 @@ static REPORTED: AtomicBool = AtomicBool::new(false);
 /// The one key in a request's user info: the target, as JSON, so what a click reads back is the
 /// same struct `post` was handed.
 const TARGET_KEY: &str = "target";
+const CODE_KEY: &str = "code";
+const CODE_CATEGORY: &str = "margin-mail-code";
+const COPY_ACTION: &str = "copy-code";
 
 define_class!(
     // SAFETY: NSObject has no subclassing requirements and `Delegate` has no `Drop`.
@@ -75,6 +80,13 @@ define_class!(
             response: &UNNotificationResponse,
             completion: &DynBlock<dyn Fn()>,
         ) {
+            if response.actionIdentifier().to_string() == COPY_ACTION {
+                if let Some(code) = code_of(response) {
+                    copy(&code);
+                }
+                completion.call(());
+                return;
+            }
             if let Some(app) = APP.get() {
                 crate::show_main_window(app);
                 // SAFETY: a constant the framework exports; reading it is the whole operation.
@@ -98,6 +110,18 @@ pub fn install(app: tauri::AppHandle) {
     };
     let center = UNUserNotificationCenter::currentNotificationCenter();
     center.setDelegate(Some(ProtocolObject::from_ref(&*delegate)));
+    let action = UNNotificationAction::actionWithIdentifier_title_options(
+        &NSString::from_str(COPY_ACTION),
+        &NSString::from_str("Copy Code"),
+        UNNotificationActionOptions::empty(),
+    );
+    let category = UNNotificationCategory::categoryWithIdentifier_actions_intentIdentifiers_options(
+        &NSString::from_str(CODE_CATEGORY),
+        &NSArray::from_retained_slice(&[action]),
+        &NSArray::new(),
+        UNNotificationCategoryOptions::empty(),
+    );
+    center.setNotificationCategories(&NSSet::from_retained_slice(&[category]));
     // The centre holds its delegate weakly. This is the strong reference, for the life of the
     // process, which is exactly as long as the centre wants it.
     std::mem::forget(delegate);
@@ -220,8 +244,16 @@ pub fn post(text: &Text) -> Result<(), String> {
     }
     content.setBody(&NSString::from_str(&text.body));
     if let Some(json) = text.target.as_ref().and_then(|t| serde_json::to_string(t).ok()) {
-        let value = NSString::from_str(&json);
-        let info = NSDictionary::from_slices(&[&*NSString::from_str(TARGET_KEY)], &[&*value]);
+        let mut keys = vec![NSString::from_str(TARGET_KEY)];
+        let mut values = vec![NSString::from_str(&json)];
+        if let Some(code) = &text.code {
+            keys.push(NSString::from_str(CODE_KEY));
+            values.push(NSString::from_str(code));
+            content.setCategoryIdentifier(&NSString::from_str(CODE_CATEGORY));
+        }
+        let keys: Vec<&NSString> = keys.iter().map(|key| &**key).collect();
+        let values: Vec<&NSString> = values.iter().map(|value| &**value).collect();
+        let info = NSDictionary::from_slices(&keys, &values);
         // SAFETY: a dictionary of strings is a dictionary; the system copies it and `target_of`
         // reads it back as the strings it was.
         let info: Retained<NSDictionary> = unsafe { Retained::cast_unchecked(info) };
@@ -268,6 +300,20 @@ fn target_of(response: &UNNotificationResponse) -> Option<NotifyTarget> {
     let value = info.objectForKey(&*NSString::from_str(TARGET_KEY))?;
     let json = value.downcast::<NSString>().ok()?;
     serde_json::from_str(&json.to_string()).ok()
+}
+
+fn code_of(response: &UNNotificationResponse) -> Option<String> {
+    let info = response.notification().request().content().userInfo();
+    let value = info.objectForKey(&*NSString::from_str(CODE_KEY))?;
+    Some(value.downcast::<NSString>().ok()?.to_string())
+}
+
+fn copy(code: &str) {
+    use objc2_app_kit::{NSPasteboard, NSPasteboardTypeString};
+    let board = NSPasteboard::generalPasteboard();
+    board.clearContents();
+    // SAFETY: a constant the framework exports.
+    board.setString_forType(&NSString::from_str(code), unsafe { NSPasteboardTypeString });
 }
 
 fn describe(error: *mut NSError) -> Option<String> {
