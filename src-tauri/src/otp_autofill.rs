@@ -48,7 +48,6 @@ pub fn clear() -> Result<(), String> {
 }
 
 fn code_in(subject: &str, body: &str) -> Option<String> {
-    use std::collections::HashSet;
     use std::sync::LazyLock;
     static CUE: LazyLock<regex::Regex> = LazyLock::new(|| {
         regex::Regex::new(
@@ -59,9 +58,16 @@ fn code_in(subject: &str, body: &str) -> Option<String> {
         LazyLock::new(|| regex::Regex::new(r"\b[A-Z0-9]{4,8}\b").unwrap());
     static DURATION: LazyLock<regex::Regex> =
         LazyLock::new(|| regex::Regex::new(r"(?i)^\s*(seconds?|minutes?|hours?|days?)\b").unwrap());
+    static NOT_A_CODE_BEFORE: LazyLock<regex::Regex> = LazyLock::new(|| {
+        regex::Regex::new(r"(?i)(ending\s+(with|in)|card|account|a/c|x{2,}|\*{2,}|inr|rs\.?|usd|eur|amount|[$€£₹])\s*$").unwrap()
+    });
+    static NOT_A_CODE_AFTER: LazyLock<regex::Regex> =
+        LazyLock::new(|| regex::Regex::new(r"^[.,:]\d").unwrap());
     let (body, _) = crate::sanitize::quoted::split_text(body);
     let text = format!("{subject}\n{body}");
-    let mut codes = HashSet::new();
+    let cues: Vec<(usize, usize)> = CUE.find_iter(&text).map(|cue| (cue.start(), cue.end())).collect();
+    let mut best: Option<(usize, String)> = None;
+    let mut tied = false;
     for token in TOKEN.find_iter(&text) {
         let value = token.as_str();
         if !value.bytes().any(|byte| byte.is_ascii_digit())
@@ -69,23 +75,38 @@ fn code_in(subject: &str, body: &str) -> Option<String> {
         {
             continue;
         }
-        let before: String = text[..token.start()]
-            .chars()
-            .rev()
-            .take(90)
-            .collect::<String>()
-            .chars()
-            .rev()
-            .collect();
-        let after: String = text[token.end()..].chars().take(60).collect();
-        if CUE.is_match(&format!("{before}{value}{after}")) && !DURATION.is_match(&after) {
-            codes.insert(value.to_string());
+        let before = &text[text.floor_char_boundary(token.start().saturating_sub(16))..token.start()];
+        let after = &text[token.end()..];
+        if DURATION.is_match(after) || NOT_A_CODE_BEFORE.is_match(before) || NOT_A_CODE_AFTER.is_match(after) {
+            continue;
+        }
+        let Some(distance) = cues
+            .iter()
+            .map(|&(start, end)| {
+                if end <= token.start() {
+                    token.start() - end
+                } else {
+                    start.saturating_sub(token.end())
+                }
+            })
+            .filter(|&distance| distance <= 90)
+            .min()
+        else {
+            continue;
+        };
+        match &best {
+            Some((closest, code)) if distance == *closest && code != value => tied = true,
+            Some((closest, _)) if distance >= *closest => {}
+            _ => {
+                best = Some((distance, value.to_string()));
+                tied = false;
+            }
         }
     }
-    if codes.len() == 1 {
-        codes.into_iter().next()
-    } else {
+    if tied {
         None
+    } else {
+        best.map(|(_, code)| code)
     }
 }
 
@@ -104,7 +125,7 @@ pub async fn refresh(app: &tauri::AppHandle) -> Result<(), String> {
                     "SELECT m.id, m.subject, m.from_address, m.from_name, m.date_ms, b.text
                  FROM messages m LEFT JOIN bodies b ON b.message_id = m.id
                  JOIN threads t ON t.provider_thread_id = m.provider_thread_id
-                 WHERE m.date_ms > ?1 AND m.date_ms <= ?2 AND m.seen = 0 AND m.sent = 0
+                 WHERE m.date_ms > ?1 AND m.date_ms <= ?2 AND m.sent = 0
                  AND m.draft = 0 AND m.hydrated = 1 AND t.spam = 0 AND t.trashed = 0
                  ORDER BY m.date_ms DESC LIMIT 20",
                 )
