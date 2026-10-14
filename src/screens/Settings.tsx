@@ -1481,7 +1481,7 @@ function PrivacySection() {
             ? "Suggest recent email verification codes in website and app fields through AutoFill. Turn on Margin Mail in AutoFill & Passwords when asked, and keep it running and unlocked. Codes expire after three minutes and never leave this device."
             : "Needs the Margin Mail AutoFill extension installed."}
           onChange={(enabled) => void changeOtpAutofill(enabled)} />
-      </div>
+      </div>}
 
       <div className="set-field">
         <Toggle checked={settings.appLockEnabled} label="Require authentication when opening"
