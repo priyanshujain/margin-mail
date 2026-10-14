@@ -4,8 +4,16 @@ import { homedir } from "node:os";
 import { join, resolve } from "node:path";
 
 const signing = process.env.MARGIN_SIGNING_DIR || join(homedir(), ".margin-signing");
-const appProfile = join(signing, "studio.margin.mail.provisionprofile");
-const extensionProfile = join(signing, "studio.margin.mail.autofill.provisionprofile");
+const appstore = process.env.MAS_MODE === "1";
+const team = appstore ? process.env.APPLE_TEAM_ID : "TQV87WLXK3";
+const appProfile = appstore ? process.env.MAS_PROVISION_PROFILE : join(signing, "studio.margin.mail.provisionprofile");
+const extensionProfile = appstore ? process.env.MAS_AUTOFILL_PROVISION_PROFILE : join(signing, "studio.margin.mail.autofill.provisionprofile");
+if (appstore && (!team || !appProfile || !extensionProfile || !process.env.MAS_BUILD_NUMBER)) {
+  throw new Error("MAS AutoFill requires APPLE_TEAM_ID, MAS_BUILD_NUMBER, MAS_PROVISION_PROFILE and MAS_AUTOFILL_PROVISION_PROFILE.");
+}
+if (appstore && (!/^[A-Z0-9]{10}$/.test(team) || !/^[1-9][0-9]{0,3}(?:\.[0-9]{1,2}){0,2}$/.test(process.env.MAS_BUILD_NUMBER))) {
+  throw new Error("MAS signing requires a 10-character APPLE_TEAM_ID and a numeric MAS_BUILD_NUMBER.");
+}
 const present = await Promise.all([appProfile, extensionProfile].map(async (path) => {
   try { await access(path); return true; } catch (error) {
     if (error.code === "ENOENT") return false;
@@ -13,21 +21,34 @@ const present = await Promise.all([appProfile, extensionProfile].map(async (path
   }
 }));
 if (!present.every(Boolean)) {
+  if (appstore) throw new Error("Both Mac App Store provisioning profiles must exist.");
   console.error("Email OTP AutoFill is unavailable: both Margin Mail provisioning profiles are required.");
   process.exit(0);
 }
-const identity = process.env.APPLE_SIGNING_IDENTITY;
-if (!identity || identity === "-") throw new Error("Email OTP AutoFill requires a Developer ID signing identity.");
+const identity = appstore ? process.env.MAS_APP_IDENTITY : process.env.APPLE_SIGNING_IDENTITY;
+if (!identity || identity === "-") throw new Error("Email OTP AutoFill requires a signing identity.");
 const plist = (path) => JSON.parse(execFileSync("plutil", ["-convert", "json", "-o", "-", path], { encoding: "utf8" }));
 const profile = (path, identifier) => {
   const xml = execFileSync("security", ["cms", "-D", "-i", path]);
   const entitlements = JSON.parse(execFileSync("plutil", ["-extract", "Entitlements", "json", "-o", "-", "-"], { input: xml, encoding: "utf8" }));
   const expiry = execFileSync("plutil", ["-extract", "ExpirationDate", "raw", "-o", "-", "-"], { input: xml, encoding: "utf8" }).trim();
-  if (entitlements["com.apple.application-identifier"] !== `TQV87WLXK3.${identifier}` ||
-      entitlements["com.apple.developer.team-identifier"] !== "TQV87WLXK3" ||
+  const prefix = execFileSync("plutil", ["-extract", "ApplicationIdentifierPrefix.0", "raw", "-o", "-", "-"], { input: xml, encoding: "utf8" }).trim();
+  let allDevices = false;
+  let provisionedDevices = false;
+  try {
+    allDevices = execFileSync("plutil", ["-extract", "ProvisionsAllDevices", "raw", "-o", "-", "-"], { input: xml, encoding: "utf8", stdio: ["pipe", "pipe", "ignore"] }).trim() === "true";
+  } catch {}
+  try {
+    execFileSync("plutil", ["-extract", "ProvisionedDevices", "json", "-o", "-", "-"], { input: xml, stdio: ["pipe", "ignore", "ignore"] });
+    provisionedDevices = true;
+  } catch {}
+  if (entitlements["com.apple.application-identifier"] !== `${prefix}.${identifier}` ||
+      entitlements["com.apple.developer.team-identifier"] !== team ||
       entitlements["com.apple.developer.authentication-services.autofill-credential-provider"] !== true ||
       !entitlements["com.apple.security.application-groups"]?.some((group) =>
-        group === "TQV87WLXK3.*" || group === "TQV87WLXK3.studio.margin.mail") ||
+        group === `${team}.*` || group === `${team}.studio.margin.mail`) ||
+      (appstore && (entitlements["get-task-allow"] === true ||
+        allDevices || provisionedDevices)) ||
       !(new Date(expiry).getTime() > Date.now())) {
     throw new Error(`Invalid or expired AutoFill profile for ${identifier}.`);
   }
@@ -42,7 +63,7 @@ await mkdir(join(contents, "MacOS"), { recursive: true });
 const config = JSON.parse(await readFile("src-tauri/tauri.conf.json", "utf8"));
 const info = plist("native/autofill/Info.plist");
 info.CFBundleShortVersionString = config.version;
-info.CFBundleVersion = config.bundle.macOS.bundleVersion || config.version;
+info.CFBundleVersion = appstore ? process.env.MAS_BUILD_NUMBER : config.bundle.macOS.bundleVersion || config.version;
 const writePlist = async (path, value) => {
   await writeFile(path, JSON.stringify(value));
   execFileSync("plutil", ["-convert", "xml1", path]);
@@ -50,15 +71,29 @@ const writePlist = async (path, value) => {
 await writePlist(join(contents, "Info.plist"), info);
 await copyFile(extensionProfile, join(contents, "embedded.provisionprofile"));
 for (const [name, authorized] of [["host", appEntitlements], ["extension", extensionEntitlements]]) {
-  const value = plist(name === "host" ? "native/autofill/host.entitlements" : "native/autofill/autofill.entitlements");
+  const value = name === "host" && appstore
+    ? { ...plist("src-tauri/entitlements.mas.plist"), ...plist("native/autofill/host.entitlements") }
+    : plist(name === "host" ? "native/autofill/host.entitlements" : "native/autofill/autofill.entitlements");
+  value["com.apple.security.application-groups"] = [`${team}.studio.margin.mail`];
   value["com.apple.application-identifier"] = authorized["com.apple.application-identifier"];
   value["com.apple.developer.team-identifier"] = authorized["com.apple.developer.team-identifier"];
   await writePlist(join(output, `${name}.entitlements`), value);
 }
-const arch = process.arch === "arm64" ? "arm64" : "x86_64";
-execFileSync("xcrun", ["swiftc", "-O", "-parse-as-library", "-application-extension", "-module-name", "MarginMailAutoFill",
-  "-target", `${arch}-apple-macosx15.0`, "-Xlinker", "-e", "-Xlinker", "_NSExtensionMain",
-  "native/autofill/CredentialProvider.swift", "-o", join(contents, "MacOS", "MarginMailAutoFill")], { stdio: ["ignore", "ignore", "inherit"] });
+const target = appstore ? process.env.MAS_TARGET : undefined;
+if (target && !["universal-apple-darwin", "aarch64-apple-darwin", "x86_64-apple-darwin"].includes(target)) {
+  throw new Error("MAS_TARGET must be a supported macOS target.");
+}
+const architectures = target === "universal-apple-darwin" ? ["arm64", "x86_64"]
+  : [target === "aarch64-apple-darwin" ? "arm64" : target === "x86_64-apple-darwin" ? "x86_64" : process.arch === "arm64" ? "arm64" : "x86_64"];
+const executable = join(contents, "MacOS", "MarginMailAutoFill");
+for (const arch of architectures) {
+  execFileSync("xcrun", ["swiftc", "-O", "-parse-as-library", "-application-extension", "-module-name", "MarginMailAutoFill",
+    "-target", `${arch}-apple-macosx15.0`, "-Xlinker", "-e", "-Xlinker", "_NSExtensionMain",
+    "native/autofill/CredentialProvider.swift", "-o", architectures.length === 1 ? executable : join(output, `MarginMailAutoFill.${arch}`)], { stdio: ["ignore", "ignore", "inherit"] });
+}
+if (architectures.length > 1) {
+  execFileSync("xcrun", ["lipo", "-create", ...architectures.map((arch) => join(output, `MarginMailAutoFill.${arch}`)), "-output", executable], { stdio: ["ignore", "ignore", "inherit"] });
+}
 const extension = join(output, "MarginMailAutoFill.appex");
 execFileSync("codesign", ["--force", "--sign", identity, "--options", "runtime", "--timestamp", "--entitlements", join(output, "extension.entitlements"), extension], { stdio: ["ignore", "ignore", "inherit"] });
 execFileSync("codesign", ["--verify", "--strict", extension], { stdio: ["ignore", "ignore", "inherit"] });
