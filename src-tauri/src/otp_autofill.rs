@@ -51,31 +51,39 @@ fn code_in(subject: &str, body: &str) -> Option<String> {
     use std::sync::LazyLock;
     static CUE: LazyLock<regex::Regex> = LazyLock::new(|| {
         regex::Regex::new(
-        r"(?i)\b(verification|security|authentication|confirmation|login|sign[ -]?in|one[ -]?time|otp|passcode|your\s+code|enter\s+(the\s+)?code)\b"
+        r"(?i)\b(verification|authentication|log[ -]?in|sign[ -]?in|one[ -]?time|otp|passcode|code|pin)\b"
     ).unwrap()
     });
     static TOKEN: LazyLock<regex::Regex> =
-        LazyLock::new(|| regex::Regex::new(r"\b[A-Z0-9]{4,8}\b").unwrap());
+        LazyLock::new(|| regex::Regex::new(r"\b(?:\d{3,4}[- ]\d{3,4}|[A-Z0-9]{4,8})\b").unwrap());
     static DURATION: LazyLock<regex::Regex> =
         LazyLock::new(|| regex::Regex::new(r"(?i)^\s*(seconds?|minutes?|hours?|days?)\b").unwrap());
     static NOT_A_CODE_BEFORE: LazyLock<regex::Regex> = LazyLock::new(|| {
-        regex::Regex::new(r"(?i)(ending\s+(with|in)|card|account|a/c|x{2,}|\*{2,}|inr|rs\.?|usd|eur|amount|[$€£₹])\s*$").unwrap()
+        regex::Regex::new(r"(?i)(ending\s+(with|in)|card|account|a/c|x{2,}|\*{2,}|inr|rs\.?|usd|eur|amount|total|[$€£₹#]|order|invoice|ref(erence)?|ticket|tracking|number\s+is|call|phone|tel|(promo|coupon|discount|referral|gift)\s+code\s*(is|:)?)\s*$").unwrap()
     });
     static NOT_A_CODE_AFTER: LazyLock<regex::Regex> =
         LazyLock::new(|| regex::Regex::new(r"^[.,:]\d").unwrap());
     let (body, _) = crate::sanitize::quoted::split_text(body);
     let text = format!("{subject}\n{body}");
-    let cues: Vec<(usize, usize)> = CUE.find_iter(&text).map(|cue| (cue.start(), cue.end())).collect();
+    static NOT_A_CUE: LazyLock<regex::Regex> = LazyLock::new(|| {
+        regex::Regex::new(r"(?i)(promo|coupon|discount|referral|gift|zip|postal|area|country|source|qr|bar)\s*$").unwrap()
+    });
+    let cues: Vec<(usize, usize)> = CUE
+        .find_iter(&text)
+        .filter(|cue| !NOT_A_CUE.is_match(&text[..cue.start()]))
+        .map(|cue| (cue.start(), cue.end()))
+        .collect();
     let mut best: Option<(usize, String)> = None;
     let mut tied = false;
     for token in TOKEN.find_iter(&text) {
-        let value = token.as_str();
+        let value = token.as_str().replace(['-', ' '], "");
+        let value = value.as_str();
         if !value.bytes().any(|byte| byte.is_ascii_digit())
             || (!value.bytes().all(|byte| byte.is_ascii_digit()) && value.len() < 6)
         {
             continue;
         }
-        let before = &text[text.floor_char_boundary(token.start().saturating_sub(16))..token.start()];
+        let before = &text[text.floor_char_boundary(token.start().saturating_sub(24))..token.start()];
         let after = &text[token.end()..];
         if DURATION.is_match(after) || NOT_A_CODE_BEFORE.is_match(before) || NOT_A_CODE_AFTER.is_match(after) {
             continue;
