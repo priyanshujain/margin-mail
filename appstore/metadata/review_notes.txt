@@ -1,0 +1,21 @@
+Margin Mail is a mail client. Connecting a Gmail or compatible IMAP/SMTP mailbox is required to use its mail features. There is no separate Margin account.
+
+Review access is not yet supplied. Before submitting, provide a working review mailbox and credentials in App Store Connect, including server settings and any app password or sign-in instructions. Do not submit this draft note unchanged. Do not use a personal mailbox for review.
+
+On first launch, enter the mailbox address. Google accounts open Google sign-in in the default browser. Compatible IMAP/SMTP accounts ask for the mailbox password or an app password, and offer manual server settings. Outlook sign-in is not supported. Proton Mail requires the separately installed Proton Mail Bridge.
+
+After sync, open Inbox, Feed and Paper Trail from the header. New senders appear in the Screener. Reply later and Set aside are available from the places menu. Settings contains Accounts, Backup and Data. Use a review mailbox populated with sample messages to exercise reading, replies, sender routing and attachments.
+
+com.apple.security.network.server
+
+Google sign-in uses the installed-app OAuth loopback flow. The app binds a transient listener to 127.0.0.1 on an ephemeral port, opens Google's consent page, accepts the browser redirect, validates the state and exchanges the code using PKCE. The listener closes when the flow completes or times out after 120 seconds. It never binds to a routable interface. App Sandbox requires this entitlement for that local bind.
+
+com.apple.security.network.client
+
+Used for mail-provider sync and sending, Google OAuth and APIs, and optional backup to the user's Google Drive or S3-compatible storage. Proton Bridge connections are local to the Mac.
+
+com.apple.security.files.downloads.read-write
+
+Attachment downloads, mbox mail exports and JSON decision exports are written directly to Downloads. This access is needed because these actions do not use a save panel. Mail caches and app databases remain in the app container.
+
+Export compliance is pending determination. The app uses Rust XChaCha20-Poly1305 for stored credentials and encrypted backups, Argon2id for backup key derivation, and TLS for network connections. This draft does not assert that encryption is exempt.

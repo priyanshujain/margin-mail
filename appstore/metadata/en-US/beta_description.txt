@@ -1,0 +1,5 @@
+Margin Mail is a keyboard-first mail client for macOS with sender screening, separate places for people, newsletters and receipts, and Reply later and Set aside piles.
+
+Test account connection, initial sync, reading and sending, sender routing, snooze, search, attachments and exports. Optional backup uses your own Google Drive or S3-compatible storage.
+
+A Gmail or compatible IMAP/SMTP account is required. Some providers require app passwords. Proton Mail requires Proton Mail Bridge. Outlook sign-in is not supported in this version.

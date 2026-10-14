@@ -1,0 +1,18 @@
+Margin Mail is a calm mail client for your Mac. Keep people, newsletters and receipts in separate places, decide which new senders get in, and work through your mail from the keyboard.
+
+CHOOSE WHO GETS IN
+New senders wait in the Screener until you choose where their mail belongs. Route them to your Inbox, Feed or Paper Trail, or screen them out. Your decisions stay beside the mail, without changing your provider's labels.
+
+MAKE ROOM FOR WHAT MATTERS
+Read newsletters in the Feed and keep receipts in the Paper Trail. Put conversations in Reply later or Set aside, snooze them until you need them, and open Focus & Reply to work through replies together.
+
+KEEP YOUR OWN CONTEXT
+Add private notes, rename conversations, merge related threads and save clips. Search the mail stored on your device and find attachments in one place. Export your mail as mbox and your app decisions as JSON.
+
+READ QUIETLY
+Remote images are blocked by default. Message bodies are sanitized and known trackers are removed. You choose when to load images. There is no AI reading or writing your mail.
+
+BRING YOUR MAILBOX
+Connect Gmail through Google sign-in, or use a compatible IMAP and SMTP mailbox. Your provider may require an app password. Proton Mail requires Proton Mail Bridge. Outlook sign-in is not supported in this version.
+
+Your mailbox stays with your provider. Margin Mail keeps a local copy of the mail within your chosen storage window. Optional encrypted backup keeps your app decisions in your own Google Drive or S3-compatible storage.
