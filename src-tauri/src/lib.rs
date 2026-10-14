@@ -448,6 +448,8 @@ pub fn run() {
             google::account_remove,
             // Reading
             mirror::threads_list,
+            mirror::place_counts,
+            mirror::place_visited,
             imap::imap_discover,
             imap::imap_test,
             imap::imap_connect,

@@ -1190,6 +1190,12 @@ export async function mockCall<T>(command: string, args?: Record<string, unknown
     // ---------------------------------------------------------------------------------------
     // The Screener
     // ---------------------------------------------------------------------------------------
+    case "place_counts":
+      return done([]);
+
+    case "place_visited":
+      return done(null);
+
     case "screener_list": {
       const accountId = arg<string | null>("accountId");
       if (empty) return done([]);

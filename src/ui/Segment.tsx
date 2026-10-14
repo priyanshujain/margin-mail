@@ -6,6 +6,9 @@ export interface SegmentOption {
   label: string;
   /** The number key this box answers to, printed in the segment. */
   keycap?: string;
+  /** Something new is in there. `strong` for the box that matters more. */
+  dot?: "quiet" | "strong";
+  count?: number;
 }
 
 export interface SegmentProps {
@@ -40,6 +43,10 @@ export function Segment({ options, value, onChange, label, disabled }: SegmentPr
         >
           {o.keycap ? <Key size="sm">{o.keycap}</Key> : null}
           {o.label}
+          {o.count ? <span className="segment-count">{o.count}</span> : null}
+          {o.dot && o.id !== value ? (
+            <span className="segment-dot" data-tone={o.dot} aria-label="New" />
+          ) : null}
         </button>
       ))}
     </div>

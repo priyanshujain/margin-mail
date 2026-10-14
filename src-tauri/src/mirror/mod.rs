@@ -21,7 +21,7 @@ use std::sync::{Mutex, OnceLock};
 use tauri::Manager;
 
 use crate::db::Db;
-use crate::dto::{FlagPatch, LabelInfo, StorageUsed, ThreadPage, ThreadQuery, ThreadView, Undo};
+use crate::dto::{FlagPatch, LabelInfo, Place, PlaceCounts, StorageUsed, ThreadPage, ThreadQuery, ThreadView, Undo};
 use crate::sync::{self, outbox, Scoped};
 
 /// Undo holds the state before a change rather than a description of it, because a bulk archive of
@@ -231,6 +231,47 @@ fn held_keys(conn: &rusqlite::Connection, keys: &[String]) -> Result<Vec<String>
 pub fn threads_list(app: tauri::AppHandle, query: ThreadQuery) -> Result<ThreadPage, String> {
     let db = db_of(&app)?;
     sync::list_pages(db.inner(), &query)
+}
+
+#[tauri::command(async)]
+pub fn place_counts(app: tauri::AppHandle) -> Result<Vec<PlaceCounts>, String> {
+    let db = db_of(&app)?;
+    let mut all = Vec::new();
+    for account_id in db.on_disk() {
+        let counts = db.with(&account_id, |conn| {
+            Ok(PlaceCounts {
+                account_id: account_id.clone(),
+                inbox: read::inbox_unseen(conn)?,
+                screener: crate::screener::list(conn, &account_id)?.len() as i64,
+                feed: read::new_since_visit(conn, Place::Feed)?,
+                paper_trail: read::new_since_visit(conn, Place::PaperTrail)?,
+            })
+        })?;
+        all.push(counts);
+    }
+    Ok(all)
+}
+
+/// Opening the Feed or the Paper Trail takes its dot off, for one account or for all of them.
+#[tauri::command(async)]
+pub fn place_visited(
+    app: tauri::AppHandle,
+    account_id: Option<String>,
+    place: Place,
+) -> Result<(), String> {
+    let Some(key) = read::visited_key(place) else {
+        return Ok(());
+    };
+    let db = db_of(&app)?;
+    let ids = match account_id {
+        Some(id) => vec![id],
+        None => db.on_disk(),
+    };
+    let now = write::now_ms().to_string();
+    for id in ids {
+        db.with(&id, |conn| write::meta_set(conn, key, &now))?;
+    }
+    Ok(())
 }
 
 /// Which account holds a thread. Every command that takes a thread key starts here, because the

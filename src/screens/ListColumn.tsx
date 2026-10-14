@@ -427,7 +427,7 @@ export function ListColumn() {
             and "Screen 200 new senders" beside a bar that is still filling is a fright about
             nothing. */}
         {place === "inbox" && waiting > 0 && fill === null ? (
-          <Pill icon={icons.SHIELD} keycap="6" onClick={() => goTo("screener")}>
+          <Pill tone="accent" icon={icons.SHIELD} keycap="6" onClick={() => goTo("screener")}>
             {`Screen ${waiting} new sender${waiting === 1 ? "" : "s"}`}
           </Pill>
         ) : null}

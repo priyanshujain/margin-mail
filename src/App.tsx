@@ -36,6 +36,7 @@ import { setAccountSwitch, useKeyContext, useKeymap } from "./keys/keymap";
 import { handleMenuAction } from "./keys/menu";
 import { useCompose } from "./store/useCompose";
 import { useAccounts } from "./store/useAccounts";
+import { useCounts } from "./store/useCounts";
 import { useMail } from "./store/useMail";
 import { useStage } from "./store/useStage";
 import { useOverlays } from "./store/useOverlays";
@@ -303,6 +304,16 @@ function Shell() {
     return onAppEvent<string>("menu-action", handleMenuAction);
   }, []);
 
+  useEffect(
+    () =>
+      useMail.subscribe((now, was) => {
+        if (now.place !== was.place || now.accountId !== was.accountId) {
+          void useCounts.getState().visited(now.accountId, now.place);
+        }
+      }),
+    [],
+  );
+
   useEffect(() => {
     // A burst of scopes costs one query. The timer is not reset by the events that arrive while it
     // is pending, so a run of them cannot hold the list off indefinitely: the first one decides
@@ -316,6 +327,18 @@ function Shell() {
       }, RELOAD_MS);
     };
 
+    let countsPending: number | undefined;
+    const reloadCounts = () => {
+      if (countsPending !== undefined) return;
+      countsPending = window.setTimeout(async () => {
+        countsPending = undefined;
+        const { accountId, place } = useMail.getState();
+        await useCounts.getState().visited(accountId, place);
+        void useCounts.getState().load();
+      }, RELOAD_MS);
+    };
+    reloadCounts();
+
     // The reason is a scope and not a bell: `threads`, `thread` or `thread:<key>`, `accounts`,
     // `screener`, and the rest. Reloading the whole list on every one of them was the jank, because
     // a pass warming the body cache says so several times a second and each of those rebuilt every
@@ -324,7 +347,10 @@ function Shell() {
       const scopes = (reason ?? "").split(" ").filter(Boolean);
       // An emitter that named no scope has changed something it could not name, and the list is the
       // only safe reading of that.
-      if (scopes.length === 0 || scopes.includes("threads")) reloadList();
+      if (scopes.length === 0 || scopes.includes("threads")) {
+        reloadList();
+        reloadCounts();
+      }
       // A body landing changes what the open thread shows and nothing at all about the row above
       // it, so it re-reads that thread in place rather than the page it sits in. That is the bare
       // scope, and it is the one the cache warmer emits several times a second.
@@ -336,10 +362,14 @@ function Shell() {
       // list, and joins whatever query is already pending.
       if (scopes.some((scope) => scope.startsWith("thread:"))) reloadList();
       if (scopes.includes("drafts")) void useCompose.getState().loadDrafts();
-      if (scopes.includes("accounts")) void useAccounts.getState().refresh();
+      if (scopes.includes("accounts")) {
+        void useAccounts.getState().refresh();
+        reloadCounts();
+      }
       // The Screener's pill counts senders waiting rather than rows, so it is not part of the page
       // the list loaded and it has to be asked for by name.
       if (scopes.includes("screener")) {
+        reloadCounts();
         void useScreener.getState().load(useMail.getState().accountId);
       }
     });
@@ -378,6 +408,7 @@ function Shell() {
 
     return () => {
       window.clearTimeout(pending);
+      window.clearTimeout(countsPending);
       changed();
       auth();
       progress();

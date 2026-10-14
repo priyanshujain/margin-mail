@@ -3,7 +3,7 @@ import { Icon } from "./Icon";
 import { Key } from "./Key";
 import "./Pill.css";
 
-export type PillTone = "default" | "wash" | "quiet";
+export type PillTone = "default" | "wash" | "quiet" | "accent";
 
 export interface PillProps {
   children: ReactNode;

@@ -11,6 +11,7 @@ import {
 } from "../ui";
 import { keyLabel } from "../keys/bindings";
 import { useAccounts } from "../store/useAccounts";
+import { countsFor, useCounts } from "../store/useCounts";
 import { useMail } from "../store/useMail";
 import { useOverlays } from "../store/useOverlays";
 import { useSettings } from "../store/useSettings";
@@ -22,7 +23,7 @@ import type { Place } from "../ipc";
 import "./header.css";
 
 /** The three boxes, and the only navigation that is on screen without being asked for. */
-const BOXES: SegmentOption[] = [
+const BOX_LIST: SegmentOption[] = [
   { id: "inbox", label: "Inbox", keycap: "1" },
   { id: "feed", label: "Feed", keycap: "2" },
   { id: "paper-trail", label: "Paper Trail", keycap: "3" },
@@ -43,6 +44,23 @@ export function quietDoubleClick(e: MouseEvent<HTMLElement>) {
   }
 }
 
+function Screening({ count }: { count: number }) {
+  if (count === 0) return null;
+  return <span className="account-screening">{`${count} to screen`}</span>;
+}
+
+function Waiting({ counts }: { counts: ReturnType<typeof countsFor> }) {
+  return (
+    <span className="account-waiting">
+      {counts.feed ? <span className="segment-dot" data-tone="quiet" title="New in the Feed" /> : null}
+      {counts.paperTrail ? (
+        <span className="segment-dot" data-tone="strong" title="New in the Paper Trail" />
+      ) : null}
+      {counts.inbox > 0 ? <span className="segment-count">{counts.inbox}</span> : null}
+    </span>
+  );
+}
+
 export function Header() {
   const place = useMail((s) => s.place);
   const accountId = useMail((s) => s.accountId);
@@ -58,6 +76,19 @@ export function Header() {
 
   const [switcher, setSwitcher] = useState(false);
   const chip = useRef<HTMLButtonElement | null>(null);
+
+  const counts = useCounts((s) => s.counts);
+  const here = countsFor(counts, accountId);
+  const boxes = BOX_LIST.map((box) =>
+    box.id === "inbox"
+      ? { ...box, count: here.inbox }
+      : box.id === "feed"
+        ? { ...box, dot: here.feed ? ("quiet" as const) : undefined }
+        : { ...box, dot: here.paperTrail ? ("strong" as const) : undefined },
+  );
+  const elsewhere =
+    accountId !== null &&
+    counts.some((c) => c.accountId !== accountId && (c.inbox > 0 || c.screener > 0));
 
   const current = accounts.find((a) => a.id === accountId) ?? null;
   const note = trouble(statuses, accountId);
@@ -89,6 +120,7 @@ export function Header() {
             <Icon d={icons.PILE} size={16} />
           )}
           {current ? current.email : "All accounts"}
+          {elsewhere ? <span className="account-elsewhere" aria-label="New mail in another account" /> : null}
           <Icon d={icons.CHEVRON_DOWN} size={12} />
         </button>
 
@@ -113,7 +145,7 @@ export function Header() {
           with no way out but the keyboard. While Settings is up nothing here is selected, because
           claiming Inbox is selected under a screen that is not the Inbox is the same lie. */}
       <Segment
-        options={BOXES}
+        options={boxes}
         value={settingsOpen ? "" : place}
         label="Boxes"
         onChange={(id) => {
@@ -159,7 +191,9 @@ export function Header() {
                 <span className="account-who">
                   <span className="account-name">{displayName({ name: account.name, address: account.email })}</span>
                   <span className="account-address">{account.email}</span>
+                  <Screening count={countsFor(counts, account.id).screener} />
                 </span>
+                <Waiting counts={countsFor(counts, account.id)} />
                 <Key>{keyLabel(`ctrl+${index + 1}`)}</Key>
               </button>
             </li>
@@ -178,7 +212,9 @@ export function Header() {
               <span className="account-who">
                 <span className="account-name">All accounts</span>
                 <span className="account-address">Every mailbox in one list</span>
+                <Screening count={countsFor(counts, null).screener} />
               </span>
+              <Waiting counts={countsFor(counts, null)} />
               <Key>{keyLabel("ctrl+0")}</Key>
             </button>
           </li>

@@ -314,6 +314,14 @@ export interface SenderRule {
   reason: string | null;
 }
 
+export interface PlaceCounts {
+  accountId: string;
+  inbox: number;
+  screener: number;
+  feed: boolean;
+  paperTrail: boolean;
+}
+
 export interface ScreenerCard {
   accountId: string;
   sender: Person;

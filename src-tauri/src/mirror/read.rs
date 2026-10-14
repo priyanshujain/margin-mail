@@ -493,6 +493,36 @@ pub fn inbox_unseen(conn: &Connection) -> Result<i64, String> {
         .map_err(|e| e.to_string())
 }
 
+/// The meta key holding when this account's `place` was last opened.
+pub fn visited_key(place: Place) -> Option<&'static str> {
+    match place {
+        Place::Feed => Some("visited-feed"),
+        Place::PaperTrail => Some("visited-paper-trail"),
+        _ => None,
+    }
+}
+
+/// Whether an unseen thread has landed in the Feed or the Paper Trail since that place was last
+/// opened. Opening the place is what clears it, not reading everything in it.
+pub fn new_since_visit(conn: &Connection, place: Place) -> Result<bool, String> {
+    let key = visited_key(place).ok_or("that place has no visit to compare against")?;
+    let visited = write::meta_i64(conn, key)?.unwrap_or(0);
+    let mut params: Vec<Value> = Vec::new();
+    let clause = place_clause(conn, place, None, &mut params)?;
+    params.push(Value::Integer(visited));
+    let sql = format!(
+        "SELECT EXISTS (SELECT 1
+         {JOINS}
+         WHERE {NOT_MERGED_AWAY}
+           AND ({clause})
+           AND t.unseen = 1
+           AND COALESCE(tf.ignored, 0) = 0
+           AND t.latest_ms > ?)"
+    );
+    conn.query_row(&sql, params_from_iter(params), |row| row.get(0))
+        .map_err(|e| e.to_string())
+}
+
 /// The window is visible in two places and nowhere else, and this is the first of them.
 fn footer(conn: &Connection, place: Place) -> Result<Option<String>, String> {
     // Trash and Spam empty themselves on Gmail's clock, which is a second retention rule and the

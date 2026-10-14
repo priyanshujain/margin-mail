@@ -133,6 +133,29 @@
   font-size: var(--t-2);
 }
 
+.account-screening {
+  color: var(--accent-ink);
+  font-size: var(--t-1);
+  font-weight: 500;
+}
+
+.account-waiting {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.account-waiting .segment-dot {
+  margin-left: 0;
+}
+
+.account-elsewhere {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--danger);
+}
+
 /* Under the rule, because it is somewhere to go rather than one more account to be. */
 .account-settings {
   display: flex;

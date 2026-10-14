@@ -53,3 +53,20 @@ button.pill[data-tone="quiet"]:hover {
   min-height: var(--touch-h);
   padding: 0 14px;
 }
+
+.pill[data-tone="accent"] {
+  background: var(--accent);
+  color: var(--accent-contrast);
+  font-weight: 500;
+}
+
+button.pill[data-tone="accent"]:hover {
+  background: var(--accent-ink);
+}
+
+.pill[data-tone="accent"] .key {
+  border-color: var(--accent-contrast);
+  background: transparent;
+  color: var(--accent-contrast);
+  opacity: 0.8;
+}

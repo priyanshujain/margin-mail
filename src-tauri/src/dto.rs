@@ -182,6 +182,17 @@ pub enum Place {
     Search,
 }
 
+/// What is waiting in one account, for the header and the account switcher.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PlaceCounts {
+    pub account_id: String,
+    pub inbox: i64,
+    pub screener: i64,
+    pub feed: bool,
+    pub paper_trail: bool,
+}
+
 /// Where a sender's mail goes. Exactly one per sender, which is the whole of the routing model.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
