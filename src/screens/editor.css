@@ -94,8 +94,8 @@
 .editor-link button, .editor-proof-issue button { padding: 4px 6px; border-radius: var(--r-sm); font-size: var(--t-2); color: var(--ink); }
 .editor-link button:hover, .editor-proof-issue button:hover { background: var(--accent-wash); }
 .editor-link [role="alert"] { flex-basis: 100%; color: var(--ink-soft); font-size: var(--t-2); }
-.editor-proof-spelling { text-decoration: underline wavy #c96c62; text-underline-offset: 3px; }
-.editor-proof-grammar { text-decoration: underline wavy #699cc6; text-underline-offset: 3px; }
+.editor-proof-spelling { text-decoration: underline wavy var(--proof-spelling); text-underline-offset: 3px; }
+.editor-proof-grammar { text-decoration: underline wavy var(--proof-grammar); text-underline-offset: 3px; }
 .editor-proof-panel { max-height: 180px; overflow-y: auto; padding: 8px; margin-bottom: 12px; border: 1px solid var(--line); border-radius: var(--r-sm); color: var(--ink-soft); font-size: var(--t-2); }
 .editor-proof-panel p { margin: 0; }
 .editor-proof-issue { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; padding: 4px 0; }

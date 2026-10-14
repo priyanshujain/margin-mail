@@ -256,6 +256,10 @@ impl ThreadFacts {
     }
 }
 
+/// The key a thread is moved by hand under, which for a thread merged into another is that other's.
+const SHOWN_KEY: &str = "COALESCE((SELECT mg.merged_key FROM state.merges mg \
+     WHERE mg.thread_key = th.thread_key), th.thread_key)";
+
 /// The routing predicates run over the message itself rather than the thread's latest row, which
 /// is the same address on a thread that just grew by this message and the right one when two
 /// people wrote in the same pass.
@@ -270,10 +274,10 @@ fn thread_facts(conn: &Connection, message_id: &str) -> Result<Option<ThreadFact
            LEFT JOIN state.snoozes sn ON sn.thread_key = th.thread_key
            LEFT JOIN state.returned rt ON rt.thread_key = th.thread_key
           WHERE t.id = ?1",
-        to_inbox = routing::rule_is(Destination::Inbox),
-        to_feed = routing::rule_is(Destination::Feed),
-        to_paper_trail = routing::rule_is(Destination::PaperTrail),
-        has_rule = routing::HAS_RULE,
+        to_inbox = routing::rule_is(Destination::Inbox, SHOWN_KEY),
+        to_feed = routing::rule_is(Destination::Feed, SHOWN_KEY),
+        to_paper_trail = routing::rule_is(Destination::PaperTrail, SHOWN_KEY),
+        has_rule = routing::has_rule(SHOWN_KEY),
         in_thread = routing::IN_THREAD,
     );
     conn.query_row(&sql, [message_id], |row| {

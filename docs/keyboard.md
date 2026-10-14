@@ -45,7 +45,7 @@ app. Bindings live in a keymap file the user can edit; the defaults are what fol
 | `g` | Merge the selected threads | no |
 | `i` | Contact card for the sender | no |
 | `Shift+L` | Label… | yes |
-| `v` | Move to Inbox, Feed or Paper Trail (sets the sender's rule); in a label list, move to a label | rule: no, label: yes |
+| `v` | Move to Inbox, Feed or Paper Trail: this thread, or everything from its sender (sets the sender's rule). Move to a label is in the More menu, in a label list | rule: no, label: yes |
 | `Cmd+U` | Unsubscribe… | sends or opens |
 | `x` | Select the focused thread | |
 | `Shift+J` / `Shift+K` | Extend the selection down / up | |

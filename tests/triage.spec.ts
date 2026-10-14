@@ -180,12 +180,13 @@ test("a call that does not go through puts the row back and says so", async ({ p
   expect((await rows(page))[1].sender).toBe("Maya Raghunathan");
 });
 
-test("Mark all as seen is a link on the heading and a row in the palette", async ({ page }) => {
+test("Mark all as seen is an action in the palette", async ({ page }) => {
   await openApp(page, { now: MIDDAY() });
   await listReady(page);
 
   await expect.poll(async () => (await rows(page)).some((row) => row.unseen)).toBe(true);
-  await page.locator(".group-head-action", { hasText: "Mark all as seen" }).click();
+  await page.keyboard.press("Meta+k");
+  await page.locator(".palette-row", { hasText: "Mark all as seen" }).click();
   await expect.poll(async () => (await rows(page)).some((row) => row.unseen)).toBe(false);
   await expect.poll(async () => (await toast(page))?.text).toBe("Marked everything as seen");
 
@@ -272,23 +273,35 @@ test("the label picker says when the labels could not be read, and offers to try
   await expect(page.locator(".label-none", { hasText: "No labels" })).toHaveCount(0);
 });
 
-test("v moves to a label in a label list, and means nothing anywhere else", async ({ page }) => {
+test("v moves one thread or everything from its sender, and a label move is in the More menu", async ({ page }) => {
   await openApp(page, { now: MIDDAY() });
   await listReady(page);
 
-  // In the Inbox `v` is the routing verb, which belongs to the next milestone: nothing owns it, so
-  // it does nothing and shows nothing.
   await page.keyboard.press("j");
+  const rows = await page.locator(".row").count();
   await page.keyboard.press("v");
-  await expect(page.locator('[role="dialog"]')).toHaveCount(0);
+  const dialog = page.locator('[role="dialog"]');
+  await expect(dialog).toHaveAttribute("aria-label", "Move to");
+  // The place it is already in is not somewhere to move it.
+  await expect(dialog.locator(".label-option")).toHaveText(["Feed1", "Paper Trail2"]);
+  await page.keyboard.press("2");
+  await expect(dialog).toHaveAttribute("aria-label", "Move to Paper Trail");
+  await expect(dialog.locator(".label-option").first()).toHaveText("This thread1");
+  await expect(dialog.locator(".label-option").nth(1)).toContainText("Everything from");
+  await page.keyboard.press("1");
+  await expect(dialog).toHaveCount(0);
+  await expect.poll(async () => (await toast(page))?.text).toBe("Moved to Paper Trail");
+  await expect(page.locator(".row")).toHaveCount(rows - 1);
 
   await page.keyboard.press("Meta+k");
   await page.locator(".palette-row", { hasText: "The flat" }).click();
   await expect(page.locator(".list-title")).toHaveText("The flat");
   await expect(page.locator(".row", { hasText: "Arun Kulkarni" })).toHaveCount(1);
 
-  await page.keyboard.press("j");
-  await page.keyboard.press("v");
+  await page.locator(".row", { hasText: "Arun Kulkarni" }).click();
+  await page.locator('button[aria-label="More"], button[title^="More"]').first().click();
+  await expect(page.locator(".more-option", { hasText: "Move to…" })).toHaveCount(1);
+  await page.locator(".more-option", { hasText: "Move to a label" }).click();
   await expect(page.locator('[role="dialog"]')).toHaveAttribute("aria-label", "Move to a label");
   await page.locator(".label-option", { hasText: "School" }).click();
   await expect.poll(async () => (await toast(page))?.text).toBe("Moved to School");

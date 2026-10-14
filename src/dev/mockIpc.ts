@@ -987,6 +987,31 @@ export async function mockCall<T>(command: string, args?: Record<string, unknown
       );
     }
 
+    case "thread_move": {
+      const keys = arg<string[]>("keys");
+      const destination = arg<Destination>("destination");
+      const everything = arg<boolean>("everythingFromSender");
+      const name = destination === "paper-trail" ? "Paper Trail" : destination === "feed" ? "Feed" : "Inbox";
+      const senders = [...new Set(keys.flatMap((key) => byKey(key)?.from.address.toLowerCase() ?? []))];
+      const moving = everything
+        ? threads.filter((t) => senders.includes(t.from.address.toLowerCase())).map((t) => t.key)
+        : keys;
+      const taken = snapshot(moving);
+      for (const [thread] of taken) {
+        thread.place = destination;
+        thread.pile = null;
+      }
+      changed("threads screener state");
+      const label = everything
+        ? senders.length === 1
+          ? `Everything from ${senders[0]} goes to ${name}`
+          : `Everything from ${senders.length} senders goes to ${name}`
+        : keys.length === 1
+          ? `Moved to ${name}`
+          : `Moved ${keys.length} threads to ${name}`;
+      return done(undoable(label, restore(taken)));
+    }
+
     case "snooze_set": {
       const keys = arg<string[]>("keys");
       const kind = arg<SnoozeKind>("kind");
@@ -1127,6 +1152,16 @@ export async function mockCall<T>(command: string, args?: Record<string, unknown
     // ---------------------------------------------------------------------------------------
     // Messages, attachments
     // ---------------------------------------------------------------------------------------
+    case "message_images_set": {
+      const id = arg<string>("messageId");
+      const message = threads
+        .flatMap((thread) => thread.messages)
+        .find((candidate) => candidate.id === id || candidate.messageId === id);
+      if (!message) throw new Error(`dev mock has no message ${id}`);
+      message.imagesAllowed = arg<boolean>("allowed");
+      return done(message);
+    }
+
     case "message_show_images": {
       const id = arg<string>("messageId");
       const message = threads

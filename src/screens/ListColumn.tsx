@@ -16,6 +16,7 @@ import { useSnooze } from "../store/useSnooze";
 import { filling, type Fill, useSync } from "../store/useSync";
 import { cap, displayName, hueOf, isBrand, rowTime } from "./format";
 import { LabelPicker, type PickerMode } from "./ActionBar";
+import { useMove } from "../store/useMove";
 import { Piles } from "./Piles";
 import { mergeThreads, NoteSheet } from "./ReadingPane";
 import { QueryTerms } from "./SearchBar";
@@ -252,11 +253,12 @@ export function ListColumn() {
       // selection of one.
       merge: () => void mergeThreads(useSelection.getState().keys),
 
-      // `v` is two verbs in docs/keyboard.md: move to a place, which sets the sender's rule, and
-      // move to a label. The first is routing, it belongs to the next milestone and there is no
-      // command behind it yet, so `v` is registered here only where it means the second one.
+      move: onTargets((keys) => {
+        if (keys.length > 0) useMove.getState().show(keys);
+      }),
+      // A label move archives, so it means something only in a label list.
       ...(place === "label"
-        ? { move: () => setPicker(triage.targets().length > 0 ? "move" : null) }
+        ? { "move-label": () => setPicker(triage.targets().length > 0 ? "move" : null) }
         : {}),
 
       select: () => {

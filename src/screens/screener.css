@@ -115,6 +115,10 @@
   gap: 6px;
 }
 
+.screen-card > .thread-banner {
+  grid-column: 1 / -1;
+}
+
 /* The whole message, under the three buttons and across the card. Enter opens it and Enter closes
    it, so it is a state of the card rather than somewhere you went. */
 .screen-message {

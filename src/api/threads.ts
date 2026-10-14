@@ -1,5 +1,6 @@
 import {
   call,
+  type Destination,
   type FlagPatch,
   type Pile,
   type SnoozeKind,
@@ -39,6 +40,10 @@ export const markAllSeen = (accountId: string | null, place: string) =>
  */
 export const startFresh = (accountId: string, olderThanMs: number) =>
   call<Undo>("start_fresh", { accountId, olderThanMs });
+
+/** Moves the threads to a place, or with `everythingFromSender` sets their senders' rule instead. */
+export const threadMove = (keys: string[], destination: Destination, everythingFromSender: boolean) =>
+  call<Undo>("thread_move", { keys, destination, everythingFromSender });
 
 export const pileToggle = (keys: string[], pile: Pile) => call<Undo>("pile_toggle", { keys, pile });
 

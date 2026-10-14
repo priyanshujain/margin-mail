@@ -47,6 +47,14 @@ CREATE TABLE IF NOT EXISTS state.piles (
     device_id  TEXT NOT NULL DEFAULT ''
 );
 
+-- A thread moved to a place by hand, which beats its sender's rule for that thread and no other.
+CREATE TABLE IF NOT EXISTS state.thread_places (
+    thread_key  TEXT PRIMARY KEY,
+    destination TEXT NOT NULL,
+    at_ms       INTEGER NOT NULL DEFAULT 0,
+    device_id   TEXT NOT NULL DEFAULT ''
+);
+
 CREATE TABLE IF NOT EXISTS state.snoozes (
     thread_key TEXT PRIMARY KEY,
     return_at  INTEGER NOT NULL,

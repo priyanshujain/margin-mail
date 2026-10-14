@@ -40,10 +40,11 @@ pub enum Kind {
     Contact,
     Pref,
     Marker,
+    ThreadPlace,
 }
 
 impl Kind {
-    pub const ALL: [Kind; 11] = [
+    pub const ALL: [Kind; 12] = [
         Kind::SenderRule,
         Kind::Pile,
         Kind::Snooze,
@@ -55,6 +56,7 @@ impl Kind {
         Kind::Contact,
         Kind::Pref,
         Kind::Marker,
+        Kind::ThreadPlace,
     ];
 
     pub fn as_str(self) -> &'static str {
@@ -70,6 +72,7 @@ impl Kind {
             Kind::Contact => "contact",
             Kind::Pref => "pref",
             Kind::Marker => "marker",
+            Kind::ThreadPlace => "thread-place",
         }
     }
 
@@ -91,6 +94,7 @@ impl Kind {
             Kind::Contact => ("contacts", "address"),
             Kind::Pref => ("prefs", "key"),
             Kind::Marker => ("markers", "place"),
+            Kind::ThreadPlace => ("thread_places", "thread_key"),
         }
     }
 }
@@ -201,6 +205,10 @@ pub enum Payload {
         #[serde(default)]
         seen_ms: i64,
     },
+    ThreadPlace {
+        #[serde(default)]
+        destination: Option<String>,
+    },
 }
 
 impl Payload {
@@ -217,6 +225,7 @@ impl Payload {
             Payload::Contact { .. } => Kind::Contact,
             Payload::Pref { .. } => Kind::Pref,
             Payload::Marker { .. } => Kind::Marker,
+            Payload::ThreadPlace { .. } => Kind::ThreadPlace,
         }
     }
 }
@@ -583,6 +592,17 @@ fn materialise(conn: &Connection, record: &Record, payload: &Payload) -> Result<
                  device_id = excluded.device_id",
             params![key, seen_ms, at, by],
         ),
+        Payload::ThreadPlace { destination } => match destination {
+            Some(destination) => conn.execute(
+                "INSERT INTO state.thread_places (thread_key, destination, at_ms, device_id)
+                 VALUES (?1, ?2, ?3, ?4)
+                 ON CONFLICT(thread_key) DO UPDATE SET
+                     destination = excluded.destination, at_ms = excluded.at_ms,
+                     device_id = excluded.device_id",
+                params![key, destination, at, by],
+            ),
+            None => conn.execute("DELETE FROM state.thread_places WHERE thread_key = ?1", [key]),
+        },
     }
     .map(|_| ())
     .map_err(|e| e.to_string())

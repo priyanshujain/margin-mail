@@ -92,8 +92,12 @@ test("the invitation renders with its date, its time and its organiser", async (
   const card = page.locator(".invite");
   await expect(card.locator(".invite-title")).toHaveText("Piano lesson: Cooper");
   // A calendar page: the month above the day, so the date is read rather than parsed.
-  // Whatever the locale calls September in three or four letters, which is "Sept" in en-GB.
-  await expect(card.locator(".invite-date .mon")).toHaveText(/^Sept?$/);
+  const month = await page.evaluate(() => {
+    const day = new Date();
+    day.setDate(day.getDate() + ((3 - day.getDay() + 7) % 7 || 7));
+    return new Intl.DateTimeFormat("en-GB", { month: "short" }).format(day);
+  });
+  await expect(card.locator(".invite-date .mon")).toHaveText(month);
   await expect(card.locator(".invite-date .day")).toHaveText(/^\d{1,2}$/);
   await expect(card.locator(".invite-when")).toContainText("17:00 to 17:45");
   await expect(card.locator(".invite-when")).toContainText("Sunny Day Music, Bandra");

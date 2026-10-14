@@ -14,8 +14,8 @@ import "./more.css";
  * docs/keyboard.md lists them, each printed with its key. A row runs the command and nothing else,
  * so the row, the key and the palette are one code path and cannot come to mean different things.
  *
- * A verb nobody owns right now is left out rather than greyed: `v` means a label move only in a
- * label list, `Cmd+U` is the Feed's, and a menu that showed them dimmed everywhere else would be a
+ * A verb nobody owns right now is left out rather than greyed: a label move means something only in
+ * a label list, `Cmd+U` is the Feed's, and a menu that showed them dimmed everywhere else would be a
  * menu you had to read twice. The registry is asked when the menu opens, which is the moment the
  * answer is about.
  */
@@ -40,7 +40,8 @@ const VERBS: readonly MoreVerb[] = [
   { command: "note", label: "Add a note" },
   { command: "contact-card", label: "Contact card" },
   { command: "label", label: "Label" },
-  { command: "move", label: "Move to a label" },
+  { command: "move", label: "Move to…" },
+  { command: "move-label", label: "Move to a label" },
   { command: "trash", label: (f) => (f.trashed ? "Put back" : "Trash") },
   { command: "spam", label: (f) => (f.spam ? "Not spam" : "Mark as spam") },
 ];

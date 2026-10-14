@@ -11,6 +11,7 @@ import { Clips } from "./screens/Clips";
 import { Compose } from "./screens/Compose";
 import { AppLockGate } from "./screens/AppLock";
 import { ContactCards } from "./screens/ContactCards";
+import { MovePicker } from "./screens/MovePicker";
 import { Contacts } from "./screens/Contacts";
 import { Feed } from "./screens/Feed";
 import { Files } from "./screens/Files";
@@ -28,6 +29,7 @@ import { Toasts } from "./screens/Toasts";
 import { ShortcutsSheet } from "./keys/Shortcuts";
 
 import { notifyTake } from "./api/notifications";
+import { openAppStoreUpdates, updateChannel } from "./api/updates";
 import { useEscapeLayer } from "./escape";
 import { registerCommands } from "./keys/commands";
 import { setAccountSwitch, useKeyContext, useKeymap } from "./keys/keymap";
@@ -100,6 +102,15 @@ const ISSUES_URL = "https://github.com/priyanshujain/margin-mail/issues/new";
 async function checkForUpdates(): Promise<void> {
   if (!isDesktop) return;
   try {
+    const channel = await updateChannel();
+    if (channel === "appstore") {
+      await openAppStoreUpdates();
+      return;
+    }
+    if (channel === "none") {
+      notify("Updates are unavailable for this build.");
+      return;
+    }
     const update = await check();
     if (!update) {
       notify("This is the newest there is.");
@@ -422,6 +433,7 @@ function Shell() {
           the Feed, the Screener and the libraries would each have a Write button that did nothing. */}
       <Compose />
       <ContactCards />
+      <MovePicker />
       <CommandPalette />
       <ShortcutsSheet open={overlay === "shortcuts"} onClose={closeOverlay} />
       <Tour />

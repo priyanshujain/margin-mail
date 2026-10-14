@@ -1,4 +1,4 @@
-render-version: 2
+render-version: 5
 message-id: 01000198a3f1-longread@thelongread.example
 in-reply-to: -
 references-first: -

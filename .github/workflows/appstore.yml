@@ -1,0 +1,142 @@
+name: App Store package
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Commit or tag to build, for example v0.1.0."
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: appstore-package
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: macos-26
+    defaults:
+      run:
+        shell: bash
+        working-directory: rust/margin-mail
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref }}
+          path: rust/margin-mail
+
+      - uses: actions/checkout@v7
+        with:
+          repository: priyanshujain/margin
+          path: python/margin
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 26
+
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 10
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin,x86_64-apple-darwin
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: rust/margin-mail/src-tauri -> target
+          key: appstore-universal
+
+      - name: Install just
+        run: brew install just
+
+      - name: Install frontend dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Provision Google credentials
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+        run: |
+          set -euo pipefail
+          if [ -z "$GOOGLE_CREDENTIALS" ]; then
+            echo "::error::GOOGLE_CREDENTIALS is required; placeholder credentials cannot connect to Gmail."
+            exit 1
+          fi
+          printf '%s' "$GOOGLE_CREDENTIALS" > google-credentials.json
+          chmod 600 google-credentials.json
+
+      - name: Import App Store certificates and profiles
+        env:
+          APP_CERT: ${{ secrets.MAS_APP_CERTIFICATE }}
+          APP_CERT_PASSWORD: ${{ secrets.MAS_APP_CERTIFICATE_PASSWORD }}
+          INSTALLER_CERT: ${{ secrets.MAS_INSTALLER_CERTIFICATE }}
+          INSTALLER_CERT_PASSWORD: ${{ secrets.MAS_INSTALLER_CERTIFICATE_PASSWORD }}
+          APP_PROFILE: ${{ secrets.MAS_PROVISION_PROFILE }}
+          AUTOFILL_PROFILE: ${{ secrets.MAS_AUTOFILL_PROVISION_PROFILE }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          MAS_APP_IDENTITY: ${{ secrets.MAS_APP_IDENTITY }}
+          MAS_INSTALLER_IDENTITY: ${{ secrets.MAS_INSTALLER_IDENTITY }}
+        run: |
+          set -euo pipefail
+          for name in APP_CERT INSTALLER_CERT APP_PROFILE AUTOFILL_PROFILE APPLE_TEAM_ID MAS_APP_IDENTITY MAS_INSTALLER_IDENTITY; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Required App Store signing setting is missing: $name"
+              exit 1
+            fi
+          done
+          keychain="$RUNNER_TEMP/margin-mail-appstore.keychain-db"
+          password=$(uuidgen)
+          security create-keychain -p "$password" "$keychain"
+          security set-keychain-settings -lut 3600 "$keychain"
+          security unlock-keychain -p "$password" "$keychain"
+          import_p12() {
+            printf '%s' "$1" | base64 --decode > "$RUNNER_TEMP/margin-mail-cert.p12"
+            chmod 600 "$RUNNER_TEMP/margin-mail-cert.p12"
+            security import "$RUNNER_TEMP/margin-mail-cert.p12" -k "$keychain" -P "$2" \
+              -T /usr/bin/codesign -T /usr/bin/productbuild
+            rm -f "$RUNNER_TEMP/margin-mail-cert.p12"
+          }
+          import_p12 "$APP_CERT" "$APP_CERT_PASSWORD"
+          import_p12 "$INSTALLER_CERT" "$INSTALLER_CERT_PASSWORD"
+          security set-key-partition-list -S apple-tool:,apple: -k "$password" "$keychain" > /dev/null
+          security list-keychains -d user -s "$keychain" login.keychain-db
+          printf '%s' "$APP_PROFILE" | base64 --decode > "$RUNNER_TEMP/margin-mail.provisionprofile"
+          printf '%s' "$AUTOFILL_PROFILE" | base64 --decode > "$RUNNER_TEMP/margin-mail-autofill.provisionprofile"
+          chmod 600 "$RUNNER_TEMP/margin-mail.provisionprofile" "$RUNNER_TEMP/margin-mail-autofill.provisionprofile"
+
+      - name: Build and sign universal package
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          MAS_APP_IDENTITY: ${{ secrets.MAS_APP_IDENTITY }}
+          MAS_INSTALLER_IDENTITY: ${{ secrets.MAS_INSTALLER_IDENTITY }}
+          MAS_PROVISION_PROFILE: ${{ runner.temp }}/margin-mail.provisionprofile
+          MAS_AUTOFILL_PROVISION_PROFILE: ${{ runner.temp }}/margin-mail-autofill.provisionprofile
+          MAS_BUILD_NUMBER: ${{ github.run_number }}
+          MAS_TARGET: universal-apple-darwin
+        run: just package-appstore
+
+      - name: Preserve signed package
+        uses: actions/upload-artifact@v4
+        with:
+          name: margin-mail-appstore-${{ github.run_number }}
+          path: rust/margin-mail/target-mas/*.pkg
+          if-no-files-found: error
+
+      - name: Remove signing material
+        if: always()
+        working-directory: ${{ github.workspace }}
+        run: |
+          status=0
+          security list-keychains -d user -s login.keychain-db || status=$?
+          if [ -f "$RUNNER_TEMP/margin-mail-appstore.keychain-db" ]; then
+            security delete-keychain "$RUNNER_TEMP/margin-mail-appstore.keychain-db" || status=$?
+          fi
+          rm -f "$RUNNER_TEMP/margin-mail-cert.p12" \
+            "$RUNNER_TEMP/margin-mail.provisionprofile" \
+            "$RUNNER_TEMP/margin-mail-autofill.provisionprofile" \
+            "$GITHUB_WORKSPACE/rust/margin-mail/google-credentials.json" || status=$?
+          exit "$status"

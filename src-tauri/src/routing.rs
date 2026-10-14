@@ -279,13 +279,12 @@ pub const IN_THREAD: &str = "EXISTS (SELECT 1 FROM messages m \
 
 /// True when the sender has a rule, of either kind. The domain is taken from the address in SQL so
 /// that the whole question stays inside the statement.
-pub const HAS_RULE: &str = "EXISTS (SELECT 1 FROM state.sender_rules r \
+const SENDER_HAS_RULE: &str = "EXISTS (SELECT 1 FROM state.sender_rules r \
      WHERE (r.is_domain = 0 AND r.subject = lower(t.from_address)) \
         OR (r.is_domain = 1 AND r.subject = substr(lower(t.from_address), \
              instr(t.from_address, '@') + 1)))";
 
-/// The predicate for a sender whose destination is a given one.
-pub fn rule_is(destination: Destination) -> String {
+fn sender_rule_is(destination: Destination) -> String {
     format!(
         "EXISTS (SELECT 1 FROM state.sender_rules r \
            WHERE ((r.is_domain = 0 AND r.subject = lower(t.from_address)) \
@@ -297,6 +296,29 @@ pub fn rule_is(destination: Destination) -> String {
                      AND a.destination <> '{}'))",
         state::write::destination_name(destination),
         state::write::destination_name(destination),
+    )
+}
+
+fn placed(thread: &str) -> String {
+    format!("EXISTS (SELECT 1 FROM state.thread_places tp WHERE tp.thread_key = {thread})")
+}
+
+/// True when the thread was moved by hand or its sender has a rule. `thread` is the SQL for the
+/// thread's key in the statement this lands in.
+pub fn has_rule(thread: &str) -> String {
+    format!("({} OR {SENDER_HAS_RULE})", placed(thread))
+}
+
+/// The predicate for a thread whose destination is a given one: where it was moved by hand, and
+/// where its sender's rule puts it when it never was.
+pub fn rule_is(destination: Destination, thread: &str) -> String {
+    format!(
+        "(EXISTS (SELECT 1 FROM state.thread_places tp \
+            WHERE tp.thread_key = {thread} AND tp.destination = '{}') \
+          OR (NOT {} AND {}))",
+        state::write::destination_name(destination),
+        placed(thread),
+        sender_rule_is(destination),
     )
 }
 

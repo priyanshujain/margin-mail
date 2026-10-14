@@ -81,10 +81,6 @@ export function useComposerFrame(at: ComposerAt, onSend: (now: boolean) => void)
 
   useKeyContext("editor", inside);
 
-  // A Tauri window answers a drop itself rather than letting the webview see it, which is the whole
-  // reason drag and drop is the one route that carries a real path: a `File` from the webview's own
-  // picker has a name and no path, and `DraftAttachment` wants a path. The size is not in the event,
-  // so it goes in as zero and `DraftSaved.overLimit` is what actually decides whether it fits.
   useEffect(() => {
     if (!isTauri || !root) return;
     const stop = listen<{ paths: string[]; position: { x: number; y: number } }>(
@@ -94,15 +90,9 @@ export function useComposerFrame(at: ComposerAt, onSend: (now: boolean) => void)
         const x = payload.position.x / window.devicePixelRatio;
         const y = payload.position.y / window.devicePixelRatio;
         if (x < rect.left || x > rect.right || y < rect.top || y > rect.bottom) return;
-        useCompose.getState().attach(
-          at,
-          payload.paths.map((path) => ({
-            path,
-            filename: path.split(/[\\/]/).pop() ?? path,
-            mimeType: "application/octet-stream",
-            size: 0,
-          })),
-        );
+        void storeAttachments(at, persistDroppedFiles(at, payload.paths)).catch((error) => {
+          notify(`Could not attach files: ${error}`);
+        });
       },
     );
     return () => void stop.then((off) => off());
@@ -191,6 +181,26 @@ async function persistFiles(at: ComposerAt, files: File[]): Promise<void> {
       reader.readAsDataURL(file);
     });
     attachments.push(await draftAttachmentStore(composer.draft.accountId, descriptor, data));
+  }
+  const current = at === "card" ? useCompose.getState().card : useCompose.getState().reply;
+  if (current?.draft.id === draftId) {
+    useCompose.getState().attach(at, attachments);
+  }
+}
+
+async function persistDroppedFiles(at: ComposerAt, paths: string[]): Promise<void> {
+  const composer = at === "card" ? useCompose.getState().card : useCompose.getState().reply;
+  if (!composer || paths.length === 0) return;
+  const draftId = composer.draft.id || crypto.randomUUID();
+  if (!composer.draft.id) useCompose.getState().edit(at, { id: draftId });
+  const attachments: DraftAttachment[] = [];
+  for (const path of paths) {
+    attachments.push(await draftAttachmentStore(composer.draft.accountId, {
+      path,
+      filename: path.split(/[\\/]/).pop() ?? path,
+      mimeType: "application/octet-stream",
+      size: 0,
+    }));
   }
   const current = at === "card" ? useCompose.getState().card : useCompose.getState().reply;
   if (current?.draft.id === draftId) {

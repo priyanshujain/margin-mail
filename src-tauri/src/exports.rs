@@ -172,10 +172,9 @@ pub fn export_state(app: tauri::AppHandle) -> Result<String, String> {
 /// when two devices meet. Importing the same file twice changes nothing, which is the same property
 /// that lets a device catch up after a month offline.
 #[tauri::command(async)]
-pub fn import_state(app: tauri::AppHandle, path: String) -> Result<(), String> {
+pub fn import_state(app: tauri::AppHandle, contents: String) -> Result<(), String> {
     let db = app.try_state::<Db>().ok_or("the mirror is not open yet")?;
-    let raw = fs::read_to_string(&path).map_err(|e| format!("could not read {path}: {e}"))?;
-    let document: serde_json::Value = serde_json::from_str(&raw).map_err(|e| e.to_string())?;
+    let document: serde_json::Value = serde_json::from_str(&contents).map_err(|e| e.to_string())?;
 
     if document.get("kind").and_then(|k| k.as_str()) != Some("margin-mail-state") {
         return Err("that file is not a Margin Mail export".to_string());

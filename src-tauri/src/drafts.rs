@@ -46,14 +46,30 @@ pub fn draft_attachment_store(
     account_id: String,
     filename: String,
     mime_type: String,
-    data_base64: String,
+    data_base64: Option<String>,
+    path: Option<String>,
 ) -> Result<DraftAttachment, String> {
     use base64::Engine;
-    if data_base64.len() as u64 > MAX_ENCODED_BYTES {
+    let bytes = if let Some(data) = data_base64 {
+        if data.len() as u64 > MAX_ENCODED_BYTES {
+            return Err(format!("{filename} is too large to attach"));
+        }
+        base64::engine::general_purpose::STANDARD
+            .decode(data).map_err(|e| e.to_string())?
+    } else if let Some(path) = path {
+        let file = std::fs::File::open(path)
+            .map_err(|e| format!("{filename} could not be read: {e}"))?;
+        let mut bytes = Vec::new();
+        use std::io::Read;
+        file.take(MAX_ENCODED_BYTES * 3 / 4 + 1)
+            .read_to_end(&mut bytes).map_err(|e| e.to_string())?;
+        bytes
+    } else {
+        return Err(format!("{filename} has no file content"));
+    };
+    if (bytes.len() as u64).div_ceil(3) * 4 > MAX_ENCODED_BYTES {
         return Err(format!("{filename} is too large to attach"));
     }
-    let bytes = base64::engine::general_purpose::STANDARD
-        .decode(data_base64).map_err(|e| e.to_string())?;
     let db = db_of(&app)?;
     db.with(&account_id, |_| Ok(()))?;
     let directory = db.account_dir(&account_id).join("draft-files");

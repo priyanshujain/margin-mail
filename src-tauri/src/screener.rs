@@ -30,7 +30,8 @@ pub fn list(conn: &Connection, account_id: &str) -> Result<Vec<ScreenerCard>, St
                 AND NOT {}
               GROUP BY lower(t.from_address)
               ORDER BY latest_ms DESC",
-            routing::HAS_RULE, routing::IN_THREAD
+            routing::has_rule("t.thread_key"),
+            routing::IN_THREAD
         ))
         .map_err(|e| e.to_string())?;
 

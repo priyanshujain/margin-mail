@@ -169,7 +169,7 @@ A flat list, newest first, of threads routed to it. No read state. A sender with
 thread in the last seven days is bundled into one row showing the count and the latest subject;
 `Enter` expands the bundle in place, and bundling can be turned off per sender from the contact
 card and off entirely in settings. The reading pane works as in the Inbox. Verbs are the same as
-the Inbox minus the seen toggle, plus Move to Inbox.
+the Inbox minus the seen toggle, plus Move to.
 
 ## 6. The piles
 

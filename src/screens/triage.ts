@@ -11,11 +11,12 @@
 // the same thing once two actions have happened, and a toast that undid the wrong one would be
 // worse than no toast at all.
 
-import { flagsSet, markAllSeen } from "../api/threads";
+import { flagsSet, markAllSeen, threadMove } from "../api/threads";
 import { labelApply, labelMove } from "../api/labels";
 import { undoLast, undoToken } from "../api/undo";
-import type { FlagPatch, Place, ThreadSummary, Undo } from "../ipc";
+import type { Destination, FlagPatch, Place, ThreadSummary, Undo } from "../ipc";
 import { useMail } from "../store/useMail";
+import { usePiles } from "../store/usePiles";
 import { useSearch } from "../store/useSearch";
 import { useSelection } from "../store/useSelection";
 import { notify, useToast } from "../store/useToast";
@@ -226,6 +227,37 @@ export async function move(keys: string[], labelId: string): Promise<void> {
   useSelection.getState().clear();
   try {
     acknowledge(await labelMove(keys, labelId));
+  } catch (e) {
+    useMail.getState().untake(taken);
+    notify(`That did not go through: ${e}`);
+  }
+}
+
+/** The places a move takes a row out of: wherever it was routed, piled or waiting. */
+const ROUTED: Place[] = ["inbox", "feed", "paper-trail", "reply-later", "set-aside", "screener"];
+
+/**
+ * `v`. One thread moves on its own; everything from the sender moves the sender's rule, which
+ * takes their other threads along, so the list is asked again rather than guessed at.
+ */
+export async function moveTo(
+  keys: string[],
+  destination: Destination,
+  everythingFromSender: boolean,
+): Promise<void> {
+  if (keys.length === 0) return;
+  const mail = useMail.getState();
+  const going = ROUTED.includes(mail.place) && mail.place !== destination;
+  const taken = going ? mail.take(keys) : [];
+  useSelection.getState().clear();
+  const after = () => {
+    refresh();
+    void usePiles.getState().load();
+  };
+  try {
+    const undo = await threadMove(keys, destination, everythingFromSender);
+    if (everythingFromSender) after();
+    acknowledge(undo, after);
   } catch (e) {
     useMail.getState().untake(taken);
     notify(`That did not go through: ${e}`);

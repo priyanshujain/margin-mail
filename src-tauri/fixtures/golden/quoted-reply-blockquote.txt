@@ -1,4 +1,4 @@
-render-version: 2
+render-version: 5
 message-id: CAG5dev-slides-03@mail.example.org
 in-reply-to: CAG5pj-slides-02@mail.73ai.org
 references-first: CAG5dev-slides-01@mail.example.org

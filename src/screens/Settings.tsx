@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { getVersion } from "@tauri-apps/api/app";
 import { openPath, revealItemInDir } from "@tauri-apps/plugin-opener";
 import { relaunch } from "@tauri-apps/plugin-process";
@@ -16,6 +16,7 @@ import { accountRemove, accountSetColor, accountSetName } from "../api/accounts"
 import { backupConfigure, backupNow, backupPhrase, backupRestore } from "../api/backup";
 import { contactUpdate, contactsList } from "../api/contacts";
 import { imapServers } from "../api/imap";
+import { openAppStoreUpdates, updateChannel } from "../api/updates";
 import { otpAutofillEnable, otpAutofillStatus, type OtpAutofillStatus } from "../api/otpAutofill";
 import {
   askForNotifications,
@@ -2332,7 +2333,8 @@ function DataSection() {
   const storage = useSettings((s) => s.storage);
   const loadStorage = useSettings((s) => s.loadStorage);
   const accounts = useAccounts((s) => s.accounts);
-  const [importing, setImporting] = useState("");
+  const [importing, setImporting] = useState<File | null>(null);
+  const importInput = useRef<HTMLInputElement>(null);
   const [asking, setAsking] = useState<Asking | null>(null);
   // Every one of these holds the database lock for as long as it takes to walk the whole mirror,
   // so a second press before the first answers is a second file, not a second chance.
@@ -2367,10 +2369,12 @@ function DataSection() {
   };
 
   const bring = async () => {
+    if (!importing) return;
     setPhase("importing");
     try {
-      await importState(importing.trim());
-      setImporting("");
+      await importState(await importing.text());
+      setImporting(null);
+      if (importInput.current) importInput.current.value = "";
       setPhase("idle");
       notify("Your app state was imported");
     } catch (e) {
@@ -2436,16 +2440,16 @@ function DataSection() {
           </Button>
         </div>
         <input
-          {...NO_AUTOFILL}
           className="settings-input"
-          type="text"
+          type="file"
+          ref={importInput}
+          accept=".json,application/json"
           aria-label="App state file to import"
-          placeholder="The path of a file an export wrote"
-          value={importing}
-          onChange={(e) => setImporting(e.target.value)}
+          disabled={busy}
+          onChange={(e) => setImporting(e.target.files?.[0] ?? null)}
         />
         <div className="set-actions">
-          <Button disabled={importing.trim().length === 0 || busy} onClick={() => void bring()}>
+          <Button disabled={!importing || busy} onClick={() => void bring()}>
             {phase === "importing" ? "Importing" : "Import"}
           </Button>
         </div>
@@ -2548,6 +2552,17 @@ function AboutSection() {
   const look = async () => {
     setPhase("checking");
     try {
+      const channel = await updateChannel();
+      if (channel === "appstore") {
+        await openAppStoreUpdates();
+        setPhase("idle");
+        return;
+      }
+      if (channel === "none") {
+        setPhase("idle");
+        notify("Updates are unavailable for this build.");
+        return;
+      }
       const update = await check();
       setOffered(update);
       setPhase(update ? "found" : "current");

@@ -65,6 +65,24 @@ build:
       *)      echo "just: no local build for $(uname -s); macOS and Linux are the desktop targets." >&2; exit 1 ;;
     esac
 
+# Build a sandboxed App Store app for local manual testing.
+build-appstore:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    [ "$(uname -s)" = Darwin ] || { echo "just: App Store builds require macOS." >&2; exit 1; }
+    APPLE_SIGNING_IDENTITY=- pnpm tauri build --bundles app --config src-tauri/tauri.appstore.conf.json
+
+package-appstore:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    [ "$(uname -s)" = Darwin ] || { echo "just: App Store packaging requires macOS." >&2; exit 1; }
+    : "${MAS_INSTALLER_IDENTITY:?set MAS_INSTALLER_IDENTITY}"
+    autofill_config=$(MAS_MODE=1 node scripts/prepare-autofill.mjs)
+    target_args=()
+    if [ -n "${MAS_TARGET:-}" ]; then target_args=(--target "$MAS_TARGET"); fi
+    env -u APPLE_SIGNING_IDENTITY pnpm tauri build "${target_args[@]}" --no-sign --bundles app --config src-tauri/tauri.appstore.conf.json --config "$autofill_config"
+    bash scripts/mas-package.sh
+
 # Wants flatpak and flatpak-builder >= 1.4.4, and pulls the GNOME runtime if needed.
 # The release workflow runs the same script over the deb it published.
 # Build the flatpak, which is the deb repackaged. Linux only.

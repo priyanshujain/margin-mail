@@ -14,6 +14,7 @@ use std::sync::{Mutex, OnceLock};
 use crate::clips;
 use crate::decisions;
 use crate::mirror;
+use crate::moves;
 use crate::piles;
 use crate::screener;
 use crate::send;
@@ -179,6 +180,9 @@ fn apply(app: &tauri::AppHandle, token: &str) -> Result<(), String> {
     // word undo, so they keep their own stacks and this is the one place that knows them all.
     if screener::owns(token) {
         return screener::undo_apply(app, token);
+    }
+    if moves::owns(token) {
+        return moves::undo_apply(app, token);
     }
     if piles::owns(token) {
         return piles::undo_apply(app, token);

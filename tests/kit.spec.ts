@@ -110,6 +110,7 @@ test("every text field in the app tells the webview not to fill it in", () => {
   for (const file of files) {
     const text = readFileSync(join(root, file), "utf8");
     for (const tag of text.match(/<input\b[\s\S]*?\n\s*\/>/g) ?? []) {
+      if (/type="(?:file|checkbox|radio|range|color)"/.test(tag)) continue;
       if (/NO_AUTOFILL|autoComplete=/.test(tag)) continue;
       offenders.push(`${file}  ${tag.split("\n")[0].trim()}`);
     }

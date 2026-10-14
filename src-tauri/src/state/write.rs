@@ -165,6 +165,37 @@ pub fn clear_rule(conn: &Connection, address: &str) -> Result<(), String> {
     Ok(())
 }
 
+/// Takes away the rule on this address and leaves a domain rule standing, which is what putting
+/// back a sender who was routed by their domain before they were moved by hand needs.
+pub fn clear_address_rule(conn: &Connection, address: &str) -> Result<(), String> {
+    append(
+        conn,
+        &address.trim().to_lowercase(),
+        &Payload::SenderRule {
+            is_domain: false,
+            destination: None,
+            reason: None,
+        },
+    )
+    .map(|_| ())
+}
+
+/// Puts one thread in a place regardless of its sender's rule, or with `None` hands it back to it.
+pub fn set_thread_place(
+    conn: &Connection,
+    thread_key: &str,
+    destination: Option<Destination>,
+) -> Result<(), String> {
+    append(
+        conn,
+        thread_key,
+        &Payload::ThreadPlace {
+            destination: destination.map(|d| destination_name(d).to_string()),
+        },
+    )
+    .map(|_| ())
+}
+
 // ---------------------------------------------------------------------------------------------
 // Piles
 // ---------------------------------------------------------------------------------------------

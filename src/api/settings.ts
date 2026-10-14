@@ -22,7 +22,7 @@ export const exportMbox = (accountId: string) => call<string>("export_mbox", { a
 
 export const exportState = () => call<string>("export_state");
 
-export const importState = (path: string) => call<void>("import_state", { path });
+export const importState = (contents: string) => call<void>("import_state", { contents });
 
 /** The package manager that owns this install, when one does. */
 export const packagedBy = () => call<string | null>("packaged_by");

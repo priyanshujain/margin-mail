@@ -131,15 +131,16 @@ test("a card per sender, with its reason and where it suggests they go", async (
   expect(todd.why).toBe("Written by a person · suggested Inbox");
   // The suggestion is on the button as well as in the pill: `y` says where it is going.
   expect(todd.actions).toEqual([
+    { label: "View entire email", key: "" },
     { label: "Yes, to Inbox", key: "y" },
     { label: "Elsewhere", key: "v" },
     { label: "No", key: "n" },
   ]);
 
   expect(all[1].why).toBe("Has an unsubscribe header · suggested Feed");
-  expect(all[1].actions[0].label).toBe("Yes, to Feed");
+  expect(all[1].actions[1].label).toBe("Yes, to Feed");
   expect(all[2].why).toBe("Sent by a service for a person · suggested Paper Trail");
-  expect(all[2].actions[0].label).toBe("Yes, to Paper Trail");
+  expect(all[2].actions[1].label).toBe("Yes, to Paper Trail");
 
   // The keyboard is on the top card, and it is the only one wearing the ring.
   expect(all.map((c) => c.focused)).toEqual([true, false, false]);
@@ -183,13 +184,13 @@ test("a double-click on Yes decides one sender, because the card waits for the a
   await openScreener(page);
 
   const first = page.locator(".screen-card").first();
-  await first.locator(".screen-actions .button").first().dblclick();
+  await first.locator(".screen-actions .button", { hasText: "Yes, to Inbox" }).dblclick();
 
   // The card is still there, marked, with all three buttons down, so the second click landed on
   // a button that could not take it rather than on the next sender's Yes.
   await expect(first).toHaveAttribute("data-state", "deciding");
   await expect(page.locator(".screen-card")).toHaveCount(3);
-  for (const button of await first.locator(".screen-actions .button").all()) {
+  for (const button of await first.locator(".screen-actions .button").filter({ hasNotText: "View entire email" }).all()) {
     await expect(button).toBeDisabled();
   }
 
@@ -230,7 +231,7 @@ test("an expanded card whose body is not cached breathes until it arrives", asyn
   await expect(slot.locator(".msg-frame")).toHaveCount(0);
   await expect(slot.locator(".button")).toHaveText(/Reply/);
 
-  await expect(slot.locator(".msg-frame")).toBeVisible({ timeout: 10_000 });
+  await expect(slot.locator(".msg-frame").first()).toBeVisible({ timeout: 10_000 });
   await expect(slot.locator(".msg-pending")).toHaveCount(0);
   await expect
     .poll(async () => (await bodyText(page)).join(" "), { timeout: 10_000 })
@@ -344,7 +345,7 @@ test("Clear all asks before it screens everybody out", async ({ page }) => {
   await page.locator(".screen-tools .button", { hasText: "Clear all" }).click();
   await page.locator(".confirm-actions .button", { hasText: "Screen them out" }).click();
   await expect(page.locator(".screen-card")).toHaveCount(0);
-  await expect(page.locator(".empty-state")).toHaveText("No one is waiting");
+  await expect(page.locator(".list-title")).toHaveText("Inbox");
   await expect.poll(async () => (await toast(page))?.text).toBe("3 senders screened out");
 });
 

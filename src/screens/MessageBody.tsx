@@ -11,10 +11,9 @@ import { Button, Pill, Sheet } from "../ui";
  * The frame is here for style isolation. Mail HTML sets global styles aggressively, and rendering a
  * newsletter in the app's own document lets it restyle the list beside it.
  *
- * Scripts cannot run in it. `sandbox` without `allow-scripts` disables them; the content security
- * policy in src-tauri/tauri.conf.json is `script-src 'self'`, which independently blocks inline
- * scripts and inline event handlers; and the sanitiser in Rust has already removed them. Three
- * layers, and the sanitiser is only the first.
+ * Sender scripts cannot run in it. The frame's content security policy is `script-src 'none'`,
+ * and the sanitiser in Rust has already removed scripts and inline event handlers. The sandbox
+ * allows scripts because WebKit otherwise blocks even the parent's click listener.
  *
  * `sandbox=""` would be tighter and it is what an earlier draft called for, but it makes the
  * frame's origin opaque, and a document the parent cannot reach is a document the parent cannot
@@ -180,7 +179,7 @@ export function MessageBody({ html, plain, surface = "theme", imagesAllowed }: M
     () =>
       css === null
         ? ""
-        : `<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="img-src ${allowImages ? "data: blob:" : "'none'"}"><style>${tokens}\n${css}</style></head><body${plain ? " data-plain" : ""}${surface === "paper" ? " data-paper" : ""}>${html}</body></html>`,
+        : `<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="script-src 'none'; img-src ${allowImages ? "data: blob:" : "'none'"}"><style>${tokens}\n${css}</style></head><body${plain ? " data-plain" : ""}${surface === "paper" ? " data-paper" : ""}>${html}</body></html>`,
     [css, html, plain, tokens, surface, allowImages],
   );
 
@@ -276,7 +275,7 @@ export function MessageBody({ html, plain, surface = "theme", imagesAllowed }: M
       // Also on the element, because what a child document is told about `prefers-color-scheme` is
       // decided by whatever embeds it and not by its own root. pane.css is where that is written.
       data-surface={surface}
-      sandbox="allow-same-origin"
+      sandbox="allow-same-origin allow-scripts"
       srcDoc={srcdoc}
     />
     </>

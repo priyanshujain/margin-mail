@@ -65,7 +65,7 @@ test("a rename shows in the list and in the pane, with what it was", async ({ pa
   );
   await expect
     .poll(async () => (await rows(page)).find((row) => row.sender === "Arun Kulkarni")?.subject)
-    .toBe("Studio lease, clause 7");
+    .toBe("Draft · Studio lease, clause 7");
 
   // And the real subject is one press away again, because a name of your own is not a deletion.
   await page.locator(".thread-name").click();

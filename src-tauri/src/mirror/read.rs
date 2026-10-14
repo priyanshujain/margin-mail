@@ -132,11 +132,12 @@ fn place_clause(
         // to a thread whose sender belongs in the Feed stays in the Feed, because that is where
         // that thread is; it is only a thread nobody has decided about that a reply pulls in here.
         Place::Inbox => {
-            let mut routed = routing::rule_is(Destination::Inbox);
+            let mut routed = routing::rule_is(Destination::Inbox, "t.thread_key");
             if !routing::holds_replies(conn) {
                 routed = format!(
                     "({routed} OR (NOT {} AND {}))",
-                    routing::HAS_RULE, routing::IN_THREAD
+                    routing::has_rule("t.thread_key"),
+                    routing::IN_THREAD
                 );
             }
             format!(
@@ -185,7 +186,7 @@ fn place_clause(
             };
             format!(
                 "t.trashed = 0 AND t.spam = 0 AND {}{loose}",
-                routing::rule_is(destination)
+                routing::rule_is(destination, "t.thread_key")
             )
         }
         // The Screener is the absence of a decision rather than a decision, which is why it is not
@@ -195,7 +196,7 @@ fn place_clause(
         Place::Screener => {
             let mut clause = format!(
                 "t.trashed = 0 AND t.spam = 0 AND t.from_address <> '' AND NOT {}",
-                routing::HAS_RULE
+                routing::has_rule("t.thread_key")
             );
             if !routing::holds_replies(conn) {
                 clause.push_str(&format!(" AND NOT {}", routing::IN_THREAD));

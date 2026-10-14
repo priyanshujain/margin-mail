@@ -1,4 +1,4 @@
-render-version: 2
+render-version: 5
 message-id: 20260902152641.9F3A1@brandt-tischlerei.example
 in-reply-to: -
 references-first: -

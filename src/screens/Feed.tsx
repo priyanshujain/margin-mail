@@ -11,6 +11,7 @@ import { useMail } from "../store/useMail";
 import { displayName, isBrand, messageTime } from "./format";
 import { BodyMissing, BodySkeleton } from "./MessageBody";
 import * as triage from "./triage";
+import { useMove } from "../store/useMove";
 import "./feed.css";
 
 /**
@@ -97,10 +98,13 @@ export function Feed() {
           const thread = useMail.getState().threads.find((t) => t.key === key);
           if (thread) void useContacts.getState().unsubscribe(thread.accountId, thread.from.address);
         },
-        // Move and Save clip have bindings and buttons and no handler here yet. Rust has both
-        // commands; what is missing is the picker and the selection on this side. An unregistered
-        // command does nothing at all, which is what docs/keyboard.md asks for and better than a
-        // verb that half happens.
+        move: () => {
+          const key = useFeed.getState().focused;
+          if (key) useMove.getState().show([key]);
+        },
+        // Save clip has a binding and a button and no handler here yet. Rust has the command;
+        // what is missing is the selection on this side. An unregistered command does nothing at
+        // all, which is what docs/keyboard.md asks for and better than a verb that half happens.
       }),
     [keys, step, toggle],
   );
@@ -317,7 +321,7 @@ function Card({ thread, view, focused, onFocus, onToggle, hold }: CardProps) {
         >
           Unsubscribe
         </Button>
-        <Button variant="ghost" keycap={keycapOf("move")} onClick={() => runCommand("move")}>
+        <Button variant="ghost" keycap={keycapOf("move")} onClick={() => useMove.getState().show([thread.key])}>
           Move
         </Button>
       </div>

@@ -69,7 +69,7 @@ test("l takes the thread out of the Inbox and puts it on the pile, and l again b
   // And it is really in the place behind the pile, at the top of it.
   await page.keyboard.press("4");
   await expect(page.locator(".list-title")).toHaveText("Reply later");
-  await expect.poll(async () => (await rows(page))[0]?.subject).toBe("Dinner on Thursday?");
+  await expect.poll(async () => (await rows(page))[0]?.subject).toBe("Draft · Dinner on Thursday?");
 
   await focusRow(page, "Maya Raghunathan");
   await page.keyboard.press("l");

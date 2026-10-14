@@ -1,4 +1,4 @@
-render-version: 2
+render-version: 5
 message-id: ll-2026-08-30@ledgerlines.example
 in-reply-to: -
 references-first: -

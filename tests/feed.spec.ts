@@ -214,7 +214,7 @@ test("the banner says images come through Margin and counts what was stripped to
   await openApp(page, { now: MIDDAY() });
   await openFeed(page);
 
-  const banner = page.locator(".feed .banner");
+  const banner = page.locator(".feed .banner").filter({ hasText: "Images are loaded through Margin" });
   await expect(banner).toContainText("Images are loaded through Margin, never from the sender.");
   // One card carries a tracker and it arrived today, so that is what the count is.
   await expect(banner).toContainText("Trackers stripped from 1 item today.");

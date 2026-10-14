@@ -170,7 +170,7 @@ function PaneBar({ notify }: { notify: boolean }) {
       </Sheet>
       <span className="pane-gap" />
       {place === "paper-trail" ? (
-        <Verb command="move" label="Move to Inbox" icon={icons.INBOX} />
+        <Verb command="move" label="Move to" icon={icons.INBOX} />
       ) : null}
       {notify ? <Verb command="notify" label="Notify" icon={icons.BELL} /> : null}
       <Verb command="archive" label="Archive" icon={icons.ARCHIVE} />

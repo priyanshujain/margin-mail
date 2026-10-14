@@ -8,6 +8,8 @@
  * missing in dark. */
 
 :root {
+  --proof-spelling: #c96c62;
+  --proof-grammar: #699cc6;
   /* The fully round radius the family's three do not cover: pills, chips and the phone's write
      button. */
   --r-pill: 999px;

@@ -1,5 +1,8 @@
 # Releasing
 
+Mac App Store preparation, signing and submission inputs are in
+[appstore.md](appstore.md).
+
 ## Installing locally
 
 `just install` builds the app for whatever machine you are sitting at and puts it where that

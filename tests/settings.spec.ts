@@ -609,9 +609,9 @@ test("an export says it is writing and cannot be pressed twice", async ({ page }
 
   const mbox = page.getByRole("button", { name: "Export pj@73ai.org as mbox" });
   const other = page.getByRole("button", { name: "Export priyanshujain@gmail.com as mbox" });
-  const state = page.locator(".set-stack", { hasText: "App state" }).getByRole("button");
-  const exporting = state.first();
-  const importing = state.nth(1);
+  const state = page.locator(".set-stack", { hasText: "App state" });
+  const exporting = state.locator("button").first();
+  const importing = state.locator("button").nth(1);
 
   await mbox.click();
   await expect(section).toHaveAttribute("data-phase", "exporting");
@@ -632,15 +632,19 @@ test("an export says it is writing and cannot be pressed twice", async ({ page }
   await expect(mbox).toBeDisabled();
   await expect(exporting).toHaveText("Export");
 
-  const path = page.getByLabel("App state file to import");
-  await path.fill("/Users/you/Downloads/margin-mail-state.json");
+  const file = page.getByLabel("App state file to import");
+  await file.setInputFiles({
+    name: "margin-mail-state.json",
+    mimeType: "application/json",
+    buffer: Buffer.from('{"kind":"margin-mail-state","accounts":{}}'),
+  });
   await importing.click();
   await expect(section).toHaveAttribute("data-phase", "importing");
   await expect(importing).toHaveText("Importing");
   await expect(importing).toBeDisabled();
   await expect(section).toHaveAttribute("data-phase", "idle");
   await expect(importing).toHaveText("Import");
-  await expect(path).toHaveValue("");
+  await expect(file).toHaveValue("");
   await expect(page.locator(".toast-text")).toContainText("was imported");
 });
 

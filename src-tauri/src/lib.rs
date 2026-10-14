@@ -23,6 +23,7 @@ pub mod log;
 pub mod mime;
 pub mod mirror;
 pub mod notify;
+pub mod moves;
 pub mod piles;
 pub mod provider;
 pub mod proofing;
@@ -234,6 +235,38 @@ fn packaged_by() -> Option<String> {
         .filter(|manager| !manager.is_empty())
 }
 
+fn has_appstore_receipt() -> bool {
+    #[cfg(target_os = "macos")]
+    {
+        std::env::current_exe()
+            .ok()
+            .and_then(|path| path.parent()?.parent().map(|contents| contents.join("_MASReceipt/receipt")))
+            .is_some_and(|path| path.is_file())
+    }
+    #[cfg(not(target_os = "macos"))]
+    {
+        false
+    }
+}
+
+#[tauri::command]
+fn update_channel(app: tauri::AppHandle) -> &'static str {
+    let plugins = &app.config().plugins.0;
+    if has_appstore_receipt() || plugins.contains_key("appstore") {
+        "appstore"
+    } else if plugins.get("updater").is_some_and(|value| !value.is_null()) {
+        "direct"
+    } else {
+        "none"
+    }
+}
+
+#[tauri::command]
+fn open_appstore_updates() -> Result<(), String> {
+    tauri_plugin_opener::open_url("macappstore://showUpdatesPage", None::<&str>)
+        .map_err(|error| error.to_string())
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 /// Hands the engine the mailbox behind an account. The engine only ever speaks through the trait,
 /// so this is the single place in the app that decides the mailbox behind an account is Gmail
@@ -296,7 +329,10 @@ pub fn run() {
     #[cfg(desktop)]
     {
         builder = builder.plugin(tauri_plugin_process::init());
-        if context.config().plugins.0.contains_key("updater") {
+        if context.config().plugins.0.get("updater").is_some_and(|value| !value.is_null())
+            && !context.config().plugins.0.contains_key("appstore")
+            && !has_appstore_receipt()
+        {
             builder = builder.plugin(tauri_plugin_updater::Builder::new().build());
         }
     }
@@ -402,6 +438,8 @@ pub fn run() {
             // Accounts and consent
             accounts::accounts_list,
             account_start,
+            update_channel,
+            open_appstore_updates,
             log::log_note,
             accounts::account_set_color,
             accounts::account_set_name,
@@ -442,6 +480,7 @@ pub fn run() {
             screener::screener_seed,
             // The piles and their friends
             piles::pile_toggle,
+            moves::thread_move,
             snooze::snooze_set,
             snooze::snooze_clear,
             snooze::snooze_evaluate,

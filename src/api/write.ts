@@ -8,8 +8,8 @@ import {
   type Undo,
 } from "../ipc";
 
-export const draftAttachmentStore = (accountId: string, file: DraftAttachment, dataBase64: string) =>
-  call<DraftAttachment>("draft_attachment_store", { accountId, filename: file.filename, mimeType: file.mimeType, dataBase64 });
+export const draftAttachmentStore = (accountId: string, file: DraftAttachment, dataBase64?: string) =>
+  call<DraftAttachment>("draft_attachment_store", { accountId, filename: file.filename, mimeType: file.mimeType, dataBase64, path: file.path });
 
 /** Saves locally on every keystroke's debounce and to the provider every few seconds. */
 export const draftSave = (draft: Draft) => call<DraftSaved>("draft_save", { draft });

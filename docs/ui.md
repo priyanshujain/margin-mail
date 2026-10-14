@@ -223,7 +223,7 @@ were stripped today.
 The list column and the pane, with This week and Earlier as the only groups and no dots. A
 bundled sender shows a count between its name and the time. Transactional mail renders in the
 interface face rather than the text face, because it is data rather than prose. The pane bar
-adds Move to Inbox.
+adds Move to.
 
 ## Focus & Reply
 

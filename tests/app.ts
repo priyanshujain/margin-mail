@@ -146,6 +146,7 @@ export function rows(page: Page): Promise<RowInfo[]> {
         group = text(el.querySelector(".group-head-label") ?? el);
         continue;
       }
+      if (el.closest(".list-item")?.hasAttribute("data-rule")) group = "";
       const rect = el.getBoundingClientRect();
       out.push({
         sender: text(el.querySelector(".row-sender")),

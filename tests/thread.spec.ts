@@ -200,7 +200,7 @@ test("the tracker banner names the vendor", async ({ page }) => {
   await expect(banner).toContainText("Blocked");
   await expect(banner).toContainText("1 tracker");
   await expect(banner).toContainText("HubSpot");
-  await expect(banner).toContainText("Remote images are off for this sender");
+  await expect(banner).toContainText("Remote images are off for this email");
   await expect(banner.locator(".banner-action")).toHaveText("Show images");
 });
 
@@ -313,6 +313,7 @@ test("More drops the rest of the thread's verbs, from the button and from .", as
     /^Add a note/,
     /^Contact card/,
     /^Label/,
+    /^Move to…/,
     /^Trash/,
     /^Mark as spam/,
   ]);
@@ -350,8 +351,8 @@ test("Paper Trail groups by week and reads in the interface face", async ({ page
   await openRow(page, 1);
 
   await expect(page.locator(".thread-subject")).toHaveText("Bill payment pending");
-  // The pane bar carries Move to Inbox in this place and nowhere else.
-  await expect(page.locator(".pane-bar")).toContainText("Move to Inbox");
+  // The pane bar carries Move to in this place and nowhere else.
+  await expect(page.locator(".pane-bar")).toContainText("Move to");
   await bodyReady(page);
   expect(
     await page.locator(".msg-frame").last().evaluate((el) => {

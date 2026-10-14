@@ -150,7 +150,7 @@ test("choosing one takes the thread out of the list, and 7 shows it with its ret
   for (const row of await rows(page)) expect(row.time).toMatch(/\d\d:\d\d$/);
 });
 
-test("a thread that is late says so, and comes back into Back above New for you", async ({
+test("a thread that is late says so, and comes back into Back above the Inbox list", async ({
   page,
 }) => {
   await openApp(page, { now: MIDDAY() });
@@ -180,7 +180,7 @@ test("a thread that is late says so, and comes back into Back above New for you"
     .poll(async () => (await rows(page)).find((row) => row.sender === "Maya Raghunathan")?.group)
     .toBe("Back");
   const groups = (await rows(page)).map((row) => row.group);
-  expect(groups.indexOf("Back")).toBeLessThan(groups.indexOf("New for you"));
+  expect(groups.indexOf("Back")).toBeLessThan(groups.indexOf(""));
 });
 
 test("the picker acts on a selection, and Escape leaves it alone", async ({ page }) => {

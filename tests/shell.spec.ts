@@ -44,7 +44,7 @@ test("a row carries sender and time over subject and snippet", async ({ page }) 
 
   const maya = (await rows(page)).find((row) => row.sender === "Maya Raghunathan");
   expect(maya).toBeTruthy();
-  expect(maya!.subject).toBe("Dinner on Thursday?");
+  expect(maya!.subject).toBe("Draft · Dinner on Thursday?");
   expect(maya!.snippet).toContain("Church Street");
   expect(maya!.time).toBe("11:42");
   // More than one message in the thread, so the count sits between the sender and the time.
@@ -68,23 +68,22 @@ test("a row carries sender and time over subject and snippet", async ({ page }) 
   expect(lines.subjectTop).toBeGreaterThan(lines.senderTop);
 });
 
-test("the Inbox puts New for you above Previously seen, and only new mail has the dot", async ({
+test("the Inbox keeps one list, and only new mail has the dot", async ({
   page,
 }) => {
   await openApp(page, { now: MIDDAY() });
   await listReady(page);
 
   const heads = await groups(page);
-  expect(heads).toContain("New for you");
-  expect(heads).toContain("Previously seen");
-  expect(heads.indexOf("New for you")).toBeLessThan(heads.indexOf("Previously seen"));
+  expect(heads).not.toContain("New for you");
+  expect(heads).not.toContain("Previously seen");
 
   const list = await rows(page);
   const arun = list.find((row) => row.sender === "Arun Kulkarni")!;
   const lena = list.find((row) => row.sender === "Lena Brandt")!;
-  expect(arun.group).toBe("New for you");
+  expect(arun.group).toBe("");
   expect(arun.unseen).toBe(true);
-  expect(lena.group).toBe("Previously seen");
+  expect(lena.group).toBe("");
   expect(lena.unseen).toBe(false);
   // A note on a thread is one line under its row, on the note surface.
   expect(lena.note).toBe("Ask about the oak finish before confirming");

@@ -81,6 +81,7 @@ export type CommandId =
   | "contact-card"
   | "label"
   | "move"
+  | "move-label"
   | "unsubscribe"
   | "select"
   | "select-extend-down"
@@ -241,6 +242,7 @@ export const BINDINGS: readonly Binding[] = [
   { keys: ["i"], command: "contact-card", label: "Contact card", context: "view", group: "Triage" },
   { keys: ["shift+l"], command: "label", label: "Label", context: "view", group: "Triage" },
   { keys: ["v"], command: "move", label: "Move to Inbox, Feed or Paper Trail", context: "view", group: "Triage" },
+  { keys: [], command: "move-label", label: "Move to a label", context: "view", group: "Triage" },
   { keys: ["cmd+u"], command: "unsubscribe", label: "Unsubscribe", context: "view", group: "Triage" },
   { keys: ["x"], command: "select", label: "Select this thread", context: "view", group: "Triage" },
   { keys: ["shift+j"], command: "select-extend-down", label: "Extend the selection down", context: "view", group: "Triage" },

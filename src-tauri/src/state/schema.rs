@@ -8,11 +8,12 @@
 
 use rusqlite::{Connection, OptionalExtension};
 
-pub const VERSION: i32 = 1;
+pub const VERSION: i32 = 2;
 
 const VERSION_KEY: &str = "schema_version";
 
-const V1: &str = include_str!("state.sql");
+// Every statement in it is `IF NOT EXISTS`, so each version runs the whole file and gains its new tables.
+const SCHEMA: &str = include_str!("state.sql");
 
 pub fn migrate(conn: &Connection) -> Result<(), String> {
     conn.execute_batch(
@@ -32,9 +33,7 @@ pub fn migrate(conn: &Connection) -> Result<(), String> {
 
     conn.execute_batch("BEGIN;").map_err(|e| e.to_string())?;
     let stepped = (|| -> Result<(), String> {
-        if found < 1 {
-            conn.execute_batch(V1).map_err(|e| e.to_string())?;
-        }
+        conn.execute_batch(SCHEMA).map_err(|e| e.to_string())?;
         conn.execute(
             "INSERT INTO state.meta (key, value) VALUES (?1, ?2)
              ON CONFLICT(key) DO UPDATE SET value = excluded.value",

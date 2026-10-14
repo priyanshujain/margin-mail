@@ -1,4 +1,4 @@
-render-version: 2
+render-version: 5
 message-id: rcpt-2026-09-01-8812@bramblecoffee.example
 in-reply-to: -
 references-first: -

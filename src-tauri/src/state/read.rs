@@ -151,6 +151,19 @@ pub fn rules(conn: &Connection, account_id: &str) -> Result<Vec<SenderRule>, Str
 // Piles and snoozes
 // ---------------------------------------------------------------------------------------------
 
+/// The place a thread was moved to by hand, if it was.
+pub fn thread_place(conn: &Connection, thread_key: &str) -> Result<Option<Destination>, String> {
+    let held: Option<String> = conn
+        .query_row(
+            "SELECT destination FROM state.thread_places WHERE thread_key = ?1",
+            [thread_key],
+            |row| row.get(0),
+        )
+        .optional()
+        .map_err(|e| e.to_string())?;
+    Ok(held.as_deref().and_then(destination_named))
+}
+
 pub fn pile_of(conn: &Connection, thread_key: &str) -> Result<Option<Pile>, String> {
     let held: Option<String> = conn
         .query_row(

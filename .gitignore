@@ -19,6 +19,7 @@ dist-ssr
 # Tauri build output
 src-tauri/target/
 src-tauri/gen/schemas/
+/target-mas/
 
 # Xcode build output. The project under src-tauri/gen/apple is generated but committed, the
 # products of building it are not.
@@ -39,3 +40,6 @@ xcuserdata/
 
 # The Kit page and screen screenshots the UI suite writes for review by eye
 /screenshots/
+
+scripts/*
+.env

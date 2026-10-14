@@ -100,11 +100,12 @@ test("an address nobody suggested becomes a chip on a comma", async ({ page }) =
   ).toContainText("nobody@elsewhere.test");
 });
 
-test("Escape leaves the draft alone, and c brings it back", async ({ page }) => {
+test("Escape offers to save the draft, and c brings it back", async ({ page }) => {
   await openInbox(page);
   await writeOne(page);
 
   await page.keyboard.press("Escape");
+  await page.getByRole("button", { name: "Save draft and close" }).click();
   await expect(page.locator(".compose")).toHaveCount(0);
 
   await page.keyboard.press("c");
@@ -237,6 +238,7 @@ test("a reply box that was closed comes back with what was in it", async ({ page
   await page.locator(".reply .editor-body").click();
   await page.keyboard.type("Thursday afternoon suits me.");
   await page.locator(".reply-close").click();
+  await page.getByRole("button", { name: "Save draft and close" }).click();
   await expect(page.locator(".reply")).toHaveCount(0);
 
   await page.keyboard.press("r");
