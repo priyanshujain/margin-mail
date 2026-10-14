@@ -109,6 +109,11 @@ async function act(
   const before = rowsOf(keys);
   const taken = going ? mail.take(keys) : [];
   if (!going) mail.patch(keys, changes);
+  if (taken.length > 0 && mail.openKey && keys.includes(mail.openKey)) {
+    const next = useMail.getState().focused;
+    if (next && !keys.includes(next)) void useMail.getState().open(next);
+    else useMail.getState().close();
+  }
   // A bulk action consumes the selection it acted on: the rows are gone and a checkbox over
   // nothing is a state you have to press Escape to get out of.
   if (going) useSelection.getState().clear();
