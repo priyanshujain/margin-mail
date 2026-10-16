@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { applyTheme, initialTheme, type Theme } from "../theme";
+import { applyTheme, hasThemeChoice, initialTheme, syncWindowTheme, type Theme } from "../theme";
 
 interface ThemeState {
   theme: Theme;
@@ -7,8 +7,11 @@ interface ThemeState {
   toggle: () => void;
 }
 
+const startTheme = initialTheme();
+syncWindowTheme(hasThemeChoice() ? startTheme : null);
+
 export const useTheme = create<ThemeState>((set, get) => ({
-  theme: initialTheme(),
+  theme: startTheme,
   set: (theme) => {
     applyTheme(theme);
     set({ theme });

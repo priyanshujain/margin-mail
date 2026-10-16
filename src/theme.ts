@@ -3,6 +3,9 @@
 // applied the stored value before React mounts, which is why the attribute is read first here:
 // the DOM is the answer, and localStorage is only the fallback.
 
+import { getCurrentWindow } from "@tauri-apps/api/window";
+import { isDesktop } from "./ipc";
+
 export type Theme = "light" | "dark";
 
 const KEY = "marginmail-theme";
@@ -18,4 +21,25 @@ export function initialTheme(): Theme {
 export function applyTheme(theme: Theme) {
   document.documentElement.setAttribute("data-theme", theme);
   localStorage.setItem(KEY, theme);
+  syncWindowTheme(theme);
+}
+
+export function syncWindowTheme(theme: Theme | null) {
+  if (isDesktop) getCurrentWindow().setTheme(theme).catch(() => {});
+}
+
+export function hasThemeChoice(): boolean {
+  return localStorage.getItem(KEY) !== null;
+}
+
+export async function followSystemTheme(): Promise<Theme> {
+  localStorage.removeItem(KEY);
+  let theme: Theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  if (isDesktop) {
+    const win = getCurrentWindow();
+    await win.setTheme(null).catch(() => {});
+    theme = (await win.theme().catch(() => null)) ?? theme;
+  }
+  document.documentElement.setAttribute("data-theme", theme);
+  return theme;
 }

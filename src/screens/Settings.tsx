@@ -34,7 +34,8 @@ import {
   packagedBy,
 } from "../api/settings";
 import { threadsList } from "../api/threads";
-import { applyFonts, applyTextSize, forgetThemeChoice, systemTheme } from "../appearance";
+import { applyFonts, applyTextSize } from "../appearance";
+import { followSystemTheme } from "../theme";
 import { useEscapeLayer } from "../escape";
 import { registerCommands } from "../keys/commands";
 import {
@@ -787,8 +788,8 @@ function AppearanceSection() {
   if (!settings) return <h2 className="settings-title">Appearance</h2>;
 
   const setTheme = (choice: string) => {
-    useTheme.getState().set(choice === "system" ? systemTheme() : (choice as "light" | "dark"));
-    if (choice === "system") forgetThemeChoice();
+    if (choice === "system") void followSystemTheme().then((theme) => useTheme.setState({ theme }));
+    else useTheme.getState().set(choice as "light" | "dark");
     void save({ theme: choice as SettingsDto["theme"] });
   };
 
